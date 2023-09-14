@@ -1,6 +1,5 @@
 
-#ifndef HELLO_HPP
-# define HELLO_HPP
+#pragma once
 
 # include <iostream>
 
@@ -12,5 +11,3 @@ class	Hello
 
 		void	helloWorld(void) const;
 };
-
-#endif

@@ -1,8 +1,5 @@
 
-#ifndef INCLUDE_HPP
-# define INCLUDE_HPP
+#pragma once
 
 # include <iostream>
 # include "hello/Hello.hpp"
-
-#endif
