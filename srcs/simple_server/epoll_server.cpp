@@ -137,7 +137,7 @@ int	main()
 					}
 					else
 					{
-						std::cout << "Data: " << buf << std::endl;
+						std::cout << buf;
 						send(events[i].data.fd, buf, n + 1, 0);
 					}
 				}
