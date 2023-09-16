@@ -86,7 +86,7 @@ int	main()
 	epoll_ctl_add(epfd, listen_sock, EPOLLIN | EPOLLOUT | EPOLLET);
 
 	std::cout << "Setting variables for future use" << std::endl;
-	int	ready_fds; // Number of fds that are ready to be used by epoll
+	int	nfds; // Number of fds that are ready to be used by epoll
 	struct epoll_event	events[MAX_EVENTS]; // Events that must be treated
 	int	i; // Avoid creating variable multiple time
 	int	conn_sock; // Store new connection socket
@@ -99,13 +99,13 @@ int	main()
 	std::cout << "Listening to connections" << std::endl;
 	for (;;)
 	{
-		ready_fds = epoll_wait(epfd, events, MAX_EVENTS, -1);
-		if (ready_fds == -1)
+		nfds = epoll_wait(epfd, events, MAX_EVENTS, -1);
+		if (nfds == -1)
 		{
 			perror("epoll_wait");
 			return (1);
 		}
-		for (i = 0; i < ready_fds; i++)
+		for (i = 0; i < nfds; i++)
 		{
 			if (events[i].data.fd == listen_sock)
 			{
@@ -130,7 +130,7 @@ int	main()
 				for (;;)
 				{
 					bzero(buf, sizeof(buf) - 1);
-					n = recv(events[i].data.fd, buf, sizeof(buf) - 1, 0);
+					n = recv(events[i].data.fd, buf, sizeof(buf) - 1, MSG_DONTWAIT);
 					if (n <= 0)
 					{
 						break;
