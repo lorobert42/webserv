@@ -1,8 +1,7 @@
 
 NAME		=	webserv
 
-SRCS		= srcs/main.cpp \
-					srcs/hello/Hello.cpp \
+SRCS		= srcs/simple_server/epoll_server.cpp
 
 OBJS		= $(SRCS:.cpp=.o)
 
@@ -31,5 +30,12 @@ re:			fclean all
 
 .cpp.o:
 			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o)
+
+docker-start:
+			docker build -t webserv .
+			docker run -it --rm -p 8080:8080 --name=webserv webserv /bin/bash
+
+docker-stop:
+			docker stop webserv
 
 .PHONY:		all clean fclean re
