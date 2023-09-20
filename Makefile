@@ -1,7 +1,8 @@
 
 NAME		=	webserv
 
-SRCS		= srcs/simple_server/epoll_server.cpp
+SRCS		=	srcs/simple_server/main.cpp \
+				srcs/simple_server/Server.cpp
 
 OBJS		= $(SRCS:.cpp=.o)
 
