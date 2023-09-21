@@ -6,11 +6,13 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/09/20 15:15:26 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/09/21 16:39:04 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include <sys/epoll.h>
+#include <sys/socket.h>
 
 int Server::setup()
 {
@@ -47,6 +49,19 @@ static int	epoll_ctl_add(int epfd, int fd, uint32_t events)
 	if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1)
 	{
 		std::cerr << "Unable to add socket to epoll: " << strerror(errno) << std::endl;
+		return (-1);
+	}
+	return (0);
+}
+
+static int	epoll_ctl_mod(int epfd, int fd, uint32_t events)
+{
+	struct epoll_event	ev;
+	ev.events = events;
+	ev.data.fd = fd;
+	if (epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev) == -1)
+	{
+		std::cerr << "Unable to modify epoll: " << strerror(errno) << std::endl;
 		return (-1);
 	}
 	return (0);
@@ -102,15 +117,18 @@ int Server::run()
 			}
 			else if (events[n].events & EPOLLIN)
 			{
+				std::cout << "Receiving data on fd: " << events[n].data.fd << std::endl;
 				if (read_handler(events[n].data.fd) == 0)
 				{
-					struct epoll_event newevent;
-					newevent.events = EPOLLOUT | EPOLLET;
-					epoll_ctl(epfd, EPOLL_CTL_MOD, events[n].data.fd, &newevent);
+					if (epoll_ctl_mod(epfd, events[n].data.fd, EPOLLOUT | EPOLLET) == -1)
+					{
+						return (-1);
+					}
 				}
 			}
 			else if (events[n].events & EPOLLOUT)
 			{
+				std::cout << "Sending data on fd: " << events[n].data.fd << std::endl;
 				write_handler(events[n].data.fd);
 				int fd = events[n].data.fd;
 				epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
@@ -155,8 +173,8 @@ int Server::read_handler(int fd)
 
 int Server::write_handler(int fd)
 {
-	(void)fd;
 	std::cout << "Write handler" << std::endl;
+	send(fd, "Hello\n", 7, 0);
 	return (0);
 }
 
