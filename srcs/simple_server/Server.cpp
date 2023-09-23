@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 
 #include "Server.hpp"
-#include <sys/epoll.h>
-#include <sys/socket.h>
 
 int Server::setup()
 {
@@ -65,6 +63,16 @@ static int	epoll_ctl_mod(int epfd, int fd, uint32_t events)
 		return (-1);
 	}
 	return (0);
+}
+
+static int  epoll_ctl_del(int epfd, int fd)
+{
+  if (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL) == -1)
+  {
+    std::cerr << "Unable to delete client socket: " << strerror(errno) << std::endl;
+    return (-1);
+  }
+  return (0);
 }
 
 int Server::run()
@@ -145,7 +153,7 @@ int Server::run()
 int Server::read_handler(int fd)
 {
 	char buffer[BUFFER_SIZE] = {0};
-	
+
 	int read = recv(fd, buffer, BUFFER_SIZE, MSG_DONTWAIT);
 	if (read <= 0)
 	{

@@ -23,7 +23,7 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
-#define MAX_EVENTS 1024
+#define MAX_EVENTS 10050
 #define BUFFER_SIZE 1024
 
 class Server {
@@ -35,7 +35,7 @@ class Server {
 		std::map<int, std::string>	_requests;
 
 		Server();
-	
+
 	public:
 		int setup();
 		int run();
