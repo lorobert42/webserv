@@ -38,7 +38,7 @@ static void	epoll_ctl_add(int epfd, int fd, uint32_t events)
 
 int	main()
 {
-	std::cout << "Creating server socket" << std::endl;
+	std::cout << "1) Creating server socket" << std::endl;
 	int	listen_sock = socket(AF_INET, SOCK_STREAM | SOCK_NONBLOCK, 0);
 	if (listen_sock == -1)
 	{
@@ -46,14 +46,14 @@ int	main()
 		return (1);
 	}
 
-	std::cout << "Configure the listen address:port as 0.0.0.0:8080" << std::endl;
+	std::cout << "2) Configure the listen address:port as 0.0.0.0:8080" << std::endl;
 	struct sockaddr_in	srv_addr;
 	bzero((char *)&srv_addr, sizeof(struct sockaddr_in));
 	srv_addr.sin_family = AF_INET;
 	srv_addr.sin_addr.s_addr = INADDR_ANY;
 	srv_addr.sin_port = htons(PORT);
 
-	std::cout << "Binding socket to address" << std::endl;
+	std::cout << "3) Binding socket to address" << std::endl;
 	if (bind(listen_sock, (struct sockaddr *)&srv_addr, sizeof(srv_addr)) == -1)
 	{
 		perror("Binding socket");
@@ -67,14 +67,14 @@ int	main()
 		return (1);
 	} */
 
-	std::cout << "Make the socket listen" << std::endl;
+	std::cout << "4) Make the socket listen" << std::endl;
 	if (listen(listen_sock, SOMAXCONN) == -1)
 	{
 		perror("Listening");
 		return (1);
 	}
 
-	std::cout << "Create the epoll structure" << std::endl;
+	std::cout << "5) Create the epoll structure" << std::endl;
 	int	epfd = epoll_create(1);
 	if (epfd == -1)
 	{
@@ -82,10 +82,10 @@ int	main()
 		return (1);
 	}
 
-	std::cout << "Add socket to epoll" << std::endl;
+	std::cout << "6) Add socket to epoll" << std::endl;
 	epoll_ctl_add(epfd, listen_sock, EPOLLIN | EPOLLOUT | EPOLLET);
 
-	std::cout << "Setting variables for future use" << std::endl;
+	std::cout << "7) Setting variables for future use" << std::endl;
 	int	nfds; // Number of fds that are ready to be used by epoll
 	struct epoll_event	events[MAX_EVENTS]; // Events that must be treated
 	int	i; // Avoid creating variable multiple time
@@ -96,7 +96,8 @@ int	main()
 	int		n;	// To store number of read bytes
 
 
-	std::cout << "Listening to connections" << std::endl;
+	std::cout << "8) Listening to connections" << std::endl;
+	std::cout << std::endl;
 	for (;;)
 	{
 		nfds = epoll_wait(epfd, events, MAX_EVENTS, -1);
@@ -154,5 +155,6 @@ int	main()
 				continue;
 			}
 		}
+		std::cout << "###" << std::endl;
 	}
 }

@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:19:14 by lorobert          #+#    #+#             */
-/*   Updated: 2023/09/20 14:51:26 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/09/26 13:52:59 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,27 +23,28 @@
 #include <sys/epoll.h>
 #include <unistd.h>
 
-#define MAX_EVENTS 10050
-#define BUFFER_SIZE 1024
+#define D_MAX_EVENTS 10050
+#define D_BUFFER_SIZE 1024
 
 class Server {
-	private:
-		unsigned int				_host;
-		int							_port;
-		int							_socket;
-		struct sockaddr_in			_addr;
-		std::map<int, std::string>	_requests;
-
-		Server();
 
 	public:
-		int setup();
-		int run();
-		int read_handler(int fd);
-		int write_handler(int fd);
+		bool	setup();
+		bool	run();
+		int		readHandler(int fd);
+		int		writeHandler(int fd);
 
 		Server(unsigned int host, int port);
 		Server(Server const& other);
 		~Server();
 		Server& operator=(Server const& other);
+
+	private:
+		Server();
+
+		unsigned int				_host;
+		int							_port;
+		int							_socket;
+		struct sockaddr_in			_addr;
+		std::map<int, std::string>	_requests;
 };

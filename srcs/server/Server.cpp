@@ -6,13 +6,55 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/09/21 16:39:04 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/09/26 13:53:50 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
 
-int Server::setup()
+// ### Constructor ###
+Server::Server()
+{}
+
+Server::Server(unsigned int host, int port)
+{
+	_host = host;
+	_port = port;
+	_socket = -1;
+	// Fill the _addr structure with host and port
+	std::cout << "Configure the listen address: [port]" << std::endl;
+	std::memset((char *)&_addr, 0, sizeof(struct sockaddr_in));
+	_addr.sin_family = AF_INET;
+	_addr.sin_addr.s_addr = htonl(_host);
+	_addr.sin_port = htons(_port);
+}
+
+// ### Copy Constructor ###
+Server::Server(Server const& other) :
+	_host(other._host),
+	_port(other._port),
+	_socket(other._socket),
+	_addr(other._addr)
+{}
+
+// ### Destructor ###
+Server::~Server()
+{}
+
+// ### Overload operator ###
+Server& Server::operator=(Server const& other)
+{
+	if (this == &other)
+		return (*this);
+	_host = other._host;
+	_port = other._port;
+	_socket = other._socket;
+	_addr = other._addr;
+	return (*this);
+}
+
+// ### Member Function ###
+bool Server::setup()
 {
 	// Create socket in non-blocking mode for an IP address
 	std::cout << "Creating server socket" << std::endl;
@@ -20,26 +62,26 @@ int Server::setup()
 	if (_socket == -1)
 	{
 		std::cerr << "Socket creation error: " << strerror(errno) << std::endl;
-		return (-1);
+		return (false);
 	}
 	// Bind the socket to IP address and port defined in _addr
 	std::cout << "Binding socket to address" << std::endl;
 	if (bind(_socket, (struct sockaddr *)&_addr, sizeof(_addr)) == -1)
 	{
 		std::cerr << "Socket binding error: " << strerror(errno) << std::endl;
-		return (-1);
+		return (false);
 	}
 	// Listen to incoming connections
 	std::cout << "Make the socket listen" << std::endl;
 	if (listen(_socket, SOMAXCONN) == -1)
 	{
 		std::cerr << "Socket listen error: " << strerror(errno) << std::endl;
-		return (-1);
+		return (false);
 	}
-	return (0);
+	return (true);
 }
 
-static int	epoll_ctl_add(int epfd, int fd, uint32_t events)
+static bool	epollCtlAdd(int epfd, int fd, uint32_t events)
 {
 	struct epoll_event	ev;
 	ev.events = events;
@@ -47,12 +89,12 @@ static int	epoll_ctl_add(int epfd, int fd, uint32_t events)
 	if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1)
 	{
 		std::cerr << "Unable to add socket to epoll: " << strerror(errno) << std::endl;
-		return (-1);
+		return (false);
 	}
-	return (0);
+	return (true);
 }
 
-static int	epoll_ctl_mod(int epfd, int fd, uint32_t events)
+static bool	epollCtlMod(int epfd, int fd, uint32_t events)
 {
 	struct epoll_event	ev;
 	ev.events = events;
@@ -60,12 +102,13 @@ static int	epoll_ctl_mod(int epfd, int fd, uint32_t events)
 	if (epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev) == -1)
 	{
 		std::cerr << "Unable to modify epoll: " << strerror(errno) << std::endl;
-		return (-1);
+		return (false);
 	}
-	return (0);
+	return (true);
 }
 
-static int  epoll_ctl_del(int epfd, int fd)
+/*
+static int  epollCtlDel(int epfd, int fd)
 {
   if (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL) == -1)
   {
@@ -73,38 +116,36 @@ static int  epoll_ctl_del(int epfd, int fd)
     return (-1);
   }
   return (0);
-}
+}*/
 
-int Server::run()
+bool Server::run()
 {
 	std::cout << "Create the epoll structure" << std::endl;
 	int	epfd = epoll_create(1);
 	if (epfd == -1)
 	{
 		std::cerr << "Epoll creation error: " << strerror(errno) << std::endl;
-		return (-1);
+		return (false);
 	}
 	std::cout << "Add socket to epoll" << std::endl;
-	if (epoll_ctl_add(epfd, _socket, EPOLLIN) == -1)
-	{
-		return (-1);
-	}
+	if (!epollCtlAdd(epfd, _socket, EPOLLIN))
+		return (false);
 
 	int nfds;
 	int client_socket;
 	struct sockaddr_in client_addr;
 	socklen_t client_len = sizeof(client_addr);
-	struct epoll_event events[MAX_EVENTS];
+	struct epoll_event events[D_MAX_EVENTS];
 	int n;
 
 	std::cout << "Listening to connections" << std::endl;
 	for (;;)
 	{
-		nfds = epoll_wait(epfd, events, MAX_EVENTS, -1);
+		nfds = epoll_wait(epfd, events, D_MAX_EVENTS, -1);
 		if (nfds == -1)
 		{
 			std::cerr << "Epoll wait error: " << strerror(errno) << std::endl;
-			return (-1);
+			return (false);
 		}
 
 		for (n = 0; n < nfds; ++n)
@@ -116,57 +157,47 @@ int Server::run()
 				if (client_socket == -1)
 				{
 					std::cerr << "Cannot accept client connection: " << strerror(errno) << std::endl;
-					return (-1);
+					return (false);
 				}
-				if (epoll_ctl_add(epfd, client_socket, EPOLLIN | EPOLLET) == -1)
-				{
-					return (-1);
-				}
+				if (!epollCtlAdd(epfd, client_socket, EPOLLIN | EPOLLET))
+					return (false);
 			}
 			else if (events[n].events & EPOLLIN)
 			{
 				std::cout << "Receiving data on fd: " << events[n].data.fd << std::endl;
-				if (read_handler(events[n].data.fd) == 0)
+				if (readHandler(events[n].data.fd) == 0)
 				{
-					if (epoll_ctl_mod(epfd, events[n].data.fd, EPOLLOUT | EPOLLET) == -1)
-					{
-						return (-1);
-					}
+					if (!epollCtlMod(epfd, events[n].data.fd, EPOLLOUT | EPOLLET))
+						return (false);
 				}
 			}
 			else if (events[n].events & EPOLLOUT)
 			{
 				std::cout << "Sending data on fd: " << events[n].data.fd << std::endl;
-				write_handler(events[n].data.fd);
+				writeHandler(events[n].data.fd);
 				int fd = events[n].data.fd;
 				epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL);
 				close(fd);
 			}
 			else
-			{
 				std::cerr << "Unexpected event" << std::endl;
-			}
 		}
 	}
 }
 
-int Server::read_handler(int fd)
+int Server::readHandler(int fd)
 {
-	char buffer[BUFFER_SIZE] = {0};
+	char buffer[D_BUFFER_SIZE] = {0};
 
-	int read = recv(fd, buffer, BUFFER_SIZE, MSG_DONTWAIT);
+	int read = recv(fd, buffer, D_BUFFER_SIZE, MSG_DONTWAIT);
 	if (read <= 0)
 	{
 		close(fd);
 		_requests[fd].erase();
 		if (read == 0)
-		{
 			std::cout << "Connection closed by client" << std::endl;
-		}
 		else
-		{
 			std::cerr << "Read error" << std::endl;
-		}
 		return (-1);
 	}
 	_requests[fd] += std::string(buffer);
@@ -179,46 +210,9 @@ int Server::read_handler(int fd)
 	return (1);
 }
 
-int Server::write_handler(int fd)
+int Server::writeHandler(int fd)
 {
 	std::cout << "Write handler" << std::endl;
 	send(fd, "Hello\n", 7, 0);
 	return (0);
-}
-
-Server::Server()
-{}
-
-Server::Server(unsigned int host, int port)
-{
-	_host = host;
-	_port = port;
-	_socket = -1;
-	// Fill the _addr structure with host and port
-	std::cout << "Configure the listen address:port" << std::endl;
-	std::memset((char *)&_addr, 0, sizeof(struct sockaddr_in));
-	_addr.sin_family = AF_INET;
-	_addr.sin_addr.s_addr = htonl(_host);
-	_addr.sin_port = htons(_port);
-}
-
-Server::Server(Server const& other) :
-	_host(other._host),
-	_port(other._port),
-	_socket(other._socket),
-	_addr(other._addr)
-{}
-
-Server::~Server()
-{}
-
-Server& Server::operator=(Server const& other)
-{
-	if (this == &other)
-		return (*this);
-	_host = other._host;
-	_port = other._port;
-	_socket = other._socket;
-	_addr = other._addr;
-	return (*this);
 }
