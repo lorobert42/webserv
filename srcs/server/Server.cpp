@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/09/28 13:27:55 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/09/28 14:18:45 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,6 +208,10 @@ int Server::readHandler(int fd)
 	}
 	_requests[fd] += std::string(buffer);
 	std::cout << "Request until now:\n" << _requests[fd] << std::endl;
+	// Every line finish by a \r\n and the header and body are separated
+	// by a \r\n so the end of the header must be a \r\n for the last line
+	// and another \r\n so the separation of the header to the body
+	// must be \r\n\r\n
 	if (_requests[fd].rfind("\n\n") != std::string::npos || _requests[fd].rfind("\r\n\r\n") != std::string::npos)
 	{
 		std::cout << "End of request" << std::endl;
@@ -216,11 +220,29 @@ int Server::readHandler(int fd)
 	return (1);
 }
 
+static std::string	readHtmlFile(void)
+{
+	std::string		line;
+	std::string		all;
+	std::ifstream	ifs("index/index.html");
+
+	if (!ifs)
+	{
+		std::cout << "file cannot be read" << std::endl;
+		return (NULL);
+	}
+	while (std::getline(ifs, line))
+		all.append(line);
+	return (all);
+}
+
 int Server::writeHandler(int fd)
 {
 	std::cout << "Write handler" << std::endl;
+	// Need to change server_message by our own
 	std::string	server_message = "HTTP/1.1 200 OK\nContent-type: text/html\nContent-legth";
-	std::string response = "<html><h1>Hello, World!</h1></html>";
+	// Have to get the set the reponse by the html we need
+	std::string response = readHtmlFile();
 	server_message.append("\n\n");
 	server_message.append(response);
 	
