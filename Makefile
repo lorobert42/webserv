@@ -1,6 +1,6 @@
 
 NAME		= webserv
-NAME_TEST	= webserv
+NAME_TEST	= webserv_test
 
 SRCS		= srcs/main.cpp \
 			  srcs/server/Server.cpp
@@ -33,7 +33,7 @@ clean:
 			rm -rf $(OBJS) $(OBJS_TEST)
 	
 fclean:		clean
-			rm -rf $(NAME)
+			rm -rf $(NAME) $(NAME_TEST)
 
 re:			fclean all
 

@@ -114,7 +114,7 @@ int	main()
 				conn_sock = accept(listen_sock, (struct sockaddr *)&cli_addr, &socklen);
 				if (conn_sock == -1)
 				{
-					perror("Connecting wiith client");
+					perror("Connecting with client");
 					return (1);
 				}
 				std::cout << "Client address: " << inet_ntoa(cli_addr.sin_addr) << ":" << ntohs(cli_addr.sin_port) << std::endl;
