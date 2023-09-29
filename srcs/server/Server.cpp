@@ -224,7 +224,7 @@ static std::string	readHtmlFile(void)
 {
 	std::string		line;
 	std::string		all;
-	std::ifstream	ifs("index/index.html");
+	std::ifstream	ifs("www/index.html");
 
 	if (!ifs)
 	{
