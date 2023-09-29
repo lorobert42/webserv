@@ -6,10 +6,8 @@ RUN apk update && apk upgrade && apk add --no-cache \
     g++ \
     && rm -rf /var/cache/apk/*
 
-COPY . /usr/webserv
+COPY . /home/webserv
 
-WORKDIR /usr/webserv
-
-RUN make re
+WORKDIR /home/webserv
 
 EXPOSE 8080

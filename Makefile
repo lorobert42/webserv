@@ -40,9 +40,11 @@ re:			fclean all
 .cpp.o:
 			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o)
 
-docker-start:
+docker-build:
 			docker build -t webserv .
-			docker run -it --rm -p 8080:8080 --name=webserv webserv /bin/bash
+
+docker-run:
+			docker run -it -v $(PWD):/home/webserv --rm -p 8080:8080 --name=webserv webserv /bin/bash
 
 docker-stop:
 			docker stop webserv
