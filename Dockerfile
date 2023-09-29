@@ -1,8 +1,14 @@
-FROM gcc:latest
+FROM alpine:latest
 
-COPY . /usr/webserve
+RUN apk update && apk upgrade && apk add --no-cache \
+    bash \
+    make \
+    g++ \
+    && rm -rf /var/cache/apk/*
 
-WORKDIR /usr/webserve
+COPY . /usr/webserv
+
+WORKDIR /usr/webserv
 
 RUN make re
 
