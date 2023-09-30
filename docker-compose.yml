@@ -10,5 +10,4 @@ services:
       - "8080:8080"
       - "80:80"
     volumes:
-        - ./srcs:/home/webserv/srcs
-        - ./www:/home/webserv/www
+        - .:/home/webserv
