@@ -41,12 +41,15 @@ re:			fclean all
 			$(CC) $(CPPFLAGS) -c $< -o $(<:.cpp=.o)
 
 docker-build:
-			docker build -t webserv .
+			docker-compose -p webserv build
 
-docker-run:
-			docker run -it -v $(PWD):/home/webserv --rm -p 8080:8080 --name=webserv webserv /bin/bash
+docker-up:
+			docker-compose -p webserv up -d
+			docker cp ${PWD}/nginx/nginx.conf webserv:/etc/nginx/nginx.conf
+			docker exec -it webserv /bin/bash -c "make re && nginx -s reload"
+			docker exec -it webserv /bin/bash
 
-docker-stop:
-			docker stop webserv
+docker-down:
+			docker-compose -p webserv down
 
 .PHONY:		all clean fclean re
