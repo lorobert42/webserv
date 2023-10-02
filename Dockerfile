@@ -6,6 +6,7 @@ RUN apk update && apk upgrade && apk add --no-cache \
     g++ \
     nginx \
     vim \
+    valgrind \
     && rm -rf /var/cache/apk/*
 
 COPY . /home/webserv
