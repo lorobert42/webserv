@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  webserv:
+    image: webserv
+    container_name: webserv
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+      - "80:80"
+    volumes:
+        - .:/home/webserv
