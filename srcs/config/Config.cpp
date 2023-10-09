@@ -25,7 +25,7 @@ Config::Config(const char *configPath) {
 				line.erase(0, 1);
 				serverConfig += line + "\n";
 			}
-			if (line[0] != ';') {
+			if (line != ";") {
 				throw InvalidCloseDirectiveException(line);
 			}
 			this->_servers.push_back(new ConfigServer(serverConfig));

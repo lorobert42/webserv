@@ -1,12 +1,11 @@
 #pragma once
 
 #include <iostream>
-#include <cstdlib>
 #include <sstream>
 #include <string>
 #include <vector>
 #include "ConfigRoute.hpp"
-#include "ConfigHelper.hpp"
+#include "ConfigExceptions.hpp"
 
 class ConfigServer {
     public:
@@ -19,7 +18,6 @@ class ConfigServer {
 		std::string					getName() const;
 		std::string					getHost() const;
 		int							getPort() const;
-		std::string					getClientMaxBodySize() const;
 		std::string					getErrorPage400() const;
 		std::string					getErrorPage403() const;
 		std::string					getErrorPage404() const;
@@ -33,7 +31,6 @@ class ConfigServer {
 		std::string					_name;
 		std::string					_host;
 		int							_port;
-		std::string					_client_max_body_size;
 		std::string					_error_page_400;
 		std::string					_error_page_403;
 		std::string					_error_page_404;

@@ -17,8 +17,8 @@ Allowing directives: [server].
 
 ```
 directive:
-	option="value"
-	option="value"
+	option=value
+	option=value
 ;
 ```
 
@@ -35,10 +35,10 @@ Allowing sub-directives: [route].
 
 ```
 directive:
-	option="value"
-	option="value"
+	option=value
+	option=value
 	sub-directive:
-		option="value"
+		option=value
 	;
 ;
 ```
@@ -46,14 +46,13 @@ directive:
 ## Option
 Option is a key-value pair.
 
-- Option is defined by a key followed by an equal sign `=` and a value surrounded by double quotes `"`.
-- To close an option, use a line break.
-- Spaces are not allowed.
+- Key is defined by a string followed by an equal sign `=`.
+- Value is defined by a string following the equal sign `=` and ending with line break.
 
 ### Example
 
 ```
-option="value"
+option=value
 ```
 
 ## Usage
@@ -71,8 +70,6 @@ option="value"
   - Default: `localhost`
 - `port`: The port of the server.
   - Default: `8080`
-- `client_max_body_size`: The maximum size of the body of a request.
-  - Default: `50M`
 - `error_page_400`: Set the path to the 400 error page.
   - Default: `www/error_pages/400.html`
 - `error_page_403`: Set the path to the 403 error page.
@@ -105,3 +102,7 @@ option="value"
   - Default: `false`
 - `cgi`: Path to the CGI executable.
   - Default: `none`
+- `upload_dir`: Path to the directory where the uploaded files will be stored.
+  - Default: `www/example/upload`
+- `client_max_body_size`: The maximum size of the body of a request.
+  - Default: `50M`

@@ -1,20 +1,22 @@
 server:
-	name="custom"
-	host="127.0.0.2"
-	port="2222"
-	client_max_body_size="222M"
-	error_page_400="custom/400.html"
-	error_page_404="custom/404.html"
-	error_page_500="custom/500.html"
+	name=custom
+	host=127.0.0.2
+	port=2222
+	error_page_400=custom/400.html
+	error_page_404=custom/404.html
+	error_page_500=custom/500.html
 
 	route:
-		uri="/custom"
-		path="www/custom"
-		index="custom.html"
-		get="true"
-		post="false"
-		delete="false"
-		autoindex="false"
-		cgi="cgi/custom"
+		uri=/custom
+		path=www/custom
+		index=custom.html
+		get=true
+		post=false
+		delete=false
+		autoindex=false
+		cgi=cgi/custom
+		client_max_body_size=1M
+		upload_store=www/custom/upload
 	;
+	name="3333"
 ;

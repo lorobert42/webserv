@@ -17,12 +17,12 @@ class InvalidCloseDirectiveException : public std::exception {
 		std::string		_message;
 };
 
-class InvalidOptionServerException : public std::exception {
+class InvalidOptionException : public std::exception {
 	public:
-		InvalidOptionServerException(std::string const &option) {
-			this->_message = "[CONFIG] Invalid server option: \"" + option + "\"";
+		InvalidOptionException(std::string const &option) {
+			this->_message = "[CONFIG] Invalid option: \"" + option + "\"";
 		}
-		~InvalidOptionServerException() throw() {}
+		~InvalidOptionException() throw() {}
 		const char* what() const throw() {
 			return this->_message.c_str();
 		}
