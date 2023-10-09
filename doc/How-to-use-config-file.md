@@ -46,7 +46,7 @@ directive:
 ## Option
 Option is a key-value pair.
 
-- Key is defined by a string followed by an equal sign `=`.
+- Option is defined by a string followed by an equal sign `=`.
 - Value is defined by a string following the equal sign `=` and ending with line break.
 
 ### Example
