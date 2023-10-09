@@ -17,12 +17,26 @@ class InvalidCloseDirectiveException : public std::exception {
 		std::string		_message;
 };
 
-class InvalidOptionException : public std::exception {
+class InvalidOptionKeyException : public std::exception {
 	public:
-		InvalidOptionException(std::string const &option) {
-			this->_message = "[CONFIG] Invalid option: \"" + option + "\"";
+		InvalidOptionKeyException(std::string const &key) {
+			this->_message = "[CONFIG] Invalid option key: \"" + key + "\"";
 		}
-		~InvalidOptionException() throw() {}
+		~InvalidOptionKeyException() throw() {}
+		const char* what() const throw() {
+			return this->_message.c_str();
+		}
+
+	private:
+		std::string		_message;
+};
+
+class InvalidOptionValueException : public std::exception {
+	public:
+		InvalidOptionValueException(std::string const &value) {
+			this->_message = "[CONFIG] Invalid option value \"" + value + "\"";
+		}
+		~InvalidOptionValueException() throw() {}
 		const char* what() const throw() {
 			return this->_message.c_str();
 		}

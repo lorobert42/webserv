@@ -16,7 +16,7 @@ server:
 		autoindex=false
 		cgi=cgi/custom
 		client_max_body_size=1M
-		upload_store=www/custom/upload
+		upload_dir=www/custom/upload
 	;
 	name="3333"
 ;

@@ -56,13 +56,13 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 		else if (option == "index")
 			this->_index = value;
 		else if (option == "get")
-			this->_get = value == "true" ? true : false;
+			this->_get = ConfigHelper::convertStringToBool(value);
 		else if (option == "post")
-			this->_post = value == "true" ? true : false;
+			this->_post = ConfigHelper::convertStringToBool(value);
 		else if (option == "delete")
-			this->_delete = value == "true" ? true : false;
+			this->_delete = ConfigHelper::convertStringToBool(value);
 		else if (option == "autoindex")
-			this->_autoindex = value == "true" ? true : false;
+			this->_autoindex = ConfigHelper::convertStringToBool(value);
 		else if (option == "cgi")
 			this->_cgi = value;
 		else if (option == "client_max_body_size")
@@ -70,7 +70,7 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 		else if (option == "upload_dir")
 			this->_upload_dir = value;
 		else
-			throw InvalidOptionException(option);
+			throw InvalidOptionKeyException(option);
 	}
 }
 

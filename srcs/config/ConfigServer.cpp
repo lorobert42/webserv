@@ -68,7 +68,7 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 		else if (option == "host")
 			this->_host = value;
 		else if (option == "port")
-			this->_port = 1;
+			this->_port = ConfigHelper::convertStringToPort(value);
 		else if (option == "error_page_400")
 			this->_error_page_400 = value;
 		else if (option == "error_page_403")
@@ -84,7 +84,7 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 		else if (option == ";")
 			continue;
 		else
-			throw InvalidOptionException(option);
+			throw InvalidOptionKeyException(option);
 	}
 }
 

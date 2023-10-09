@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include "ConfigHelper.hpp"
 #include "ConfigExceptions.hpp"
 
 class ConfigRoute {
