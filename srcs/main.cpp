@@ -1,19 +1,18 @@
+#include "config/Config.hpp"
 
-#include "include.hpp"
-
-int	main(void)
+int	main(int argc, char **argv)
 {
-	Server	serv(INADDR_ANY, D_PORT);
-
-	if(!serv.setup())
-	{
-		std::cout << "Fail to setup the serv." << std::endl;
+	if (argc > 2) {
+		std::cout << "Usage: ./webserv [config_file]" << std::endl;
 		return (1);
 	}
-	if(!serv.run())
-	{
-		std::cout << "Server stoped" << std::endl;
-		return (2);
+	try {
+		const Config *config = argc == 2 ? new Config(argv[1]) : new Config();
+		std::cout << *config;
+		delete config;
+	} catch (std::exception &e) {
+		std::cout << "Error: " << e.what() << std::endl;
+		return (1);
 	}
 	return (0);
 }
