@@ -5,6 +5,12 @@ Config::Config() {
 }
 
 Config::Config(const char *configPath) {
+	// Check extension must be .lms
+	std::string path(configPath);
+	if (path.substr(path.find_last_of(".") + 1) != "lms") {
+		throw InvalidExtensionException();
+	}
+
 	// Open config file
 	std::ifstream config(configPath);
 	if (!config.is_open()) {

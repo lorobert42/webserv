@@ -3,6 +3,18 @@
 #include <iostream>
 #include <exception>
 
+class InvalidExtensionException : public std::exception {
+	public:
+		virtual const char* what() const throw() {
+			return ("[FILE] Invalid extension, must be .lms");
+		}
+};
+class CouldNotOpenFileException : public std::exception {
+	public:
+		virtual const char* what() const throw() {
+			return ("[FILE] Could not open config file");
+		}
+};
 class InvalidCloseDirectiveException : public std::exception {
 	public:
 		InvalidCloseDirectiveException(std::string const &directive) {

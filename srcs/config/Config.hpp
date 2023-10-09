@@ -6,6 +6,7 @@
 #include <vector>
 #include <exception>
 #include "ConfigServer.hpp"
+#include "ConfigExceptions.hpp"
 
 class Config {
     public:
@@ -18,13 +19,6 @@ class Config {
         std::vector<ConfigServer*>   getServers() const;
     private:
         std::vector<ConfigServer*>   _servers;
-
-	class CouldNotOpenFileException : public std::exception {
-		public:
-			virtual const char* what() const throw() {
-				return ("[CONFIG] Could not open config file");
-			}
-	};
 };
 
 std::ostream    &operator<<(std::ostream &o, Config const &rhs);
