@@ -22,7 +22,7 @@ class ConfigRoute {
 		bool		getDelete() const;
 		bool		getAutoindex() const;
 		std::string getCgi() const;
-		std::string getClientMaxBodySize() const;
+		double		getClientMaxBodySize() const;
 		std::string getUploadDir() const;
     private:
 		std::string	_uri;
@@ -33,7 +33,7 @@ class ConfigRoute {
 		bool		_delete;
 		bool		_autoindex;
 		std::string	_cgi;
-		std::string	_client_max_body_size;
+		double 		_client_max_body_size;
 		std::string	_upload_dir;
 };
 

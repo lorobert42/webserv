@@ -104,5 +104,5 @@ option=value
   - Default: `none`
 - `upload_dir`: Path to the directory where the uploaded files will be stored.
   - Default: `www/example/upload`
-- `client_max_body_size`: The maximum size of the body of a request.
-  - Default: `50M`
+- `client_max_body_size`: The maximum size of the body of a request. You can use the suffixes `K`, `M` and `G` to specify the size in kilobytes, megabytes and gigabytes.
+  - Default: `1M`

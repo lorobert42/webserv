@@ -8,7 +8,7 @@ const bool			DEFAULT_POST 					= false;
 const bool			DEFAULT_DELETE 					= false;
 const bool			DEFAULT_AUTOINDEX 				= false;
 const std::string	DEFAULT_CGI 					= "";
-const std::string   DEFAULT_CLIENT_MAX_BODY_SIZE	= "1M";
+const double		DEFAULT_CLIENT_MAX_BODY_SIZE	= 1 * 1024 * 1024;
 const std::string   DEFAULT_UPLOAD_DIR				= "www/example/upload";
 
 ConfigRoute::ConfigRoute() :
@@ -66,7 +66,7 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 		else if (option == "cgi")
 			this->_cgi = value;
 		else if (option == "client_max_body_size")
-			this->_client_max_body_size = value;
+			this->_client_max_body_size = ConfigHelper::convertStringToClientMaxBodySize(value);
 		else if (option == "upload_dir")
 			this->_upload_dir = value;
 		else
@@ -126,7 +126,7 @@ std::string	ConfigRoute::getCgi() const {
 	return this->_cgi;
 }
 
-std::string	ConfigRoute::getClientMaxBodySize() const {
+double	ConfigRoute::getClientMaxBodySize() const {
 	return this->_client_max_body_size;
 }
 
