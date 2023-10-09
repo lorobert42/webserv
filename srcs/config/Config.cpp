@@ -37,6 +37,11 @@ Config::Config(const char *configPath) {
 			this->_servers.push_back(new ConfigServer(serverConfig));
 		}
 	}
+
+	// Check if at least one server is defined
+	if (this->_servers.size() == 0) {
+		throw NoServerDefinedException();
+	}
 }
 
 Config::~Config() {

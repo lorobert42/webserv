@@ -90,6 +90,8 @@ ConfigRoute	&ConfigRoute::operator=(ConfigRoute const &rhs) {
 		this->_delete = rhs._delete;
 		this->_autoindex = rhs._autoindex;
 		this->_cgi = rhs._cgi;
+		this->_client_max_body_size = rhs._client_max_body_size;
+		this->_upload_dir = rhs._upload_dir;
 	}
 	return (*this);
 }
