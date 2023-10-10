@@ -5,13 +5,14 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/09/20 13:19:14 by lorobert          #+#    #+#             */
-/*   Updated: 2023/09/28 14:14:31 by mjulliat         ###   ########.fr       */
+/*   Created: 2023/10/05 09:46:17 by lorobert          #+#    #+#             */
+/*   Updated: 2023/10/10 16:54:26 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
+#include "../config/ConfigServer.hpp"
 #include <cerrno>
 #include <cstring>
 #include <iostream>
@@ -19,33 +20,30 @@
 #include <netinet/in.h>
 #include <string>
 #include <sys/socket.h>
-#include <fcntl.h>
-#include <sys/epoll.h>
-#include <unistd.h>
-#include <fstream>
-
-#define D_MAX_EVENTS 10050
-#define D_BUFFER_SIZE 1024
 
 class Server {
-
 	public:
-		bool	setup();
-		bool	run();
-		int		readHandler(int fd);
-		int		writeHandler(int fd);
+		bool setup();
 
-		Server(unsigned int host, int port);
-		Server(Server const& other);
+		std::string getName() const;
+		std::string getHost() const;
+		int getPort() const;
+		int getSocket() const;
+		std::map<int, std::string> getRequests() const;
+		struct sockaddr_in getAddr() const;
+		Server(ConfigServer config);
+		Server(Server const &other);
 		~Server();
-		Server& operator=(Server const& other);
+		Server &operator=(Server const &other);
 
 	private:
 		Server();
 
-		unsigned int				_host;
-		int							_port;
-		int							_socket;
-		struct sockaddr_in			_addr;
-		std::map<int, std::string>	_requests;
+		ConfigServer _config;
+		std::string _name;
+		std::string _host;
+		int _port;
+		int _socket;
+		std::map<int, std::string> _requests;
+		struct sockaddr_in _addr;
 };

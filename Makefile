@@ -3,11 +3,12 @@ NAME		= webserv
 NAME_TEST	= webserv_test
 
 SRCS		= srcs/main.cpp \
-			  srcs/server/Server.cpp \
-			  srcs/config/Config.cpp \
-			  srcs/config/ConfigServer.cpp \
-			  srcs/config/ConfigRoute.cpp \
-			  srcs/config/ConfigHelper.cpp \
+			srcs/server/ServerManager.cpp \
+			srcs/server/Server.cpp \
+			srcs/config/Config.cpp \
+			srcs/config/ConfigServer.cpp \
+			srcs/config/ConfigRoute.cpp \
+			srcs/config/ConfigHelper.cpp \
 
 SRCS_TEST	= srcs/epoll_serv.cpp
 
