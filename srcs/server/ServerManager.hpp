@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:19:14 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 15:55:48 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 16:17:43 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,12 @@ class ServerManager {
 
 	private:
 		Config*					_config;
-        std::map<int, Server> 	_servers;
+        std::map<int, Server*> 	_servers;
 		int						_epfd;
 		//std::map<int, Client>	_clients;
 
 		bool	_isServerSocket(int socket) const;
-		Server&	_getServerBySocket(int socket);
+		Server*	_getServerBySocket(int socket);
 		void	_newClient(int server_socket);
 		bool	_epollCtlAdd(int epfd, int fd, uint32_t events);
 		bool	_epollCtlMod(int epfd, int fd, uint32_t events);

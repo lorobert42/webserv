@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 15:56:22 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 16:17:38 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,16 +44,17 @@ void ServerManager::setup()
 {
 	// Setup all servers and add them to the manager
 	std::vector<ConfigServer*> servers = _config->getServers();
+	Server* new_serv = NULL;
 	for (std::vector<ConfigServer*>::const_iterator it = servers.begin(); it != servers.end(); it++)
 	{
 		std::cout << (*it)->getPort() << std::endl;
-		Server new_serv(*it);
-		if (new_serv.setup() == false)
+		new_serv = new Server(*it);
+		if (new_serv->setup() == false)
 		{
-			std::cerr << "Unable to setup server: " << new_serv.getName() << std::endl;
+			std::cerr << "Unable to setup server: " << new_serv->getName() << std::endl;
 			continue;
 		}
-		_servers[new_serv.getSocket()] = new_serv;
+		_servers[new_serv->getSocket()] = new_serv;
 	}
 }
 
@@ -61,14 +62,14 @@ void ServerManager::setup()
 bool ServerManager::_isServerSocket(int socket) const
 {
 	// Check if socket file descriptor belongs to a server
-	std::map<int, Server>::const_iterator search = _servers.find(socket);
+	std::map<int, Server*>::const_iterator search = _servers.find(socket);
 	return (search != _servers.end());
 }
 
-Server& ServerManager::_getServerBySocket(int socket)
+Server* ServerManager::_getServerBySocket(int socket)
 {
 	// Find server instance linked to a socket file descriptor
-	std::map<int, Server>::iterator search = _servers.find(socket);
+	std::map<int, Server*>::iterator search = _servers.find(socket);
 	if (search == _servers.end())
 	{
 		// TODO: Better error management
@@ -104,11 +105,11 @@ bool ServerManager::run()
 		return (false);
 	}
 	std::cout << "- Add socket to epoll" << std::endl;
-	for (std::map<int, Server>::const_iterator it = _servers.begin(); it != _servers.end(); it++)
+	for (std::map<int, Server*>::const_iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
-		if (!_epollCtlAdd(_epfd, it->second.getSocket(), EPOLLIN))
+		if (!_epollCtlAdd(_epfd, it->second->getSocket(), EPOLLIN))
 		{
-			std::cerr << "Unable to add server to epoll: " << it->second.getName() << std::endl;
+			std::cerr << "Unable to add server to epoll: " << it->second->getName() << std::endl;
 			continue;
 		}
 	}
