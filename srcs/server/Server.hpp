@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 09:46:17 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/10 16:54:26 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 10:01:26 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,26 +24,24 @@
 class Server {
 	public:
 		bool setup();
-
 		std::string getName() const;
 		std::string getHost() const;
 		int getPort() const;
 		int getSocket() const;
-		std::map<int, std::string> getRequests() const;
 		struct sockaddr_in getAddr() const;
+
 		Server(ConfigServer config);
-		Server(Server const &other);
+		Server(Server const& other);
 		~Server();
-		Server &operator=(Server const &other);
+		Server &operator=(Server const& other);
 
 	private:
 		Server();
 
-		ConfigServer _config;
-		std::string _name;
-		std::string _host;
-		int _port;
-		int _socket;
-		std::map<int, std::string> _requests;
-		struct sockaddr_in _addr;
+		ConfigServer		_config;
+		std::string			_name;
+		std::string			_host;
+		int					_port;
+		int					_socket;
+		struct sockaddr_in	_addr;
 };

@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 09:15:53 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 10:06:13 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ ServerManager& ServerManager::operator=(ServerManager const& other)
 // ### Member Function ###
 void ServerManager::setup()
 {
+	// Setup all servers and add them to the manager
 	std::vector<ConfigServer*> servers = _config.getServers();
 	for (std::vector<ConfigServer*>::const_iterator it = servers.begin(); it != servers.end(); it++)
 	{
@@ -55,14 +56,17 @@ void ServerManager::setup()
 	}
 }
 
+
 bool ServerManager::_isServerSocket(int socket) const
 {
+	// Check if socket file descriptor belongs to a server
 	std::map<int, Server>::const_iterator search = _servers.find(socket);
 	return (search != _servers.end());
 }
 
 Server& ServerManager::_getServerBySocket(int socket)
 {
+	// Find server instance linked to a socket file descriptor
 	std::map<int, Server>::iterator search = _servers.find(socket);
 	if (search == _servers.end())
 	{
@@ -156,6 +160,7 @@ bool ServerManager::run()
 
 bool ServerManager::_epollCtlAdd(int epfd, int fd, uint32_t events)
 {
+	// Add scoket file descriptor to the epoll structure, watching events
 	struct epoll_event	ev;
 	ev.events = events;
 	ev.data.fd = fd;
@@ -169,6 +174,7 @@ bool ServerManager::_epollCtlAdd(int epfd, int fd, uint32_t events)
 
 bool ServerManager::_epollCtlMod(int epfd, int fd, uint32_t events)
 {
+	// Modify the events watched by epoll for fd
 	struct epoll_event	ev;
 	ev.events = events;
 	ev.data.fd = fd;
@@ -183,12 +189,13 @@ bool ServerManager::_epollCtlMod(int epfd, int fd, uint32_t events)
 
 bool ServerManager::_epollCtlDel(int epfd, int fd)
 {
-  if (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL) == -1)
-  {
-    std::cerr << "Unable to delete client socket: " << strerror(errno) << std::endl;
-    return (false);
-  }
-  return (true);
+	// Remove a socket fd from epoll
+	if (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL) == -1)
+	{
+		std::cerr << "Unable to delete client socket: " << strerror(errno) << std::endl;
+		return (false);
+	}
+	return (true);
 }
 
 int ServerManager::readHandler(int fd)
