@@ -6,50 +6,12 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/10 16:54:37 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 09:15:53 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerManager.hpp"
 #include "Server.hpp"
-#include <vector>
-
-static bool	epollCtlAdd(int epfd, int fd, uint32_t events)
-{
-	struct epoll_event	ev;
-	ev.events = events;
-	ev.data.fd = fd;
-	if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1)
-	{
-		std::cerr << "Unable to add socket to epoll: " << strerror(errno) << std::endl;
-		return (false);
-	}
-	return (true);
-}
-
-static bool	epollCtlMod(int epfd, int fd, uint32_t events)
-{
-	struct epoll_event	ev;
-	ev.events = events;
-	ev.data.fd = fd;
-	if (epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev) == -1)
-	{
-		std::cerr << "Unable to modify epoll: " << strerror(errno) << std::endl;
-		return (false);
-	}
-	return (true);
-}
-
-/*
-static int  epollCtlDel(int epfd, int fd)
-{
-  if (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL) == -1)
-  {
-    std::cerr << "Unable to delete client socket: " << strerror(errno) << std::endl;
-    return (-1);
-  }
-  return (0);
-}*/
 
 // ### Constructor ###
 ServerManager::ServerManager()
@@ -89,23 +51,28 @@ void ServerManager::setup()
 			std::cerr << "Unable to setup server: " << new_serv.getName() << std::endl;
 			continue;
 		}
-		_servers.push_back(new_serv);
+		_servers[new_serv.getSocket()] = new_serv;
 	}
 }
 
-bool ServerManager::_isServerSocket(int socket)
+bool ServerManager::_isServerSocket(int socket) const
 {
-	for (std::vector<Server>::const_iterator it = _servers.begin(); it != _servers.end(); it++)
-	{
-		if ((*it).getSocket() == socket)
-		{
-			return (true);
-		}
-	}
-	return (false);
+	std::map<int, Server>::const_iterator search = _servers.find(socket);
+	return (search != _servers.end());
 }
 
-void ServerManager::_acceptClient(int server_socket)
+Server& ServerManager::_getServerBySocket(int socket)
+{
+	std::map<int, Server>::iterator search = _servers.find(socket);
+	if (search == _servers.end())
+	{
+		// TODO: Better error management
+		throw std::runtime_error("Server does not exist");
+	}
+	return (search->second);
+}
+
+void ServerManager::_newClient(int server_socket)
 {
 	int client_socket;
 	struct sockaddr_in client_addr;
@@ -117,8 +84,9 @@ void ServerManager::_acceptClient(int server_socket)
 		std::cerr << "Cannot accept client connection: " << strerror(errno) << std::endl;
 		return;
 	}
-	if (!epollCtlAdd(_epfd, client_socket, EPOLLIN | EPOLLET))
+	if (!_epollCtlAdd(_epfd, client_socket, EPOLLIN | EPOLLET))
 		return;
+	_clients[client_socket] = Client(_getServerBySocket(server_socket), client_socket);
 }
 
 bool ServerManager::run()
@@ -131,11 +99,11 @@ bool ServerManager::run()
 		return (false);
 	}
 	std::cout << "- Add socket to epoll" << std::endl;
-	for (std::vector<Server>::const_iterator it = _servers.begin(); it != _servers.end(); it++)
+	for (std::map<int, Server>::const_iterator it = _servers.begin(); it != _servers.end(); it++)
 	{
-		if (!epollCtlAdd(_epfd, (*it).getSocket(), EPOLLIN))
+		if (!_epollCtlAdd(_epfd, it->second.getSocket(), EPOLLIN))
 		{
-			std::cerr << "Unable to add server to epoll: " << (*it).getName() << std::endl;
+			std::cerr << "Unable to add server to epoll: " << it->second.getName() << std::endl;
 			continue;
 		}
 	}
@@ -161,14 +129,14 @@ bool ServerManager::run()
 			if (_isServerSocket(events[n].data.fd))
 			{
 				std::cout << "[Received new connection]" << std::endl;
-				_acceptClient(events[n].data.fd);
+				_newClient(events[n].data.fd);
 			}
 			else if (events[n].events & EPOLLIN)
 			{
 				std::cout << "[Receiving data on fd:] " << events[n].data.fd << std::endl;
 				if (readHandler(events[n].data.fd) == 0)
 				{
-					if (!epollCtlMod(_epfd, events[n].data.fd, EPOLLOUT | EPOLLET))
+					if (!_epollCtlMod(_epfd, events[n].data.fd, EPOLLOUT | EPOLLET))
 						return (false);
 				}
 			}
@@ -184,6 +152,43 @@ bool ServerManager::run()
 				std::cerr << "Unexpected event" << std::endl;
 		}
 	}
+}
+
+bool ServerManager::_epollCtlAdd(int epfd, int fd, uint32_t events)
+{
+	struct epoll_event	ev;
+	ev.events = events;
+	ev.data.fd = fd;
+	if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1)
+	{
+		std::cerr << "Unable to add socket to epoll: " << strerror(errno) << std::endl;
+		return (false);
+	}
+	return (true);
+}
+
+bool ServerManager::_epollCtlMod(int epfd, int fd, uint32_t events)
+{
+	struct epoll_event	ev;
+	ev.events = events;
+	ev.data.fd = fd;
+	if (epoll_ctl(epfd, EPOLL_CTL_MOD, fd, &ev) == -1)
+	{
+		std::cerr << "Unable to modify epoll: " << strerror(errno) << std::endl;
+		return (false);
+	}
+	return (true);
+}
+
+
+bool ServerManager::_epollCtlDel(int epfd, int fd)
+{
+  if (epoll_ctl(epfd, EPOLL_CTL_DEL, fd, NULL) == -1)
+  {
+    std::cerr << "Unable to delete client socket: " << strerror(errno) << std::endl;
+    return (false);
+  }
+  return (true);
 }
 
 int ServerManager::readHandler(int fd)

@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:19:14 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/10 16:51:37 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 09:13:20 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@
 #include <unistd.h>
 #include <fstream>
 #include <vector>
+#include <stdexcept>
 #include "../config/Config.hpp"
 #include "Client.hpp"
 #include "Server.hpp"
@@ -46,9 +47,16 @@ class ServerManager {
 
 	private:
 		Config					_config;
-        std::vector<Server> 	_servers;
+        std::map<int, Server> 	_servers;
 		int						_epfd;
 		std::map<int, Client>	_clients;
+
+		bool	_isServerSocket(int socket) const;
+		Server&	_getServerBySocket(int socket);
+		void	_newClient(int server_socket);
+		bool	_epollCtlAdd(int epfd, int fd, uint32_t events);
+		bool	_epollCtlMod(int epfd, int fd, uint32_t events);
+		bool	_epollCtlDel(int epfd, int fd);
 
 		ServerManager();
 };
