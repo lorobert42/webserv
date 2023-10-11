@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 09:46:17 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 10:01:26 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 12:46:08 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,13 @@ class Server {
 		int getSocket() const;
 		struct sockaddr_in getAddr() const;
 
+		Server();
 		Server(ConfigServer config);
 		Server(Server const& other);
 		~Server();
 		Server &operator=(Server const& other);
 
 	private:
-		Server();
-
 		ConfigServer		_config;
 		std::string			_name;
 		std::string			_host;

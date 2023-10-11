@@ -6,11 +6,12 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 22:21:36 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 10:01:19 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 12:47:01 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
+#include <stdexcept>
 
 // ### Accessors ###
 std::string Server::getName() const
@@ -40,7 +41,10 @@ struct sockaddr_in Server::getAddr() const
 
 // ### Constructor ###
 Server::Server()
-{}
+{
+	// TODO: Better error management
+	throw std::runtime_error("Wait, that's illegal");
+}
 
 Server::Server(ConfigServer config) :
 	_config(config)
