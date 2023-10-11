@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:19:14 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 16:17:43 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 16:36:19 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 #include <vector>
 #include <stdexcept>
 #include "../config/Config.hpp"
-//#include "Client.hpp"
+#include "../client/Client.hpp"
 #include "Server.hpp"
 
 #define D_MAX_EVENTS 10050
