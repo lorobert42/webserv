@@ -6,14 +6,18 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 22:21:36 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 12:47:01 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 15:54:06 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Server.hpp"
-#include <stdexcept>
 
 // ### Accessors ###
+ConfigServer* Server::getConfig() const
+{
+	return (_config);
+}
+
 std::string Server::getName() const
 {
 	return (_name);
@@ -46,12 +50,12 @@ Server::Server()
 	throw std::runtime_error("Wait, that's illegal");
 }
 
-Server::Server(ConfigServer config) :
+Server::Server(ConfigServer* config) :
 	_config(config)
 {
-	_name = config.getName();
-	_host = config.getHost();
-	_port = config.getPort();
+	_name = config->getName();
+	_host = config->getHost();
+	_port = config->getPort();
 	_socket = -1;
 	// Fill the _addr structure with host and port
 	std::cout << "1) Configure the listen address: [port]" << std::endl;

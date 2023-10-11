@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:19:14 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 09:13:20 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 15:55:48 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 #include <vector>
 #include <stdexcept>
 #include "../config/Config.hpp"
-#include "Client.hpp"
+//#include "Client.hpp"
 #include "Server.hpp"
 
 #define D_MAX_EVENTS 10050
@@ -40,16 +40,16 @@ class ServerManager {
 		int		readHandler(int fd);
 		int		writeHandler(int fd);
 
-		ServerManager(Config config);
+		ServerManager(Config* config);
 		ServerManager(ServerManager const& other);
 		~ServerManager();
 		ServerManager& operator=(ServerManager const& other);
 
 	private:
-		Config					_config;
+		Config*					_config;
         std::map<int, Server> 	_servers;
 		int						_epfd;
-		std::map<int, Client>	_clients;
+		//std::map<int, Client>	_clients;
 
 		bool	_isServerSocket(int socket) const;
 		Server&	_getServerBySocket(int socket);

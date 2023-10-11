@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 10:06:13 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 15:56:22 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,7 @@
 ServerManager::ServerManager()
 {}
 
-ServerManager::ServerManager(Config config) :
+ServerManager::ServerManager(Config* config) :
 	_config(config)
 {}
 
@@ -43,10 +43,11 @@ ServerManager& ServerManager::operator=(ServerManager const& other)
 void ServerManager::setup()
 {
 	// Setup all servers and add them to the manager
-	std::vector<ConfigServer*> servers = _config.getServers();
+	std::vector<ConfigServer*> servers = _config->getServers();
 	for (std::vector<ConfigServer*>::const_iterator it = servers.begin(); it != servers.end(); it++)
 	{
-		Server new_serv(**it);
+		std::cout << (*it)->getPort() << std::endl;
+		Server new_serv(*it);
 		if (new_serv.setup() == false)
 		{
 			std::cerr << "Unable to setup server: " << new_serv.getName() << std::endl;
@@ -90,7 +91,7 @@ void ServerManager::_newClient(int server_socket)
 	}
 	if (!_epollCtlAdd(_epfd, client_socket, EPOLLIN | EPOLLET))
 		return;
-	_clients[client_socket] = Client(_getServerBySocket(server_socket), client_socket);
+	//_clients[client_socket] = Client(_getServerBySocket(server_socket), client_socket);
 }
 
 bool ServerManager::run()
@@ -113,9 +114,6 @@ bool ServerManager::run()
 	}
 
 	int nfds;
-	int client_socket;
-	struct sockaddr_in client_addr;
-	socklen_t client_len = sizeof(client_addr);
 	struct epoll_event events[D_MAX_EVENTS];
 
 	std::cout << "- Listening to connections:" << std::endl;
@@ -186,7 +184,6 @@ bool ServerManager::_epollCtlMod(int epfd, int fd, uint32_t events)
 	return (true);
 }
 
-
 bool ServerManager::_epollCtlDel(int epfd, int fd)
 {
 	// Remove a socket fd from epoll
@@ -200,31 +197,8 @@ bool ServerManager::_epollCtlDel(int epfd, int fd)
 
 int ServerManager::readHandler(int fd)
 {
-	char buffer[D_BUFFER_SIZE] = {0};
-
-	int read = recv(fd, buffer, D_BUFFER_SIZE, MSG_DONTWAIT);
-	if (read <= 0)
-	{
-		close(fd);
-		_requests[fd].erase();
-		if (read == 0)
-			std::cout << "Connection closed by client" << std::endl;
-		else
-			std::cerr << "Read error" << std::endl;
-		return (-1);
-	}
-	_requests[fd] += std::string(buffer);
-	std::cout << "Request until now:\n" << _requests[fd] << std::endl;
-	// Every line finish by a \r\n and the header and body are separated
-	// by a \r\n so the end of the header must be a \r\n for the last line
-	// and another \r\n so the separation of the header to the body
-	// must be \r\n\r\n
-	if (_requests[fd].rfind("\n\n") != std::string::npos || _requests[fd].rfind("\r\n\r\n") != std::string::npos)
-	{
-		std::cout << "End of request" << std::endl;
-		return (0);
-	}
-	return (1);
+	(void)fd;
+	return (0);
 }
 
 static std::string	readHtmlFile(void)

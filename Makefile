@@ -21,7 +21,7 @@ else
  CC			= c++ -g
 endif
 
-CPPFLAGS	= -Wall -Werror -Wextra -std=c++98
+CPPFLAGS	= -Wall -Werror -Wextra -std=c++98 -fsanitize=address
 
 EXE_NAME	= -o $(NAME)
 EXE_NAME_T	= -o $(NAME_TEST)

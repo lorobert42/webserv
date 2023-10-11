@@ -1,4 +1,5 @@
 #include "config/Config.hpp"
+#include "server/ServerManager.hpp"
 
 int	main(int argc, char **argv)
 {
@@ -7,8 +8,11 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	try {
-		const Config *config = argc == 2 ? new Config(argv[1]) : new Config();
-		std::cout << *config;
+		Config *config = argc == 2 ? new Config(argv[1]) : new Config();
+		//std::cout << *config;
+		ServerManager sm(config);
+		sm.setup();
+		sm.run();
 		delete config;
 	} catch (std::exception &e) {
 		std::cout << "Error: " << e.what() << std::endl;
