@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "ServerManager.hpp"
+#include <unistd.h>
 
 extern bool g_should_stop;
 
@@ -120,9 +121,9 @@ bool ServerManager::_run()
 			}
 			else if (events[n].events & EPOLLIN)
 			{
-				Client	client(_getClientBySocket(events[n].data.fd));
-				std::cout << "[Receiving data on fd:] " << client.getSocket() << std::endl;
-				if (client.readHandler() == 0)
+				Client*	client(_getClientBySocket(events[n].data.fd));
+				std::cout << "[Receiving data on fd:] " << client->getSocket() << std::endl;
+				if (client->readHandler() == 0)
 				{
 					if (!_epollCtlMod(_epfd, events[n].data.fd, EPOLLOUT | EPOLLET))
 						return (false);
@@ -130,12 +131,11 @@ bool ServerManager::_run()
 			}
 			else if (events[n].events & EPOLLOUT)
 			{
-				Client	client(_getClientBySocket(events[n].data.fd));
-				std::cout << "[Sending data on fd:] " << client.getSocket() << std::endl;
-				client.writeHandler();
-				int fd = client.getSocket();
-				epoll_ctl(_epfd, EPOLL_CTL_DEL, fd, NULL);
-				close(fd);
+				Client*	client(_getClientBySocket(events[n].data.fd));
+				std::cout << "[Sending data on fd:] " << client->getSocket() << std::endl;
+				client->writeHandler();
+				_epollCtlDel(_epfd, events[n].data.fd);
+				_closeClient(events[n].data.fd);
 			}
 			else
 				std::cerr << "Unexpected event" << std::endl;
@@ -182,7 +182,7 @@ Server* ServerManager::_getServerBySocket(int socket)
 	return (search->second);
 }
 
-Client ServerManager::_getClientBySocket(int socket)
+Client* ServerManager::_getClientBySocket(int socket)
 {
 	// Find client instance linked to a socket file descriptor
 	std::map<int, Client*>::iterator search = _clients.find(socket);
@@ -191,7 +191,15 @@ Client ServerManager::_getClientBySocket(int socket)
 		// TODO: Better error management
 		throw std::runtime_error("Client does not exist");
 	}
-	return (*search->second);
+	return (search->second);
+}
+
+void	ServerManager::_closeClient(int socket)
+{
+	Client*	client = _getClientBySocket(socket);
+	delete client;
+	close(socket);
+	_clients.erase(socket);
 }
 
 bool ServerManager::_epollCtlAdd(int epfd, int fd, uint32_t events)
