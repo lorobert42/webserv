@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/10 16:49:52 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 15:24:21 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,6 +20,7 @@ class Client
 		int				getSocket() const;
 		std::string		getRequest() const;
 
+		Client();
 		Client(Server const& server, int client_socket);
 		Client(Client const& other);
 		Client& operator=(Client const& other);
@@ -29,6 +30,4 @@ class Client
 		Server 			_server;
 		int				_socket;
 		std::string		_request;
-
-		Client();
 };

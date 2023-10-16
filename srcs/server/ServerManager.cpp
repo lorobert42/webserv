@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 16:17:38 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/11 16:57:49 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,12 @@ ServerManager::ServerManager(ServerManager const& other) :
 
 // ### Destructor ###
 ServerManager::~ServerManager()
-{}
+{
+	for (std::map<int, Server*>::iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		delete it->second;
+	}
+}
 
 // ### Overload operator ###
 ServerManager& ServerManager::operator=(ServerManager const& other)
@@ -57,7 +62,6 @@ void ServerManager::setup()
 		_servers[new_serv->getSocket()] = new_serv;
 	}
 }
-
 
 bool ServerManager::_isServerSocket(int socket) const
 {

@@ -47,7 +47,7 @@ class ServerManager {
 
 	private:
 		Config*					_config;
-        std::map<int, Server*> 	_servers;
+		std::map<int, Server*> 	_servers;
 		int						_epfd;
 		//std::map<int, Client>	_clients;
 
