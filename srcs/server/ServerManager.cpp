@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "ServerManager.hpp"
+#include <map>
 #include <unistd.h>
 
 extern bool g_should_stop;
@@ -97,7 +98,7 @@ bool ServerManager::_setupEpoll()
 	return true;
 }
 
-bool ServerManager::_run()
+void ServerManager::_run()
 {
 	int nfds;
 	struct epoll_event events[D_MAX_EVENTS];
@@ -109,7 +110,7 @@ bool ServerManager::_run()
 		if (nfds == -1)
 		{
 			std::cerr << "Epoll wait error: " << strerror(errno) << std::endl;
-			return (false);
+			break;
 		}
 
 		for (int n = 0; n < nfds; ++n)
@@ -126,7 +127,7 @@ bool ServerManager::_run()
 				if (client->readHandler() == 0)
 				{
 					if (!_epollCtlMod(_epfd, events[n].data.fd, EPOLLOUT | EPOLLET))
-						return (false);
+						return; // TODO: handle error
 				}
 			}
 			else if (events[n].events & EPOLLOUT)
@@ -141,7 +142,8 @@ bool ServerManager::_run()
 				std::cerr << "Unexpected event" << std::endl;
 		}
 	}
-	return (true);
+	std::cout << "Closing remaining clients" << std::endl;
+	_closeAllClients();
 }
 
 void ServerManager::_newClient(int server_socket)
@@ -200,6 +202,14 @@ void	ServerManager::_closeClient(int socket)
 	delete client;
 	close(socket);
 	_clients.erase(socket);
+}
+
+void	ServerManager::_closeAllClients()
+{
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++)
+	{
+		_closeClient(it->first);
+	}
 }
 
 bool ServerManager::_epollCtlAdd(int epfd, int fd, uint32_t events)

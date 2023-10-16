@@ -52,12 +52,13 @@ class ServerManager {
 
 		void	_setupServers();
 		bool	_setupEpoll();
-		bool	_run();
+		void	_run();
 		bool	_isServerSocket(int socket) const;
 		Server*	_getServerBySocket(int socket);
 		Client*	_getClientBySocket(int socket);
 		void	_newClient(int server_socket);
 		void	_closeClient(int client_socket);
+		void	_closeAllClients();
 		bool	_epollCtlAdd(int epfd, int fd, uint32_t events);
 		bool	_epollCtlMod(int epfd, int fd, uint32_t events);
 		bool	_epollCtlDel(int epfd, int fd);
