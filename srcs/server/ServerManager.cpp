@@ -6,11 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-<<<<<<< HEAD
 /*   Updated: 2023/10/11 16:57:49 by lorobert         ###   ########.fr       */
-=======
-/*   Updated: 2023/10/16 12:11:55 by mjulliat         ###   ########.fr       */
->>>>>>> a3a49b2 (Write and read handler in client class)
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,50 +75,7 @@ void ServerManager::_setupServers()
 	}
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-bool ServerManager::_isServerSocket(int socket) const
-{
-	// Check if socket file descriptor belongs to a server
-	std::map<int, Server*>::const_iterator search = _servers.find(socket);
-	return (search != _servers.end());
-}
-
-Server* ServerManager::_getServerBySocket(int socket)
-{
-	// Find server instance linked to a socket file descriptor
-	std::map<int, Server*>::iterator search = _servers.find(socket);
-	if (search == _servers.end())
-	{
-		// TODO: Better error management
-		throw std::runtime_error("Server does not exist");
-	}
-	return (search->second);
-}
-
-void ServerManager::_newClient(int server_socket)
-{
-	int client_socket;
-	struct sockaddr_in client_addr;
-	socklen_t client_len = sizeof(client_addr);
-
-	client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_len);
-	if (client_socket == -1)
-	{
-		std::cerr << "Cannot accept client connection: " << strerror(errno) << std::endl;
-		return;
-	}
-	if (!_epollCtlAdd(_epfd, client_socket, EPOLLIN | EPOLLET))
-		return;
-	//_clients[client_socket] = Client(_getServerBySocket(server_socket), client_socket);
-}
-
-=======
->>>>>>> a3a49b2 (Write and read handler in client class)
-bool ServerManager::run()
-=======
 bool ServerManager::_setupEpoll()
->>>>>>> 47bb372 (Add ServerManager.start() to simplify server starting, add signal management)
 {
 	std::cout << "3) Create the epoll structure:" << std::endl;
 	_epfd = epoll_create(1);

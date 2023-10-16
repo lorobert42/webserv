@@ -6,11 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-<<<<<<< HEAD
-/*   Updated: 2023/10/16 14:55:53 by lorobert         ###   ########.fr       */
-=======
 /*   Updated: 2023/10/16 12:14:22 by mjulliat         ###   ########.fr       */
->>>>>>> a3a49b2 (Write and read handler in client class)
 /*                                                                            */
 /* ************************************************************************** */
 
