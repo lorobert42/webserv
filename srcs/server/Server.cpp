@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 22:21:36 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 15:54:06 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/16 09:56:42 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,8 +46,9 @@ struct sockaddr_in Server::getAddr() const
 // ### Constructor ###
 Server::Server()
 {
+	std::cout << "constructor of server call" << std::endl;
 	// TODO: Better error management
-	throw std::runtime_error("Wait, that's illegal");
+	throw std::runtime_error("[Server] : Wait, that's illegal");
 }
 
 Server::Server(ConfigServer* config) :
@@ -58,7 +59,7 @@ Server::Server(ConfigServer* config) :
 	_port = config->getPort();
 	_socket = -1;
 	// Fill the _addr structure with host and port
-	std::cout << "1) Configure the listen address: [port]" << std::endl;
+	std::cout << "1) Configure the listen address: [" << _port <<  "]" << std::endl;
 	std::memset((char *)&_addr, 0, sizeof(struct sockaddr_in));
 	_addr.sin_family = AF_INET;
 	_addr.sin_addr.s_addr = INADDR_ANY;
