@@ -16,6 +16,8 @@
 
 #include "ServerManager.hpp"
 
+extern bool g_should_stop;
+
 // ### Constructor ###
 ServerManager::ServerManager()
 {}
@@ -48,7 +50,17 @@ ServerManager& ServerManager::operator=(ServerManager const& other)
 }
 
 // ### Member Function ###
-void ServerManager::setup()
+void	ServerManager::start()
+{
+	_setupServers();
+	if (_setupEpoll() == false)
+	{
+		return;
+	}
+	_run();
+}
+
+void ServerManager::_setupServers()
 {
 	// Setup all servers and add them to the manager
 	std::vector<ConfigServer*> servers = _config->getServers();
@@ -60,12 +72,14 @@ void ServerManager::setup()
 		if (new_serv->setup() == false)
 		{
 			std::cerr << "Unable to setup server: " << new_serv->getName() << std::endl;
+			delete new_serv;
 			continue;
 		}
 		_servers[new_serv->getSocket()] = new_serv;
 	}
 }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
 bool ServerManager::_isServerSocket(int socket) const
 {
@@ -106,6 +120,9 @@ void ServerManager::_newClient(int server_socket)
 =======
 >>>>>>> a3a49b2 (Write and read handler in client class)
 bool ServerManager::run()
+=======
+bool ServerManager::_setupEpoll()
+>>>>>>> 47bb372 (Add ServerManager.start() to simplify server starting, add signal management)
 {
 	std::cout << "3) Create the epoll structure:" << std::endl;
 	_epfd = epoll_create(1);
@@ -123,14 +140,18 @@ bool ServerManager::run()
 			continue;
 		}
 	}
+	return true;
+}
 
+bool ServerManager::_run()
+{
 	int nfds;
 	struct epoll_event events[D_MAX_EVENTS];
 
 	std::cout << "- Listening to connections:" << std::endl;
-	while (true)
+	while (g_should_stop == false)
 	{
-		nfds = epoll_wait(_epfd, events, D_MAX_EVENTS, -1);
+		nfds = epoll_wait(_epfd, events, D_MAX_EVENTS, D_TIMEOUT);
 		if (nfds == -1)
 		{
 			std::cerr << "Epoll wait error: " << strerror(errno) << std::endl;
@@ -167,6 +188,7 @@ bool ServerManager::run()
 				std::cerr << "Unexpected event" << std::endl;
 		}
 	}
+	return (true);
 }
 
 void ServerManager::_newClient(int server_socket)
