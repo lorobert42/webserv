@@ -2,11 +2,11 @@
 
 CgiHandler::CgiHandler() {}
 
-CgiHandler::CgiHandler(ConfigServer* config) {
-	(void)config;
+CgiHandler::CgiHandler(Client *client) {
+	(void)client;
 
 	// TODO: Set environment variables dedicated for the server
-	this->_env["SERVER_SOFTWARE"] = "TODO";
+	this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
 	this->_env["SERVER_NAME"] = "TODO";
 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 
@@ -54,15 +54,22 @@ CgiHandler   	&CgiHandler::operator=(CgiHandler const &rhs)
 	return (*this);
 }
 
+void	CgiHandler::displayEnv() {
+	char**	env = this->_getEnv();
+
+	for (int i = 0; env[i]; i++) {
+		std::cout << env[i] << std::endl;
+	}
+}
+
 char	**CgiHandler::_getEnv() {
 	char**	env = new char*[this->_env.size() + 1];
 	int		i = 0;
 
 	for (std::map<std::string, std::string>::iterator it = this->_env.begin(); it != this->_env.end(); it++) {
-		env[i] = new char[it->first.length() + it->second.length() + 2];
-		env[i] = strcat(env[i], it->first.c_str());
-		env[i] = strcat(env[i], "=");
-		env[i] = strcat(env[i], it->second.c_str());
+		std::string tmp = it->first + "=" + it->second;
+		env[i] = new char[tmp.length() + 1];
+		strcpy(env[i], tmp.c_str());
 		i++;
 	}
 	env[i] = NULL;
@@ -80,8 +87,10 @@ std::string	CgiHandler::executeCgi() {
 	// TODO
 
 	// Free env
-	for (int i = 0; env[i]; i++)
+	for (int i = 0; env[i]; i++) {
 		delete[] env[i];
+	}
+		
 	delete[] env;
 
 	return (body);

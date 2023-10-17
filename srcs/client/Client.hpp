@@ -17,6 +17,9 @@
 #include <sys/socket.h>
 #include "Request.hpp"
 #include "../config/ConfigServer.hpp"
+#include "../cgi/CgiHandler.hpp"
+
+class CgiHandler;
 
 class Client
 {

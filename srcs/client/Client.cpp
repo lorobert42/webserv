@@ -107,6 +107,11 @@ int	Client::writeHandler(void)
 			std::cout << "Could not send reposne" << std::endl;
 		total_bytes_send += bytes_send;
 	}
+
+	// FIXME
+	CgiHandler cgi(this);
+	cgi.displayEnv();
+
 	return (0);
 }
 
