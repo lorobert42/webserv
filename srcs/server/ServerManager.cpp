@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 16:57:49 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/17 11:51:08 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -161,7 +161,7 @@ void ServerManager::_newClient(int server_socket)
 	}
 	if (!_epollCtlAdd(_epfd, client_socket, EPOLLIN | EPOLLET))
 		return;
-	new_client = new Client(_getServerBySocket(server_socket), client_socket);
+	new_client = new Client(_getServerBySocket(server_socket)->getConfig(), client_socket);
 	_clients[client_socket] = new_client;
 }
 
