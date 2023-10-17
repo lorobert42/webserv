@@ -3,6 +3,9 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <stdlib.h>
+#include <unistd.h>
+#include <cstring>
 #include "../config/ConfigServer.hpp"
 
 class CgiHandler
@@ -13,10 +16,11 @@ class CgiHandler
 		~CgiHandler();
 
 		CgiHandler   	&operator=(CgiHandler const &rhs);
-		std::string		executeCgi(const std::string &scriptName);
+		std::string		executeCgi();
 
 	private:
 		CgiHandler();
+		char**								_getEnv();
 		std::map<std::string, std::string>	_env;
 		std::string							_body;
 };

@@ -13,6 +13,6 @@ COPY . /home/webserv
 
 WORKDIR /home/webserv
 
-EXPOSE 8080 80
+EXPOSE 8080 80 8081
 
 CMD ["nginx", "-g", "daemon off;"]
