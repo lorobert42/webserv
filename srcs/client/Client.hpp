@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/17 14:08:40 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/17 14:21:32 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sys/socket.h>
 #include "Request.hpp"
 #include "../config/ConfigServer.hpp"
 
@@ -33,7 +34,7 @@ class Client
 		int writeHandler(void);
 	
 	private:
-		ConfigServer	*_conig_server;
+		ConfigServer	*_config_server;
 		int				_socket;
 		std::string		_read;
 		Request			*_request;

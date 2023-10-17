@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/17 14:09:09 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/17 14:19:45 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ Client& Client::operator=(Client const& other)
 {
 	if (this == &other)
 		return (*this);
-	this->_config = other._config;
+	this->_config_server = other._config_server;
 	this->_socket = other._socket;
 	return (*this);
 }
