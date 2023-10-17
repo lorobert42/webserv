@@ -11,11 +11,11 @@
 /* ************************************************************************** */
 
 #pragma once
-
-#include "../server/Server.hpp"
 #include <iostream>
 #include <string>
 #include <fstream>
+#include "Request.hpp"
+#include "../server/Server.hpp"
 
 class Client
 {
@@ -34,8 +34,7 @@ class Client
 	
 	private:
 		Server			*_server;
-		int				_socket;
-		std::string		_request;
-
-
+		int				    _socket;
+		std::string   _read;
+		Request     *_request;
 };

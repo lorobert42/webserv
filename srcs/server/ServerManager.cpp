@@ -212,6 +212,56 @@ void	ServerManager::_closeAllClients()
 	}
 }
 
+void ServerManager::_newClient(int server_socket)
+{
+	int client_socket;
+	struct sockaddr_in client_addr;
+	socklen_t client_len = sizeof(client_addr);
+	Client	*new_client = NULL;
+
+	client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_len);
+	if (client_socket == -1)
+	{
+		std::cerr << "Cannot accept client connection: " << strerror(errno) << std::endl;
+		return;
+	}
+	if (!_epollCtlAdd(_epfd, client_socket, EPOLLIN | EPOLLET))
+		return;
+	new_client = new Client(_getServerBySocket(server_socket), client_socket);
+	_clients[client_socket] = new_client;
+}
+
+bool ServerManager::_isServerSocket(int socket) const
+{
+	// Check if socket file descriptor belongs to a server
+	std::map<int, Server*>::const_iterator search = _servers.find(socket);
+	return (search != _servers.end());
+}
+
+Server* ServerManager::_getServerBySocket(int socket)
+{
+	// Find server instance linked to a socket file descriptor
+	std::map<int, Server*>::iterator search = _servers.find(socket);
+	if (search == _servers.end())
+	{
+		// TODO: Better error management
+		throw std::runtime_error("Server does not exist");
+	}
+	return (search->second);
+}
+
+Client ServerManager::_getClientBySocket(int socket)
+{
+	// Find client instance linked to a socket file descriptor
+	std::map<int, Client*>::iterator search = _clients.find(socket);
+	if (search == _clients.end())
+	{
+		// TODO: Better error management
+		throw std::runtime_error("Client does not exist");
+	}
+	return (*search->second);
+}
+
 bool ServerManager::_epollCtlAdd(int epfd, int fd, uint32_t events)
 {
 	// Add scoket file descriptor to the epoll structure, watching events
