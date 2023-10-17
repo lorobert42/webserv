@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/17 12:23:29 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/17 14:09:09 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,13 +19,13 @@ Client::Client()
 	throw std::runtime_error("[Client] : Wait, that's illegal");
 }
 
-Client::Client(Server *server, int &client_socket) :
-	_server(server), _socket(client_socket)
+Client::Client(ConfigServer *config, int &client_socket) :
+	_config_server(config), _socket(client_socket)
 {}
 
 // ### Copy Constructor ###
 Client::Client(Client const& other) :
-	_server(other._server), _socket(other._socket)
+	_config_server(other._config_server), _socket(other._socket)
 {}
 
 // ### Destructor ###
@@ -37,7 +37,7 @@ Client& Client::operator=(Client const& other)
 {
 	if (this == &other)
 		return (*this);
-	this->_server = other._server;
+	this->_config = other._config;
 	this->_socket = other._socket;
 	return (*this);
 }
