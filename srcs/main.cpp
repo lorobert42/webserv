@@ -1,5 +1,18 @@
+#include <csignal>
+#include <iostream>
 #include "config/Config.hpp"
 #include "server/ServerManager.hpp"
+
+bool	g_should_stop = false;
+
+static void sigHandler(int signum)
+{
+	if (signum == SIGINT)
+	{
+		std::cout << "Received SIGINT signal" << std::endl;
+		g_should_stop = true;
+	}
+}
 
 int	main(int argc, char **argv)
 {
@@ -8,11 +21,14 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	try {
+		if (signal(SIGINT, sigHandler) == SIG_ERR)
+		{
+			std::cerr << "Cannot handle signal" << std::endl;
+		}
 		Config *config = argc == 2 ? new Config(argv[1]) : new Config();
 		//std::cout << *config;
-		ServerManager sm(config);
-		sm.setup();
-		sm.run();
+		ServerManager server_manager(config);
+		server_manager.start();
 		delete config;
 	} catch (std::exception &e) {
 		std::cerr << "Error: " << e.what() << std::endl;

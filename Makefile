@@ -6,6 +6,7 @@ SRCS		= srcs/main.cpp \
 			srcs/server/ServerManager.cpp \
 			srcs/server/Server.cpp \
 			srcs/client/Client.cpp \
+			srcs/client/Request.cpp \
 			srcs/config/Config.cpp \
 			srcs/config/ConfigServer.cpp \
 			srcs/config/ConfigRoute.cpp \
