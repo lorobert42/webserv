@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/16 12:13:56 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/17 12:23:29 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,7 +42,7 @@ Client& Client::operator=(Client const& other)
 	return (*this);
 }
 
-//	### Member Function ###
+//	### Member Function [PUBLIC] ###
 
 int	Client::getSocket(void) const
 {
@@ -51,22 +51,21 @@ int	Client::getSocket(void) const
 
 std::string	Client::getRequest(void) const
 {
-	return (this->_request);
+	return (this->_read);
 }
 
 int	Client::readHandler(void)
 {
 	std::cout << "Read Handler" << std::endl;
 	char buffer[1024] = {0};
-	std::string	str;
 
 	int read = recv(_socket, buffer, 1024, MSG_DONTWAIT);
 	if (read < 0)
 		throw std::runtime_error("[READ] : Error");
-	str += std::string(buffer);
-	std::cout << "Request until now:\n" << str << std::endl;
-	if (str.rfind("\r\n\r\n") != std::string::npos)
+	_read += std::string(buffer);
+	if (_read.rfind("\r\n\r\n") != std::string::npos)
 	{
+		_request = new Request(_read);
 		std::cout << "End of request" << std::endl;
 		return (0);
 	}
@@ -77,7 +76,7 @@ static std::string	readHtmlFile(void)
 {
 	std::string		line;
 	std::string		all;
-	std::ifstream	ifs("www/example/index.html");
+	std::ifstream	ifs("www/srcs/index.html");
 
 	if (!ifs)
 	{
@@ -110,3 +109,7 @@ int	Client::writeHandler(void)
 	}
 	return (0);
 }
+
+//	### Member Function [PRIVATE]
+
+
