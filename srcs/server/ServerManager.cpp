@@ -6,11 +6,15 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/16 12:11:55 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/17 11:51:08 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ServerManager.hpp"
+#include <map>
+#include <unistd.h>
+
+extern bool g_should_stop;
 
 // ### Constructor ###
 ServerManager::ServerManager()
@@ -27,7 +31,12 @@ ServerManager::ServerManager(ServerManager const& other) :
 
 // ### Destructor ###
 ServerManager::~ServerManager()
-{}
+{
+	for (std::map<int, Server*>::iterator it = _servers.begin(); it != _servers.end(); it++)
+	{
+		delete it->second;
+	}
+}
 
 // ### Overload operator ###
 ServerManager& ServerManager::operator=(ServerManager const& other)
@@ -39,7 +48,17 @@ ServerManager& ServerManager::operator=(ServerManager const& other)
 }
 
 // ### Member Function ###
-void ServerManager::setup()
+void	ServerManager::start()
+{
+	_setupServers();
+	if (_setupEpoll() == false)
+	{
+		return;
+	}
+	_run();
+}
+
+void ServerManager::_setupServers()
 {
 	// Setup all servers and add them to the manager
 	std::vector<ConfigServer*> servers = _config->getServers();
@@ -51,13 +70,14 @@ void ServerManager::setup()
 		if (new_serv->setup() == false)
 		{
 			std::cerr << "Unable to setup server: " << new_serv->getName() << std::endl;
+			delete new_serv;
 			continue;
 		}
 		_servers[new_serv->getSocket()] = new_serv;
 	}
 }
 
-bool ServerManager::run()
+bool ServerManager::_setupEpoll()
 {
 	std::cout << "3) Create the epoll structure:" << std::endl;
 	_epfd = epoll_create(1);
@@ -75,18 +95,22 @@ bool ServerManager::run()
 			continue;
 		}
 	}
+	return true;
+}
 
+void ServerManager::_run()
+{
 	int nfds;
 	struct epoll_event events[D_MAX_EVENTS];
 
 	std::cout << "- Listening to connections:" << std::endl;
-	while (true)
+	while (g_should_stop == false)
 	{
-		nfds = epoll_wait(_epfd, events, D_MAX_EVENTS, -1);
+		nfds = epoll_wait(_epfd, events, D_MAX_EVENTS, D_TIMEOUT);
 		if (nfds == -1)
 		{
 			std::cerr << "Epoll wait error: " << strerror(errno) << std::endl;
-			return (false);
+			break;
 		}
 
 		for (int n = 0; n < nfds; ++n)
@@ -98,26 +122,93 @@ bool ServerManager::run()
 			}
 			else if (events[n].events & EPOLLIN)
 			{
-				Client	client(_getClientBySocket(events[n].data.fd));
-				std::cout << "[Receiving data on fd:] " << client.getSocket() << std::endl;
-				if (client.readHandler() == 0)
+				Client*	client(_getClientBySocket(events[n].data.fd));
+				std::cout << "[Receiving data on fd:] " << client->getSocket() << std::endl;
+				if (client->readHandler() == 0)
 				{
 					if (!_epollCtlMod(_epfd, events[n].data.fd, EPOLLOUT | EPOLLET))
-						return (false);
+						return; // TODO: handle error
 				}
 			}
 			else if (events[n].events & EPOLLOUT)
 			{
-				Client	client(_getClientBySocket(events[n].data.fd));
-				std::cout << "[Sending data on fd:] " << client.getSocket() << std::endl;
-				client.writeHandler();
-				int fd = client.getSocket();
-				epoll_ctl(_epfd, EPOLL_CTL_DEL, fd, NULL);
-				close(fd);
+				Client*	client(_getClientBySocket(events[n].data.fd));
+				std::cout << "[Sending data on fd:] " << client->getSocket() << std::endl;
+				client->writeHandler();
+				_epollCtlDel(_epfd, events[n].data.fd);
+				_closeClient(events[n].data.fd);
 			}
 			else
 				std::cerr << "Unexpected event" << std::endl;
 		}
+	}
+	std::cout << "Closing remaining clients" << std::endl;
+	_closeAllClients();
+}
+
+void ServerManager::_newClient(int server_socket)
+{
+	int client_socket;
+	struct sockaddr_in client_addr;
+	socklen_t client_len = sizeof(client_addr);
+	Client	*new_client = NULL;
+
+	client_socket = accept(server_socket, (struct sockaddr *)&client_addr, &client_len);
+	if (client_socket == -1)
+	{
+		std::cerr << "Cannot accept client connection: " << strerror(errno) << std::endl;
+		return;
+	}
+	if (!_epollCtlAdd(_epfd, client_socket, EPOLLIN | EPOLLET))
+		return;
+	new_client = new Client(_getServerBySocket(server_socket)->getConfig(), client_socket);
+	_clients[client_socket] = new_client;
+}
+
+bool ServerManager::_isServerSocket(int socket) const
+{
+	// Check if socket file descriptor belongs to a server
+	std::map<int, Server*>::const_iterator search = _servers.find(socket);
+	return (search != _servers.end());
+}
+
+Server* ServerManager::_getServerBySocket(int socket)
+{
+	// Find server instance linked to a socket file descriptor
+	std::map<int, Server*>::iterator search = _servers.find(socket);
+	if (search == _servers.end())
+	{
+		// TODO: Better error management
+		throw std::runtime_error("Server does not exist");
+	}
+	return (search->second);
+}
+
+Client* ServerManager::_getClientBySocket(int socket)
+{
+	// Find client instance linked to a socket file descriptor
+	std::map<int, Client*>::iterator search = _clients.find(socket);
+	if (search == _clients.end())
+	{
+		// TODO: Better error management
+		throw std::runtime_error("Client does not exist");
+	}
+	return (search->second);
+}
+
+void	ServerManager::_closeClient(int socket)
+{
+	Client*	client = _getClientBySocket(socket);
+	delete client;
+	close(socket);
+	_clients.erase(socket);
+}
+
+void	ServerManager::_closeAllClients()
+{
+	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++)
+	{
+		_closeClient(it->first);
 	}
 }
 

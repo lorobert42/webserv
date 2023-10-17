@@ -6,12 +6,11 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/17 11:34:36 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/16 12:14:22 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
-
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -35,7 +34,7 @@ class Client
 	
 	private:
 		Server			*_server;
-		int				_socket;
-		std::string		_read;
-		Request			*_request;
+		int				    _socket;
+		std::string   _read;
+		Request     *_request;
 };

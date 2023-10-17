@@ -111,5 +111,3 @@ int	Client::writeHandler(void)
 }
 
 //	### Member Function [PRIVATE]
-
-
