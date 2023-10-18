@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/17 14:19:45 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/18 15:09:47 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,9 +57,9 @@ std::string	Client::getRequest(void) const
 int	Client::readHandler(void)
 {
 	std::cout << "Read Handler" << std::endl;
-	char buffer[1024] = {0};
+	char buffer[4096] = {0};
 
-	int read = recv(_socket, buffer, 1024, MSG_DONTWAIT);
+	int read = recv(_socket, buffer, 4096, MSG_DONTWAIT);
 	if (read < 0)
 		throw std::runtime_error("[READ] : Error");
 	_read += std::string(buffer);

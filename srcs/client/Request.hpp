@@ -22,8 +22,9 @@ class Request
 	private :
 		Request(void);
 
-		std::map<std::string, std::string>	_map;
+		std::map<std::string, std::string>	_header;
 		std::string	_method;
 		std::string	_index;
 		std::string	_version;
+		std::string	_body;
 };
