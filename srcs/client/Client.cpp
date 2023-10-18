@@ -62,6 +62,10 @@ int	Client::readHandler(void)
 	int read = recv(_socket, buffer, 4096, MSG_DONTWAIT);
 	if (read < 0)
 		throw std::runtime_error("[READ] : Error");
+	else if (read == 0)
+	{
+		return (-1);
+	}
 	_read += std::string(buffer);
 	if (_read.rfind("\r\n\r\n") != std::string::npos)
 	{
