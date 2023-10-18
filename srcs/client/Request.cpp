@@ -62,3 +62,28 @@ Request& Request::operator=(Request const& other)
 
 //	### Member Function [PUBLIC] ###
 
+const std::string	&Request::getMethod(void) const
+{
+	return (_method);
+}
+
+const std::string	&Request::getIndex(void) const
+{
+	return (_index);
+}
+
+const std::string	&Request::getVersion(void) const
+{
+	return (_version);
+}
+
+const std::string	Request::getValue(const std::string &key) const
+{
+	std::map<std::string,std::string>::const_iterator	find;
+
+	find = _map.find(key);
+	if (find != _map.end())
+		return (find->second);
+	else
+		return (NULL);
+}

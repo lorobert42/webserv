@@ -15,6 +15,10 @@ class Request
 		Request &operator=(Request const &other);
 		~Request(void);
 
+		const std::string	&getMethod(void) const;
+		const std::string	&getIndex(void) const;
+		const std::string	&getVersion(void) const;
+		const std::string	getValue(const std::string &key) const;
 	private :
 		Request(void);
 
