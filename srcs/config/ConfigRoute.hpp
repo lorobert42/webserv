@@ -17,6 +17,7 @@ class ConfigRoute {
         std::string getUri() const;
 		std::string getPath() const;
 		std::string getIndex() const;
+		std::string getPathWithIndex() const;
 		bool		getGet() const;
 		bool		getPost() const;
 		bool		getDelete() const;

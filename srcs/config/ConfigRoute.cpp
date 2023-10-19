@@ -1,7 +1,7 @@
 #include "ConfigRoute.hpp"
 
 const std::string	DEFAULT_URI 					= "/";
-const std::string	DEFAULT_PATH 					= "www/example";
+const std::string	DEFAULT_PATH 					= "srcs/config/www";
 const std::string	DEFAULT_INDEX 					= "index.html";
 const bool			DEFAULT_GET 					= true;
 const bool			DEFAULT_POST 					= false;
@@ -11,7 +11,7 @@ const std::string	DEFAULT_CGI 					= "";
 const std::string	DEFAULT_CGI_PHP 				= "";
 const std::string	DEFAULT_CGI_PYTHON 				= "";
 const double		DEFAULT_CLIENT_MAX_BODY_SIZE	= 1 * 1024 * 1024;
-const std::string   DEFAULT_UPLOAD_DIR				= "www/example/upload";
+const std::string   DEFAULT_UPLOAD_DIR				= "";
 
 ConfigRoute::ConfigRoute() :
 	_uri(DEFAULT_URI),
@@ -114,6 +114,10 @@ std::string ConfigRoute::getUri() const {
 
 std::string ConfigRoute::getPath() const {
 	return this->_path;
+}
+
+std::string ConfigRoute::getPathWithIndex() const {
+	return this->_path + "/" + this->_index;
 }
 
 std::string ConfigRoute::getIndex() const {

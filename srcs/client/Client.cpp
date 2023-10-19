@@ -76,11 +76,11 @@ int	Client::readHandler(void)
 	return (1);
 }
 
-static std::string	readHtmlFile(void)
+static std::string	readHtmlFile(std::string pathWithIndex)
 {
 	std::string		line;
 	std::string		all;
-	std::ifstream	ifs("www/srcs/index.html");
+	std::ifstream	ifs(pathWithIndex.c_str());
 
 	if (!ifs)
 	{
@@ -98,7 +98,7 @@ int	Client::writeHandler(void)
 	// Need to change server_message by our own
 	std::string	server_message = "HTTP/1.1 200 OK\nContent-type: text/html\nContent-length";
 	// Have to get the set the reponse by the html we need
-	std::string response = readHtmlFile();
+	std::string response = readHtmlFile(this->_config_server->getRouteWithUri("/")->getPathWithIndex());
 	server_message.append("\n\n");
 	server_message.append(response);
 	
