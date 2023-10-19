@@ -63,7 +63,7 @@ void ServerManager::_setupServers()
 	Server* new_serv = NULL;
 	for (std::vector<ConfigServer*>::const_iterator it = servers.begin(); it != servers.end(); it++)
 	{
-		std::cout << (*it)->getPort() << std::endl;
+		//std::cout << (*it)->getPort() << std::endl;
 		new_serv = new Server(*it);
 		if (new_serv->setup() == false)
 		{

@@ -8,6 +8,8 @@ const bool			DEFAULT_POST 					= false;
 const bool			DEFAULT_DELETE 					= false;
 const bool			DEFAULT_AUTOINDEX 				= false;
 const std::string	DEFAULT_CGI 					= "";
+const std::string	DEFAULT_CGI_PHP 				= "";
+const std::string	DEFAULT_CGI_PYTHON 				= "";
 const double		DEFAULT_CLIENT_MAX_BODY_SIZE	= 1 * 1024 * 1024;
 const std::string   DEFAULT_UPLOAD_DIR				= "www/example/upload";
 
@@ -20,6 +22,8 @@ ConfigRoute::ConfigRoute() :
 	_delete(DEFAULT_DELETE),
 	_autoindex(DEFAULT_AUTOINDEX),
 	_cgi(DEFAULT_CGI),
+	_cgi_php(DEFAULT_CGI_PHP),
+	_cgi_python(DEFAULT_CGI_PYTHON),
 	_client_max_body_size(DEFAULT_CLIENT_MAX_BODY_SIZE),
 	_upload_dir(DEFAULT_UPLOAD_DIR)
 	{}
@@ -34,6 +38,8 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 	this->_delete = DEFAULT_DELETE;
 	this->_autoindex = DEFAULT_AUTOINDEX;
 	this->_cgi = DEFAULT_CGI;
+	this->_cgi_php = DEFAULT_CGI_PHP;
+	this->_cgi_python = DEFAULT_CGI_PYTHON;
 	this->_client_max_body_size = DEFAULT_CLIENT_MAX_BODY_SIZE;
 	this->_upload_dir = DEFAULT_UPLOAD_DIR;
 
@@ -65,6 +71,10 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 			this->_autoindex = ConfigHelper::convertStringToBool(value);
 		else if (option == "cgi")
 			this->_cgi = value;
+		else if (option == "cgi_php")
+			this->_cgi_php = value;
+		else if (option == "cgi_python")
+			this->_cgi_python = value;
 		else if (option == "client_max_body_size")
 			this->_client_max_body_size = ConfigHelper::convertStringToClientMaxBodySize(value);
 		else if (option == "upload_dir")
@@ -90,6 +100,8 @@ ConfigRoute	&ConfigRoute::operator=(ConfigRoute const &rhs) {
 		this->_delete = rhs._delete;
 		this->_autoindex = rhs._autoindex;
 		this->_cgi = rhs._cgi;
+		this->_cgi_php = rhs._cgi_php;
+		this->_cgi_python = rhs._cgi_python;
 		this->_client_max_body_size = rhs._client_max_body_size;
 		this->_upload_dir = rhs._upload_dir;
 	}
@@ -128,6 +140,14 @@ std::string	ConfigRoute::getCgi() const {
 	return this->_cgi;
 }
 
+std::string	ConfigRoute::getCgiPhp() const {
+	return this->_cgi_php;
+}
+
+std::string	ConfigRoute::getCgiPython() const {
+	return this->_cgi_python;
+}
+
 double	ConfigRoute::getClientMaxBodySize() const {
 	return this->_client_max_body_size;
 }
@@ -146,6 +166,8 @@ std::ostream &operator<<(std::ostream &o, ConfigRoute const &rhs) {
 	o << "delete: " << rhs.getDelete() << std::endl;
 	o << "autoindex: " << rhs.getAutoindex() << std::endl;
 	o << "cgi: " << rhs.getCgi() << std::endl;
+	o << "cgi_php: " << rhs.getCgiPhp() << std::endl;
+	o << "cgi_python: " << rhs.getCgiPython() << std::endl;
 	o << "client_max_body_size: " << rhs.getClientMaxBodySize() << std::endl;
 	o << "upload_dir: " << rhs.getUploadDir() << std::endl;
 	return (o);
