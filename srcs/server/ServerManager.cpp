@@ -11,8 +11,6 @@
 /* ************************************************************************** */
 
 #include "ServerManager.hpp"
-#include <map>
-#include <unistd.h>
 
 extern bool g_should_stop;
 
@@ -124,10 +122,16 @@ void ServerManager::_run()
 			{
 				Client*	client(_getClientBySocket(events[n].data.fd));
 				std::cout << "[Receiving data on fd:] " << client->getSocket() << std::endl;
-				if (client->readHandler() == 0)
+				int	handler_response = client->readHandler();
+				if (handler_response == 0)
 				{
-					if (!_epollCtlMod(_epfd, events[n].data.fd, EPOLLOUT | EPOLLET))
+					if (!_epollCtlMod(_epfd, events[n].data.fd, EPOLLOUT))
 						return; // TODO: handle error
+				}
+				else if (handler_response == -1)
+				{
+					std::cout << "Client disconnected: " << events[n].data.fd << std::endl;
+					_closeClient(events[n].data.fd);
 				}
 			}
 			else if (events[n].events & EPOLLOUT)
@@ -159,7 +163,7 @@ void ServerManager::_newClient(int server_socket)
 		std::cerr << "Cannot accept client connection: " << strerror(errno) << std::endl;
 		return;
 	}
-	if (!_epollCtlAdd(_epfd, client_socket, EPOLLIN | EPOLLET))
+	if (!_epollCtlAdd(_epfd, client_socket, EPOLLIN))
 		return;
 	new_client = new Client(_getServerBySocket(server_socket)->getConfig(), client_socket);
 	_clients[client_socket] = new_client;
