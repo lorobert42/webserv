@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
+/*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/17 14:18:13 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/23 14:07:56 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -120,13 +120,18 @@ void ServerManager::_run()
 			}
 			else if (events[n].events & EPOLLIN)
 			{
-				Client*	client(_getClientBySocket(events[n].data.fd));
+				Client*	client = _getClientBySocket(events[n].data.fd);
+				if (!client)
+					continue;
 				std::cout << "[Receiving data on fd:] " << client->getSocket() << std::endl;
 				int	handler_response = client->readHandler();
 				if (handler_response == 0)
 				{
-					if (!_epollCtlMod(_epfd, events[n].data.fd, EPOLLOUT))
-						return; // TODO: handle error
+					if (!_epollCtlMod(_epfd, events[n].data.fd, EPOLLOUT | EPOLLET))
+					{
+						g_should_stop = true;
+						break;
+					}
 				}
 				else if (handler_response == -1)
 				{
@@ -136,10 +141,16 @@ void ServerManager::_run()
 			}
 			else if (events[n].events & EPOLLOUT)
 			{
-				Client*	client(_getClientBySocket(events[n].data.fd));
+				Client*	client = _getClientBySocket(events[n].data.fd);
+				if (!client)
+					continue;
 				std::cout << "[Sending data on fd:] " << client->getSocket() << std::endl;
 				client->writeHandler();
-				_epollCtlDel(_epfd, events[n].data.fd);
+				if (!_epollCtlDel(_epfd, events[n].data.fd))
+				{
+					g_should_stop = true;
+					break;
+				}
 				_closeClient(events[n].data.fd);
 			}
 			else
@@ -163,9 +174,18 @@ void ServerManager::_newClient(int server_socket)
 		std::cerr << "Cannot accept client connection: " << strerror(errno) << std::endl;
 		return;
 	}
-	if (!_epollCtlAdd(_epfd, client_socket, EPOLLIN))
+	Server	*server = _getServerBySocket(server_socket);
+	if (!server)
+	{
+		close(client_socket);
 		return;
-	new_client = new Client(_getServerBySocket(server_socket)->getConfig(), client_socket);
+	}
+	if (!_epollCtlAdd(_epfd, client_socket, EPOLLIN))
+	{
+		close(client_socket);
+		return;
+	}
+	new_client = new Client(server->getConfig(), client_socket);
 	_clients[client_socket] = new_client;
 }
 
@@ -182,8 +202,8 @@ Server* ServerManager::_getServerBySocket(int socket)
 	std::map<int, Server*>::iterator search = _servers.find(socket);
 	if (search == _servers.end())
 	{
-		// TODO: Better error management
-		throw std::runtime_error("Server does not exist");
+		std::cerr << "Server " << socket << " does not exist" << std::endl;
+		return NULL;
 	}
 	return (search->second);
 }
@@ -194,8 +214,8 @@ Client* ServerManager::_getClientBySocket(int socket)
 	std::map<int, Client*>::iterator search = _clients.find(socket);
 	if (search == _clients.end())
 	{
-		// TODO: Better error management
-		throw std::runtime_error("Client does not exist");
+		std::cerr << "Client " << socket << " does not exist" << std::endl;
+		return NULL;
 	}
 	return (search->second);
 }
@@ -203,6 +223,8 @@ Client* ServerManager::_getClientBySocket(int socket)
 void	ServerManager::_closeClient(int socket)
 {
 	Client*	client = _getClientBySocket(socket);
+	if (!client)
+		return;
 	delete client;
 	close(socket);
 	_clients.erase(socket);
