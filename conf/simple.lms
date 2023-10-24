@@ -15,7 +15,7 @@ server:
 		delete=false
 		autoindex=false
 		cgi=cgi/custom
-		cgi_php=/usr/bin/php-cgi
+		cgi_php=/usr/bin/php-cgi82
 		cgi_python=/usr/bin/python
 		client_max_body_size=1K
 		upload_dir=www/custom/upload

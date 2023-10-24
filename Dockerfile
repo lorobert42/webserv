@@ -7,6 +7,9 @@ RUN apk update && apk upgrade && apk add --no-cache \
     nginx \
     vim \
     valgrind \
+    php82 \
+    php82-fpm \
+    php82-cgi \
     && rm -rf /var/cache/apk/*
 
 COPY . /home/webserv

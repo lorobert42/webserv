@@ -3,10 +3,11 @@
 #include <iostream>
 #include <string>
 #include <map>
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 #include <cstring>
 #include "../client/Client.hpp"
+#include "../client/Request.hpp"
 
 class Client;
 

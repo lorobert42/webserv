@@ -3,17 +3,15 @@
 CgiHandler::CgiHandler() {}
 
 CgiHandler::CgiHandler(Client *client) {
-	(void)client;
-
 	// TODO: Set environment variables dedicated for the server
 	this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
 	this->_env["SERVER_NAME"] = "TODO";
 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 
 	// TODO: Set environment variables dedicated for the request
-	this->_env["SERVER_PROTOCOL"] = "HTTP/1.1";
-	this->_env["SERVER_PORT"] = "TODO";
-	this->_env["REQUEST_METHOD"] = "TODO";
+	this->_env["SERVER_PROTOCOL"] = client->getRequest()->getVersion();
+	this->_env["SERVER_PORT"] = client->getConfigServer()->getPort();
+	this->_env["REQUEST_METHOD"] = client->getRequest()->getMethod();
 	this->_env["PATH_INFO"] = "TODO";
 	this->_env["PATH_TRANSLATED"] = "TODO";
 	this->_env["SCRIPT_NAME"] = "TODO";
@@ -27,14 +25,14 @@ CgiHandler::CgiHandler(Client *client) {
 	this->_env["CONTENT_LENGTH"] = "TODO";
 
 	// TODO: Set environment variables from the client
-	this->_env["HTTP_ACCEPT"] = "TODO";
+	this->_env["HTTP_ACCEPT"] = client->getRequest()->getValue("Accept");
 	this->_env["HTTP_ACCEPT_CHARSET"] = "TODO";
-	this->_env["HTTP_ACCEPT_ENCODING"] = "TODO";
-	this->_env["HTTP_ACCEPT_LANGUAGE"] = "TODO";
-	this->_env["HTTP_CONNECTION"] = "TODO";
-	this->_env["HTTP_HOST"] = "TODO";
-	this->_env["HTTP_REFERER"] = "TODO";
-	this->_env["HTTP_USER_AGENT"] = "TODO";
+	this->_env["HTTP_ACCEPT_ENCODING"] = client->getRequest()->getValue("Accept-Encoding");
+	this->_env["HTTP_ACCEPT_LANGUAGE"] = client->getRequest()->getValue("Accept-Language");
+	this->_env["HTTP_CONNECTION"] = client->getRequest()->getValue("Connection");
+	this->_env["HTTP_HOST"] = client->getRequest()->getValue("Host");
+	this->_env["HTTP_REFERER"] = "TODO"; // client->getRequest()->getValue("Referer");
+	this->_env["HTTP_USER_AGENT"] = client->getRequest()->getValue("User-Agent");
 	this->_env["HTTP_COOKIE"] = "TODO";
 }
 

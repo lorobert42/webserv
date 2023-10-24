@@ -30,8 +30,9 @@ class Client
 		Client& operator=(Client const& other);
 		~Client(void);
 
-		int	getSocket(void) const;
-		std::string getRequest(void) const;
+		int				getSocket(void) const;
+		ConfigServer	*getConfigServer(void) const;
+		Request			*getRequest(void) const;
 
 		int	readHandler(void);
 		int writeHandler(void);

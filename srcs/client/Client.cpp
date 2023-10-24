@@ -49,9 +49,14 @@ int	Client::getSocket(void) const
 	return (this->_socket);	
 }
 
-std::string	Client::getRequest(void) const
+ConfigServer	*Client::getConfigServer(void) const
 {
-	return (this->_read);
+	return (this->_config_server);
+}
+
+Request	*Client::getRequest(void) const
+{
+	return (this->_request);
 }
 
 int	Client::readHandler(void)
