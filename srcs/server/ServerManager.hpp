@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerManager.hpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
+/*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:19:14 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/16 14:59:13 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/25 10:02:42 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,6 @@
 #include "Server.hpp"
 
 #define D_MAX_EVENTS 10050
-#define D_BUFFER_SIZE 1024
 #define D_TIMEOUT 200
 
 class ServerManager {
@@ -50,15 +49,23 @@ class ServerManager {
 		std::map<int, Server*> 	_servers;
 		std::map<int, Client*>	_clients;
 
+		// Initialization
 		void	_setupServers();
 		bool	_setupEpoll();
+		// Main loop
 		void	_run();
-		bool	_isServerSocket(int socket) const;
-		Server*	_getServerBySocket(int socket);
-		Client*	_getClientBySocket(int socket);
+		// I/O management
+		bool	_handleRead(int fd);
+		bool	_handleWrite(int fd);
+		// Clients management
 		void	_newClient(int server_socket);
+		Client*	_getClientBySocket(int socket);
 		void	_closeClient(int client_socket);
 		void	_closeAllClients();
+		// Servers management
+		bool	_isServerSocket(int socket) const;
+		Server*	_getServerBySocket(int socket);
+		// Epoll management
 		bool	_epollCtlAdd(int epfd, int fd, uint32_t events);
 		bool	_epollCtlMod(int epfd, int fd, uint32_t events);
 		bool	_epollCtlDel(int epfd, int fd);
