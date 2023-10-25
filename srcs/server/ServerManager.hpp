@@ -6,25 +6,19 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:19:14 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/25 10:02:42 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/10/25 10:35:09 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #pragma once
 
 #include <iostream>
-#include <unistd.h>
-#include <algorithm>
 #include <cerrno>
 #include <cstring>
+#include <unistd.h>
 #include <string>
-#include <fstream>
 #include <map>
-#include <vector>
-#include <stdexcept>
-#include <netinet/in.h>
 #include <sys/socket.h>
-#include <fcntl.h>
 #include <sys/epoll.h>
 #include "../config/Config.hpp"
 #include "../client/Client.hpp"

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.hpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
+/*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 09:46:17 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/11 20:01:58 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/25 10:35:38 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,15 +16,12 @@
 #include <cerrno>
 #include <cstring>
 #include <iostream>
-#include <map>
 #include <netinet/in.h>
 #include <string>
-#include <stdexcept>
 #include <sys/socket.h>
 
 class Server {
 	public:
-		bool setup();
 		ConfigServer* getConfig() const;
 		std::string getName() const;
 		std::string getHost() const;
@@ -32,7 +29,8 @@ class Server {
 		int getSocket() const;
 		struct sockaddr_in getAddr() const;
 
-		Server();
+		bool setup();
+
 		Server(ConfigServer* config);
 		Server(Server const& other);
 		~Server();
@@ -45,4 +43,6 @@ class Server {
 		int					_port;
 		int					_socket;
 		struct sockaddr_in	_addr;
+
+		Server();
 };

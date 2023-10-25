@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Server.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
+/*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/05 22:21:36 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/16 09:56:42 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/25 10:35:40 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,7 @@ struct sockaddr_in Server::getAddr() const
 
 // ### Constructor ###
 Server::Server()
-{
-	std::cout << "constructor of server call" << std::endl;
-	// TODO: Better error management
-	throw std::runtime_error("[Server] : Wait, that's illegal");
-}
+{}
 
 Server::Server(ConfigServer* config) :
 	_config(config)
