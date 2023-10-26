@@ -106,7 +106,7 @@ int	Client::writeHandler(void)
 	// Have to get the set the reponse by the html we need
 	std::string response1 = readHtmlFile(this->_config_server->getRouteWithUri("/")->getPathWithIndex());
 
-	// FIXME
+	// TODO
 	CgiHandler cgi(this);
 	std::string response = cgi.executeCgi();
 
