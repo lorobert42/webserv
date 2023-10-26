@@ -3,12 +3,12 @@
 const std::string   DEFAULT_SERVER_NAME             = "webserv";
 const std::string   DEFAULT_HOST                    = "localhost";
 const int           DEFAULT_PORT                    = 8080;
-const std::string   DEFAULT_ERROR_PAGE_400          = "www/error_pages/400.html";
-const std::string   DEFAULT_ERROR_PAGE_403          = "www/error_pages/403.html";
-const std::string   DEFAULT_ERROR_PAGE_404          = "www/error_pages/404.html";
-const std::string   DEFAULT_ERROR_PAGE_405          = "www/error_pages/405.html";
-const std::string   DEFAULT_ERROR_PAGE_413          = "www/error_pages/413.html";
-const std::string   DEFAULT_ERROR_PAGE_500          = "www/error_pages/500.html";
+const std::string   DEFAULT_ERROR_PAGE_400          = "srcs/config/www/400.html";
+const std::string   DEFAULT_ERROR_PAGE_403          = "srcs/config/www/403.html";
+const std::string   DEFAULT_ERROR_PAGE_404          = "srcs/config/www/404.html";
+const std::string   DEFAULT_ERROR_PAGE_405          = "srcs/config/www/405.html";
+const std::string   DEFAULT_ERROR_PAGE_413          = "srcs/config/www/413.html";
+const std::string   DEFAULT_ERROR_PAGE_500          = "srcs/config/www/500.html";
 
 ConfigServer::ConfigServer():
 	_name(DEFAULT_SERVER_NAME),
