@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/26 13:14:08 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/26 15:47:51 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,11 @@
 class CgiHandler;
 
 enum	code_error {
-		E_SUCCESS = 0
+		E_SUCCESS = 0,
 		E_NO_ROUTE = 1,
 		E_NO_DIRECTORY = 2,
-		E_NO_FILE = 3;
+		E_NO_FILE = 3,
+		E_FAIL = 4
 };
 
 #define D_BUFF_SIZE 4096

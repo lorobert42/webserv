@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/26 13:13:50 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/26 15:55:17 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -129,13 +129,15 @@ int	Client::writeHandler(void)
 	_route = _config_server->getRouteWithUri(_request->getIndex());
 	_path = _route->getPath();
 	if (_route == NULL)
+	{
+		std::cout << "Route not find" << std::endl;
 		return (_requestNotFound());
-	if (_checkFile() == true)
+	}
+	if (_checkFile() == E_SUCCESS)
 		server_message = _requestFound();
 	else
 		return (_requestNotFound());
 
-	server_message = "HTTP/1.1 200 OK\ncontent-type: text/html\ncontent-length:";
 	// Have to get the set the reponse by the html we need
 	std::string response = readHtmlFile(_route->getPathWithIndex());
 

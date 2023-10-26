@@ -4,12 +4,5 @@ server:
 	port=8080
 
 	route:
-		uri=/
-		path=srcs/config/www
-		index=index.html
-	;
-	route:
-		uri=/foo
-		ndex=home.html
 	;
 ;
