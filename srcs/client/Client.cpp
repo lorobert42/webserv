@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/18 15:09:47 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/26 12:04:30 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,9 @@ Client::Client(Client const& other) :
 
 // ### Destructor ###
 Client::~Client()
-{}
+{
+	delete(_request);
+}
 
 // ### Overload operator ###
 Client& Client::operator=(Client const& other)
@@ -83,15 +85,17 @@ int	Client::readHandler(void)
 	return (1);
 }
 
-static std::string	readHtmlFile(std::string pathWithIndex)
+static std::string	readHtmlFile(std::string path_with_index)
 {
 	std::string		line;
 	std::string		all;
-	std::ifstream	ifs(pathWithIndex.c_str());
+	std::ifstream	ifs(path_with_index.c_str());
 
+	std::cout << path_with_index << std::endl;
 	if (!ifs)
 	{
 		std::cout << "file cannot be read" << std::endl;
+		//TODO better error handling
 		return (NULL);
 	}
 	while (std::getline(ifs, line))
@@ -104,8 +108,8 @@ int	Client::writeHandler(void)
 	std::cout << "Write handler" << std::endl;
 	// Need to change server_message by our own
 	std::string	server_message;
-	_uri = _request->getIndex();
-	_route = _config_server->getRouteWithUri(_uri);
+	_route = _config_server->getRouteWithUri(_request->getIndex());
+	_path = _route->getPath();
 	if (_route == NULL)
 	{
 		std::cout << "Route not found" << std::endl;
@@ -115,16 +119,16 @@ int	Client::writeHandler(void)
 		server_message = _requestFound();
 	else
 	{
-		std::cout << "File not found" << std::endl;
+		std::cout << "#\nFile not found" << std::endl;
 		return (_requestNotFound());
 	}
 
 	// Have to get the set the reponse by the html we need
-	std::string response1 = readHtmlFile(this->_config_server->getRouteWithUri("/")->getPathWithIndex());
+	std::string response = readHtmlFile(_route->getPathWithIndex());
 
 	// TODO
-	CgiHandler cgi(this);
-	std::string response = cgi.executeCgi();
+	//CgiHandler cgi(this);
+	//std::string response = cgi.executeCgi();
 
 	server_message.append("\n\n");
 	server_message.append(response);
@@ -148,20 +152,19 @@ bool	Client::_checkFile(void)
 {
 	struct	stat s;
 
-	if (stat(_uri.c_str(), &s))
+	if (stat(_path.c_str(), &s) == 0)
 	{
-		std::cout << _uri << std::endl;
 		if (s.st_mode & S_IFDIR) // it's a directory
 		{
-			_uri.append(_route->getIndex());
-			if (access(_uri.c_str(), R_OK))
+			_path.append(_route->getIndex());
+			if (access(_path.c_str(), R_OK))
 				return (true);
 			else
 				return (false);
 		}
 		if (s.st_mode & S_IFREG) // it's a file
 		{
-			if (access(_uri.c_str(), R_OK))
+			if (access(_path.c_str(), R_OK))
 				return (true);
 			else
 				return (false);
@@ -170,16 +173,21 @@ bool	Client::_checkFile(void)
 			return (false);
 	}
 	else
-	{
-		std::cout << "here" << std::endl;
 		return (false);
-	}
 }
 
 std::string	Client::_requestFound(void)
 {
-	std::cout << "Request Found" << std::endl;
-	return (NULL);
+	std::string	header_message = D_200_MESSAGE;
+	std::string	content_type;
+	std::stringstream ss(_request->getValue("Accept"));
+
+
+	std::getline(ss,content_type,',');
+	header_message.append("\ncontent_type: ");
+	header_message.append(content_type);
+	header_message.append("\ncontent_length: ");
+	return (header_message);
 }
 
 int	Client::_requestNotFound(void)
