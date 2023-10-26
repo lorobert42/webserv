@@ -102,10 +102,10 @@ std::string CgiHandler::executeCgi() {
 		close(pipefd[1]);
 
 		// Prepare the argument list
-		char* argv[3] = {const_cast<char*>("/usr/bin/php-cgi82"), const_cast<char*>("/home/webserv/www/cgi/env.cgi.php"), NULL};
+		char* argv[3] = {const_cast<char*>("/usr/bin/php-cgi"), const_cast<char*>("/home/webserv/www/cgi/env.cgi.php"), NULL};
 
 		// Execute the CGI script
-		if (execve("/usr/bin/php-cgi82", argv, env) == -1) {
+		if (execve("/usr/bin/php-cgi", argv, env) == -1) {
 			perror("[CGI] execve() failed");
 			_exit(EXIT_FAILURE);
 		}

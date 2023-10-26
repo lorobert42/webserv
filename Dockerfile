@@ -7,12 +7,13 @@ RUN apk update && apk upgrade && apk add --no-cache \
     nginx \
     vim \
     valgrind \
-    php82 \
-    php82-fpm \
-    php82-cgi \
+    php \
+    php-fpm \
+    php-cgi \
     && rm -rf /var/cache/apk/*
 
 COPY . /home/webserv
+COPY ./docker_conf/php.local.ini /etc/php81/conf.d/php.local.ini
 
 WORKDIR /home/webserv
 
