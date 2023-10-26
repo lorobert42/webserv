@@ -17,11 +17,13 @@ class ConfigRoute {
         std::string getUri() const;
 		std::string getPath() const;
 		std::string getIndex() const;
+		std::string getPathWithIndex() const;
 		bool		getGet() const;
 		bool		getPost() const;
 		bool		getDelete() const;
 		bool		getAutoindex() const;
-		std::string getCgi() const;
+		std::string getCgiScript() const;
+		std::string getCgiBin() const;
 		double		getClientMaxBodySize() const;
 		std::string getUploadDir() const;
     private:
@@ -32,7 +34,8 @@ class ConfigRoute {
 		bool		_post;
 		bool		_delete;
 		bool		_autoindex;
-		std::string	_cgi;
+		std::string	_cgi_script;
+		std::string	_cgi_bin;
 		double 		_client_max_body_size;
 		std::string	_upload_dir;
 };

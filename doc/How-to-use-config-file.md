@@ -61,7 +61,7 @@ option=value
 
 #### Sub-directives
 - `route`: Route configuration.
-  - Default: `none`
+  - Default: A simple route with the URI `/`, path `srcs/config/www` and index `index.html`.
 
 #### Options
 - `name`: The name of the server.
@@ -89,7 +89,7 @@ option=value
 - `uri`: The URI of the route.
   - Default: `/`
 - `path`: The path to the resource.
-  - Default: `www/example`
+  - Default: `srcs/config/www`
 - `index`: The index of the route.
   - Default: `index.html`
 - `get`: Enable or disable the GET method.
@@ -100,9 +100,11 @@ option=value
   - Default: `false`
 - `autoindex`: Enable or disable the autoindex (list ressources of the directory).
   - Default: `false`
-- `cgi`: Path to the CGI executable.
+- `cgi_script`: Path to the CGI script.
+  - Default: `none`
+- `cgi_bin`: Path to the CGI binary.
   - Default: `none`
 - `upload_dir`: Path to the directory where the uploaded files will be stored.
-  - Default: `www/example/upload`
+  - Default: `none`
 - `client_max_body_size`: The maximum size of the body of a request. You can use the suffixes `K`, `M` and `G` to specify the size in kilobytes, megabytes and gigabytes.
   - Default: `1M`

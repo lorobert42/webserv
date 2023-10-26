@@ -1,15 +1,16 @@
 #include "ConfigRoute.hpp"
 
 const std::string	DEFAULT_URI 					= "/";
-const std::string	DEFAULT_PATH 					= "www/srcs";
+const std::string	DEFAULT_PATH 					= "srcs/config/www";
 const std::string	DEFAULT_INDEX 					= "index.html";
 const bool			DEFAULT_GET 					= true;
 const bool			DEFAULT_POST 					= false;
 const bool			DEFAULT_DELETE 					= false;
 const bool			DEFAULT_AUTOINDEX 				= false;
-const std::string	DEFAULT_CGI 					= "";
+const std::string	DEFAULT_CGI_SCRIPT				= "";
+const std::string	DEFAULT_CGI_BIN					= "";
 const double		DEFAULT_CLIENT_MAX_BODY_SIZE	= 1 * 1024 * 1024;
-const std::string   DEFAULT_UPLOAD_DIR				= "www/example/upload";
+const std::string   DEFAULT_UPLOAD_DIR				= "";
 
 ConfigRoute::ConfigRoute() :
 	_uri(DEFAULT_URI),
@@ -19,7 +20,8 @@ ConfigRoute::ConfigRoute() :
 	_post(DEFAULT_POST),
 	_delete(DEFAULT_DELETE),
 	_autoindex(DEFAULT_AUTOINDEX),
-	_cgi(DEFAULT_CGI),
+	_cgi_script(DEFAULT_CGI_SCRIPT),
+	_cgi_bin(DEFAULT_CGI_BIN),
 	_client_max_body_size(DEFAULT_CLIENT_MAX_BODY_SIZE),
 	_upload_dir(DEFAULT_UPLOAD_DIR)
 	{}
@@ -33,7 +35,8 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 	this->_post = DEFAULT_POST;
 	this->_delete = DEFAULT_DELETE;
 	this->_autoindex = DEFAULT_AUTOINDEX;
-	this->_cgi = DEFAULT_CGI;
+	this->_cgi_script = DEFAULT_CGI_SCRIPT;
+	this->_cgi_bin = DEFAULT_CGI_BIN;
 	this->_client_max_body_size = DEFAULT_CLIENT_MAX_BODY_SIZE;
 	this->_upload_dir = DEFAULT_UPLOAD_DIR;
 
@@ -63,8 +66,10 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 			this->_delete = ConfigHelper::convertStringToBool(value);
 		else if (option == "autoindex")
 			this->_autoindex = ConfigHelper::convertStringToBool(value);
-		else if (option == "cgi")
-			this->_cgi = value;
+		else if (option == "cgi_script")
+			this->_cgi_script = value;
+		else if (option == "cgi_bin")
+			this->_cgi_bin = value;
 		else if (option == "client_max_body_size")
 			this->_client_max_body_size = ConfigHelper::convertStringToClientMaxBodySize(value);
 		else if (option == "upload_dir")
@@ -89,7 +94,8 @@ ConfigRoute	&ConfigRoute::operator=(ConfigRoute const &rhs) {
 		this->_post = rhs._post;
 		this->_delete = rhs._delete;
 		this->_autoindex = rhs._autoindex;
-		this->_cgi = rhs._cgi;
+		this->_cgi_script = rhs._cgi_script;
+		this->_cgi_bin = rhs._cgi_bin;
 		this->_client_max_body_size = rhs._client_max_body_size;
 		this->_upload_dir = rhs._upload_dir;
 	}
@@ -102,6 +108,10 @@ std::string ConfigRoute::getUri() const {
 
 std::string ConfigRoute::getPath() const {
 	return this->_path;
+}
+
+std::string ConfigRoute::getPathWithIndex() const {
+	return this->_path + "/" + this->_index;
 }
 
 std::string ConfigRoute::getIndex() const {
@@ -124,8 +134,12 @@ bool	ConfigRoute::getAutoindex() const {
 	return this->_autoindex;
 }
 
-std::string	ConfigRoute::getCgi() const {
-	return this->_cgi;
+std::string	ConfigRoute::getCgiScript() const {
+	return this->_cgi_script;
+}
+
+std::string	ConfigRoute::getCgiBin() const {
+	return this->_cgi_bin;
 }
 
 double	ConfigRoute::getClientMaxBodySize() const {
@@ -145,7 +159,8 @@ std::ostream &operator<<(std::ostream &o, ConfigRoute const &rhs) {
 	o << "post: " << rhs.getPost() << std::endl;
 	o << "delete: " << rhs.getDelete() << std::endl;
 	o << "autoindex: " << rhs.getAutoindex() << std::endl;
-	o << "cgi: " << rhs.getCgi() << std::endl;
+	o << "cgi_script: " << rhs.getCgiScript() << std::endl;
+	o << "cgi_bin: " << rhs.getCgiBin() << std::endl;
 	o << "client_max_body_size: " << rhs.getClientMaxBodySize() << std::endl;
 	o << "upload_dir: " << rhs.getUploadDir() << std::endl;
 	return (o);

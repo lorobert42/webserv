@@ -19,6 +19,9 @@
 #include <sys/stat.h>
 #include "Request.hpp"
 #include "../config/ConfigServer.hpp"
+#include "../cgi/CgiHandler.hpp"
+
+class CgiHandler;
 
 #define D_BUFF_SIZE 4096
 #define D_200_MESSAGE "200 ok"
@@ -33,8 +36,9 @@ class Client
 		Client& operator=(Client const& other);
 		~Client(void);
 
-		int	getSocket(void) const;
-		std::string getRequest(void) const;
+		int				getSocket(void) const;
+		ConfigServer	*getConfigServer(void) const;
+		Request			*getRequest(void) const;
 
 		int	readHandler(void);
 		int writeHandler(void);

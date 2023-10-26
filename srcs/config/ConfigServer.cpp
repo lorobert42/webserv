@@ -164,10 +164,6 @@ ConfigRoute	*ConfigServer::getRouteWithUri(const std::string &uri) const {
 	return (NULL);
 }
 
-void	ConfigServer::addRoute(ConfigRoute &route) {
-	this->_routes.push_back(&route);
-}
-
 std::ostream    &operator<<(std::ostream &o, ConfigServer const &rhs) {
 	o << "=== Server ===" << std::endl;
 	o << "name: " << rhs.getName() << std::endl;

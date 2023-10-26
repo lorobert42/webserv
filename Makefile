@@ -11,6 +11,7 @@ SRCS		= srcs/main.cpp \
 			srcs/config/ConfigServer.cpp \
 			srcs/config/ConfigRoute.cpp \
 			srcs/config/ConfigHelper.cpp \
+			srcs/cgi/CgiHandler.cpp \
 
 SRCS_TEST	= srcs/epoll_serv.cpp
 

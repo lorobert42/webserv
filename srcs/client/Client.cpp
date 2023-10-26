@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/23 20:32:35 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/18 15:09:47 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,9 +49,14 @@ int	Client::getSocket(void) const
 	return (this->_socket);	
 }
 
-std::string	Client::getRequest(void) const
+ConfigServer	*Client::getConfigServer(void) const
 {
-	return (this->_read);
+	return (this->_config_server);
+}
+
+Request	*Client::getRequest(void) const
+{
+	return (this->_request);
 }
 
 int	Client::readHandler(void)
@@ -78,11 +83,11 @@ int	Client::readHandler(void)
 	return (1);
 }
 
-static std::string	readHtmlFile(void)
+static std::string	readHtmlFile(std::string pathWithIndex)
 {
 	std::string		line;
 	std::string		all;
-	std::ifstream	ifs("www/srcs/index.html");
+	std::ifstream	ifs(pathWithIndex.c_str());
 
 	if (!ifs)
 	{
@@ -115,7 +120,12 @@ int	Client::writeHandler(void)
 	}
 
 	// Have to get the set the reponse by the html we need
-	std::string response = readHtmlFile();
+	std::string response1 = readHtmlFile(this->_config_server->getRouteWithUri("/")->getPathWithIndex());
+
+	// TODO
+	CgiHandler cgi(this);
+	std::string response = cgi.executeCgi();
+
 	server_message.append("\n\n");
 	server_message.append(response);
 	
@@ -128,6 +138,7 @@ int	Client::writeHandler(void)
 			std::cout << "Could not send reposne" << std::endl;
 		total_bytes_send += bytes_send;
 	}
+
 	return (0);
 }
 
