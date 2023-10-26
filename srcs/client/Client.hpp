@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/23 20:20:13 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/26 11:42:54 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sstream>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -24,8 +25,8 @@
 class CgiHandler;
 
 #define D_BUFF_SIZE 4096
-#define D_200_MESSAGE "200 ok"
-#define D_404_MESSAGE "404"
+#define D_200_MESSAGE "HTTP/1.1 200 OK"
+#define D_404_MESSAGE "HTTP/1.1 404"
 
 class Client
 {
@@ -56,4 +57,5 @@ class Client
 		std::string		_uri;
 
 		Client(void);
+		std::string		_path;
 };
