@@ -100,7 +100,7 @@ option=value
   - Default: `false`
 - `autoindex`: Enable or disable the autoindex (list ressources of the directory).
   - Default: `false`
-- `cgi`: Path to the CGI executable.
+- `cgi`: Path to the CGI script.
   - Default: `none`
 - `cgi_php`: Path to the PHP CGI executable.
   - Default: `none`

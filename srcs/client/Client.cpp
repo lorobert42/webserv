@@ -102,8 +102,14 @@ int	Client::writeHandler(void)
 	std::cout << "Write handler" << std::endl;
 	// Need to change server_message by our own
 	std::string	server_message = "HTTP/1.1 200 OK\nContent-type: text/html\nContent-length";
+
 	// Have to get the set the reponse by the html we need
-	std::string response = readHtmlFile(this->_config_server->getRouteWithUri("/")->getPathWithIndex());
+	std::string response1 = readHtmlFile(this->_config_server->getRouteWithUri("/")->getPathWithIndex());
+
+	// FIXME
+	CgiHandler cgi(this);
+	std::string response = cgi.executeCgi();
+
 	server_message.append("\n\n");
 	server_message.append(response);
 	
@@ -116,10 +122,6 @@ int	Client::writeHandler(void)
 			std::cout << "Could not send reposne" << std::endl;
 		total_bytes_send += bytes_send;
 	}
-
-	// FIXME
-	CgiHandler cgi(this);
-	cgi.displayEnv();
 
 	return (0);
 }

@@ -3,10 +3,13 @@
 CgiHandler::CgiHandler() {}
 
 CgiHandler::CgiHandler(Client *client) {
+
 	// TODO: Set environment variables dedicated for the server
 	this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
 	this->_env["SERVER_NAME"] = "TODO";
 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
+	this->_env["REDIRECT_STATUS"] = "200";
+	this->_env["SCRIPT_FILENAME"] = "/home/webserv/www/cgi/env.cgi.php";
 
 	// TODO: Set environment variables dedicated for the request
 	this->_env["SERVER_PROTOCOL"] = client->getRequest()->getVersion();
@@ -74,22 +77,77 @@ char	**CgiHandler::_getEnv() {
 	return (env);
 }
 
-std::string	CgiHandler::executeCgi() {
-	pid_t		pid = fork();
-	char**		env = this->_getEnv();
-	std::string	body;
+std::string CgiHandler::executeCgi() {
+	pid_t pid;
+	int pipefd[2];  // File descriptor array for the pipe
+	char** env = this->_getEnv();
+	std::string body;
 
-	if (pid == -1)
+	if (pipe(pipefd) == -1) {
+		throw std::runtime_error("[CGI] pipe() failed");
+	}
+
+	pid = fork();
+
+	if (pid < 0) {
 		throw std::runtime_error("[CGI] fork() failed");
+	}
+	// This code will be executed by the child process
+	else if (pid == 0) {
+		// Close the read end of the pipe
+		close(pipefd[0]);
 
-	// TODO
+		// Redirect stdout to the write end of the pipe
+		dup2(pipefd[1], STDOUT_FILENO);
+		close(pipefd[1]);
+
+		// Prepare the argument list
+		char* argv[3] = {const_cast<char*>("/usr/bin/php-cgi82"), const_cast<char*>("/home/webserv/www/cgi/env.cgi.php"), NULL};
+
+		// Execute the CGI script
+		if (execve("/usr/bin/php-cgi82", argv, env) == -1) {
+			perror("[CGI] execve() failed");
+			_exit(EXIT_FAILURE);
+		}
+	}
+	// This code will be executed by the parent process
+	else {
+		// Close the write end of the pipe
+		close(pipefd[1]);
+
+		// Read the output from the pipe into the 'body' variable
+		char buffer[4096];
+		ssize_t bytesRead;
+		while ((bytesRead = read(pipefd[0], buffer, sizeof(buffer))) > 0) {
+			body.append(buffer, bytesRead);
+		}
+
+		// Wait for the child process to finish
+		int status;
+		if (waitpid(pid, &status, 0) == -1) {
+			perror("[CGI] waitpid() failed");
+		} else {
+			if (WIFEXITED(status)) {
+				int exitStatus = WEXITSTATUS(status);
+				// You can process the exit status here if needed
+				(void)exitStatus;
+			} else if (WIFSIGNALED(status)) {
+				int terminatingSignal = WTERMSIG(status);
+				// You can handle the signal termination here if needed
+				(void)terminatingSignal;
+			}
+		}
+		// Close the read end of the pipe
+		close(pipefd[0]);
+	}
 
 	// Free env
 	for (int i = 0; env[i]; i++) {
 		delete[] env[i];
 	}
-		
 	delete[] env;
 
-	return (body);
+	std::cout << "Body: " << body << std::endl;
+
+	return body;
 }

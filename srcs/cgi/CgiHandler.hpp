@@ -1,11 +1,10 @@
 #pragma once
 
 #include <iostream>
-#include <string>
 #include <map>
-#include <cstdlib>
 #include <unistd.h>
 #include <cstring>
+#include <sys/wait.h>
 #include "../client/Client.hpp"
 #include "../client/Request.hpp"
 
