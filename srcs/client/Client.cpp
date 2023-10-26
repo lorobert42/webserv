@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/26 12:04:30 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/26 13:13:50 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,17 +111,11 @@ int	Client::writeHandler(void)
 	_route = _config_server->getRouteWithUri(_request->getIndex());
 	_path = _route->getPath();
 	if (_route == NULL)
-	{
-		std::cout << "Route not found" << std::endl;
 		return (_requestNotFound());
-	}
 	if (_checkFile() == true)
 		server_message = _requestFound();
 	else
-	{
-		std::cout << "#\nFile not found" << std::endl;
 		return (_requestNotFound());
-	}
 
 	// Have to get the set the reponse by the html we need
 	std::string response = readHtmlFile(_route->getPathWithIndex());
@@ -148,7 +142,7 @@ int	Client::writeHandler(void)
 
 //	### Member Function [PRIVATE]
 
-bool	Client::_checkFile(void)
+int	Client::_checkFile(void)
 {
 	struct	stat s;
 
@@ -158,22 +152,22 @@ bool	Client::_checkFile(void)
 		{
 			_path.append(_route->getIndex());
 			if (access(_path.c_str(), R_OK))
-				return (true);
+				return (E_SUCCESS);
 			else
-				return (false);
+				return (E_NO_FILE);
 		}
 		if (s.st_mode & S_IFREG) // it's a file
 		{
 			if (access(_path.c_str(), R_OK))
-				return (true);
+				return (E_SUCCESS);
 			else
-				return (false);
+				return (E_NO_FILE);
 		}
 		else
-			return (false);
+			return (E_NO_FILE);
 	}
 	else
-		return (false);
+		return (E_FAIL);
 }
 
 std::string	Client::_requestFound(void)

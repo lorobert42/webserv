@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/26 11:42:54 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/26 13:14:08 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,13 @@
 #include "../cgi/CgiHandler.hpp"
 
 class CgiHandler;
+
+enum	code_error {
+		E_SUCCESS = 0
+		E_NO_ROUTE = 1,
+		E_NO_DIRECTORY = 2,
+		E_NO_FILE = 3;
+};
 
 #define D_BUFF_SIZE 4096
 #define D_200_MESSAGE "HTTP/1.1 200 OK"
@@ -44,7 +51,7 @@ class Client
 		int	readHandler(void);
 		int writeHandler(void);
 	
-		bool		_checkFile(void);
+		int			_checkFile(void);
 		std::string	_requestFound(void);
 		int			_requestNotFound(void);
 

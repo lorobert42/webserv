@@ -10,7 +10,6 @@ server:
 	;
 	route:
 		uri=/foo
-		path=www/srcs
-		index=home.html
+		ndex=home.html
 	;
 ;
