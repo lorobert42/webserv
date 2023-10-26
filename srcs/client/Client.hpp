@@ -38,7 +38,6 @@ enum	code_error {
 class Client
 {
 	public:
-		Client(void);
 		Client(ConfigServer *config, int &client_socket);
 		Client(Client const& other);
 		Client& operator=(Client const& other);
@@ -46,7 +45,7 @@ class Client
 
 		int				getSocket(void) const;
 		ConfigServer	*getConfigServer(void) const;
-		Request			*getRequest(void) const;
+		Request*			getRequest(void) const;
 
 		int	readHandler(void);
 		int writeHandler(void);
@@ -61,5 +60,9 @@ class Client
 		ConfigRoute		*_route;
 		int				_socket;
 		std::string		_read;
+		bool		_headerOk;
+		std::string		_uri;
+
+		Client(void);
 		std::string		_path;
 };

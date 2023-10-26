@@ -71,17 +71,17 @@ option=value
 - `port`: The port of the server.
   - Default: `8080`
 - `error_page_400`: Set the path to the 400 error page.
-  - Default: `www/error_pages/400.html`
+  - Default: `srcs/config/www/400.html`
 - `error_page_403`: Set the path to the 403 error page.
-  - Default: `www/error_pages/403.html`
+  - Default: `srcs/config/www/403.html`
 - `error_page_404`: Set the path to the 404 error page.
-  - Default: `www/error_pages/404.html`
+  - Default: `srcs/config/www/404.html`
 - `error_page_405`: Set the path to the 405 error page.
-  - Default: `www/error_pages/405.html`
+  - Default: `srcs/config/www/405.html`
 - `error_page_413`: Set the path to the 413 error page.
-  - Default: `www/error_pages/413.html`
+  - Default: `srcs/config/www/413.html`
 - `error_page_500`: Set the path to the 500 error page.
-  - Default: `www/error_pages/500.html`
+  - Default: `srcs/config/www/500.html`
 
 ### Route
 
