@@ -127,13 +127,15 @@ std::string CgiHandler::executeCgi() {
 
 		// Wait for the child process to finish
 		int status;
-		if (waitpid(pid, &status, 0) == -1) {
+		if (waitpid(pid, &status, 0) == -1)
 			perror("[CGI] waitpid() failed");
-		} else {
-			if (status == 2)
+		else {
+			if (status == 2) {
 				return ("508 Loop Detected\r\n");
+			}
 			if (status != 0) {
 				return ("502 Bad Gateway\r\n");
+			}
 		}
 		// Close the read end of the pipe
 		close(fd[0]);
