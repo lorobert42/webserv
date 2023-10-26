@@ -150,7 +150,7 @@ int	Client::writeHandler(void)
 	//std::string response = cgi.executeCgi();
 
 	server_message.append("\n\n");
-	server_message.append(body);
+	server_message.append(response);
 
 	int	bytes_send = 0;
 	int	total_bytes_send = 0;
