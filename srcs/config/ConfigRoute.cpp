@@ -1,7 +1,7 @@
 #include "ConfigRoute.hpp"
 
 const std::string	DEFAULT_URI 					= "/";
-const std::string	DEFAULT_PATH 					= "www/example";
+const std::string	DEFAULT_PATH 					= "www/srcs";
 const std::string	DEFAULT_INDEX 					= "index.html";
 const bool			DEFAULT_GET 					= true;
 const bool			DEFAULT_POST 					= false;

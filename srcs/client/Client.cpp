@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/18 15:09:47 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/23 20:32:35 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,16 +57,18 @@ std::string	Client::getRequest(void) const
 int	Client::readHandler(void)
 {
 	std::cout << "Read Handler" << std::endl;
-	char buffer[4096] = {0};
+	char buffer[D_BUFF_SIZE] = {0};
 
-	int read = recv(_socket, buffer, 4096, MSG_DONTWAIT);
+	int read = recv(_socket, buffer, D_BUFF_SIZE, MSG_DONTWAIT);
 	if (read < 0)
 		throw std::runtime_error("[READ] : Error");
 	else if (read == 0)
 	{
+		std::cout << "read error -1" << std::endl;
 		return (-1);
 	}
-	_read += std::string(buffer);
+	if (read != 0)
+		_read.append(buffer);
 	if (_read.rfind("\r\n\r\n") != std::string::npos)
 	{
 		_request = new Request(_read);
@@ -96,7 +98,22 @@ int	Client::writeHandler(void)
 {
 	std::cout << "Write handler" << std::endl;
 	// Need to change server_message by our own
-	std::string	server_message = "HTTP/1.1 200 OK\nContent-type: text/html\nContent-length";
+	std::string	server_message;
+	_uri = _request->getIndex();
+	_route = _config_server->getRouteWithUri(_uri);
+	if (_route == NULL)
+	{
+		std::cout << "Route not found" << std::endl;
+		return (_requestNotFound());
+	}
+	if (_checkFile() == true)
+		server_message = _requestFound();
+	else
+	{
+		std::cout << "File not found" << std::endl;
+		return (_requestNotFound());
+	}
+
 	// Have to get the set the reponse by the html we need
 	std::string response = readHtmlFile();
 	server_message.append("\n\n");
@@ -115,3 +132,47 @@ int	Client::writeHandler(void)
 }
 
 //	### Member Function [PRIVATE]
+
+bool	Client::_checkFile(void)
+{
+	struct	stat s;
+
+	if (stat(_uri.c_str(), &s))
+	{
+		std::cout << _uri << std::endl;
+		if (s.st_mode & S_IFDIR) // it's a directory
+		{
+			_uri.append(_route->getIndex());
+			if (access(_uri.c_str(), R_OK))
+				return (true);
+			else
+				return (false);
+		}
+		if (s.st_mode & S_IFREG) // it's a file
+		{
+			if (access(_uri.c_str(), R_OK))
+				return (true);
+			else
+				return (false);
+		}
+		else
+			return (false);
+	}
+	else
+	{
+		std::cout << "here" << std::endl;
+		return (false);
+	}
+}
+
+std::string	Client::_requestFound(void)
+{
+	std::cout << "Request Found" << std::endl;
+	return (NULL);
+}
+
+int	Client::_requestNotFound(void)
+{
+	std::cout << "Request not Found" << std::endl;
+	return (0);
+}

@@ -156,6 +156,14 @@ std::vector<ConfigRoute*>	ConfigServer::getRoutes() const {
 	return this->_routes;
 }
 
+ConfigRoute	*ConfigServer::getRouteWithUri(const std::string &uri) const {
+	for (std::vector<ConfigRoute*>::const_iterator it = this->_routes.begin(); it != this->_routes.end(); ++it) {
+		if ((*it)->getUri() == uri)
+			return (*it);
+	}
+	return (NULL);
+}
+
 void	ConfigServer::addRoute(ConfigRoute &route) {
 	this->_routes.push_back(&route);
 }

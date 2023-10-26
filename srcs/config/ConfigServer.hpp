@@ -25,6 +25,7 @@ class ConfigServer {
 		std::string					getErrorPage413() const;
 		std::string					getErrorPage500() const;
         std::vector<ConfigRoute*>	getRoutes() const;
+		ConfigRoute					*getRouteWithUri(const std::string &uri) const;
 
 		void						addRoute(ConfigRoute &route);
     private:
