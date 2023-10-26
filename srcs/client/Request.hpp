@@ -19,6 +19,7 @@ class Request
 		const std::string	&getIndex(void) const;
 		const std::string	&getVersion(void) const;
 		const std::string	getValue(const std::string &key) const;
+
 	private :
 		Request(void);
 
