@@ -14,23 +14,22 @@
 
 // ### Constructor ###
 Client::Client()
-{
-	// TODO: Better error management
-	throw std::runtime_error("[Client] : Wait, that's illegal");
-}
+{}
 
 Client::Client(ConfigServer *config, int &client_socket) :
-	_config_server(config), _socket(client_socket)
+	_config_server(config), _socket(client_socket), _headerOk(false)
 {}
 
 // ### Copy Constructor ###
 Client::Client(Client const& other) :
-	_config_server(other._config_server), _socket(other._socket)
+	_config_server(other._config_server), _socket(other._socket), _headerOk(other._headerOk)
 {}
 
 // ### Destructor ###
 Client::~Client()
-{}
+{
+	delete _request;
+}
 
 // ### Overload operator ###
 Client& Client::operator=(Client const& other)
@@ -39,6 +38,7 @@ Client& Client::operator=(Client const& other)
 		return (*this);
 	this->_config_server = other._config_server;
 	this->_socket = other._socket;
+	_headerOk = other._headerOk;
 	return (*this);
 }
 
@@ -54,9 +54,9 @@ ConfigServer	*Client::getConfigServer(void) const
 	return (this->_config_server);
 }
 
-Request	*Client::getRequest(void) const
+Request*	Client::getRequest(void) const
 {
-	return (this->_request);
+	return (_request);
 }
 
 int	Client::readHandler(void)
@@ -69,14 +69,34 @@ int	Client::readHandler(void)
 		throw std::runtime_error("[READ] : Error");
 	else if (read == 0)
 	{
-		std::cout << "read error -1" << std::endl;
+		std::cout << "Nothing to read, client quit" << std::endl;
 		return (-1);
 	}
 	if (read != 0)
 		_read.append(buffer);
-	if (_read.rfind("\r\n\r\n") != std::string::npos)
+	if (!_headerOk && _read.rfind("\r\n\r\n") != std::string::npos)
 	{
 		_request = new Request(_read);
+		_request->parseHeader();
+		_headerOk = true;
+		if (_request->getMethod() != "POST")
+			return (0);
+	}
+	else if (_headerOk && _request->getMethod() == "POST")
+	{
+		_request->setBody(_request->getBody() + buffer);
+		std::cout << "Expected Content-Length: " << _request->getValue("Content-Length") << std::endl;
+		std::cout << "Body until now: " << _request->getBody() << std::endl;
+		int check = _request->checkBody();
+		switch (check)
+		{
+			case ERROR:
+				return (-1);
+				break;
+			case TOO_SHORT:
+				return (1);
+				break;
+		}
 		std::cout << "End of request" << std::endl;
 		return (0);
 	}
@@ -106,18 +126,18 @@ int	Client::writeHandler(void)
 	std::string	server_message;
 	_uri = _request->getIndex();
 	_route = _config_server->getRouteWithUri(_uri);
-/*	if (_route == NULL)
-	{
-		std::cout << "Route not found" << std::endl;
-		return (_requestNotFound());
-	}
-	if (_checkFile() == true)
-		server_message = _requestFound();
-	else
-	{
-		std::cout << "File not found" << std::endl;
-		return (_requestNotFound());
-	}*/
+	/*	if (_route == NULL)
+			{
+			std::cout << "Route not found" << std::endl;
+			return (_requestNotFound());
+			}
+			if (_checkFile() == true)
+			server_message = _requestFound();
+			else
+			{
+			std::cout << "File not found" << std::endl;
+			return (_requestNotFound());
+			}*/
 
 	server_message = "HTTP/1.1 200 OK\ncontent-type: text/html\ncontent-length:";
 	// Have to get the set the reponse by the html we need
@@ -125,11 +145,11 @@ int	Client::writeHandler(void)
 
 	// TODO
 	//CgiHandler cgi(this);
-//	std::string response = cgi.executeCgi();
+	//	std::string response = cgi.executeCgi();
 
 	server_message.append("\n\n");
 	server_message.append(body);
-	
+
 	int	bytes_send = 0;
 	int	total_bytes_send = 0;
 	while (total_bytes_send <static_cast<int>(server_message.size()))
