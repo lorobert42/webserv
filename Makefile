@@ -3,11 +3,14 @@ NAME		= webserv
 NAME_TEST	= webserv_test
 
 SRCS		= srcs/main.cpp \
-			  srcs/server/Server.cpp \
-			  srcs/config/Config.cpp \
-			  srcs/config/ConfigServer.cpp \
-			  srcs/config/ConfigRoute.cpp \
-			  srcs/config/ConfigHelper.cpp \
+			srcs/server/ServerManager.cpp \
+			srcs/server/Server.cpp \
+			srcs/client/Client.cpp \
+			srcs/client/Request.cpp \
+			srcs/config/Config.cpp \
+			srcs/config/ConfigServer.cpp \
+			srcs/config/ConfigRoute.cpp \
+			srcs/config/ConfigHelper.cpp \
 
 SRCS_TEST	= srcs/epoll_serv.cpp
 
@@ -20,7 +23,7 @@ else
  CC			= c++ -g
 endif
 
-CPPFLAGS	= -Wall -Werror -Wextra -std=c++98
+CPPFLAGS	= -Wall -Werror -Wextra -std=c++98 -fsanitize=address
 
 EXE_NAME	= -o $(NAME)
 EXE_NAME_T	= -o $(NAME_TEST)
