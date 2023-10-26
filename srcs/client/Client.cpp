@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/18 15:09:47 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/26 10:49:14 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,7 +106,7 @@ int	Client::writeHandler(void)
 	std::string	server_message;
 	_uri = _request->getIndex();
 	_route = _config_server->getRouteWithUri(_uri);
-	if (_route == NULL)
+/*	if (_route == NULL)
 	{
 		std::cout << "Route not found" << std::endl;
 		return (_requestNotFound());
@@ -117,17 +117,18 @@ int	Client::writeHandler(void)
 	{
 		std::cout << "File not found" << std::endl;
 		return (_requestNotFound());
-	}
+	}*/
 
+	server_message = "HTTP/1.1 200 OK\ncontent-type: text/html\ncontent-length:";
 	// Have to get the set the reponse by the html we need
-	std::string response1 = readHtmlFile(this->_config_server->getRouteWithUri("/")->getPathWithIndex());
+	std::string body = readHtmlFile(this->_config_server->getRouteWithUri("/")->getPathWithIndex());
 
 	// TODO
-	CgiHandler cgi(this);
-	std::string response = cgi.executeCgi();
+	//CgiHandler cgi(this);
+//	std::string response = cgi.executeCgi();
 
 	server_message.append("\n\n");
-	server_message.append(response);
+	server_message.append(body);
 	
 	int	bytes_send = 0;
 	int	total_bytes_send = 0;
