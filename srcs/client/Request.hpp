@@ -21,8 +21,9 @@ class Request
 		~Request(void);
 
 		void	parseHeader();
-		size_t	checkBody();
+		int	checkBody();
 
+		void	appendBody(std::string const& to_add);
 		void	setBody(std::string const& new_body);
 		const std::string	&getMethod(void) const;
 		const std::string	&getIndex(void) const;

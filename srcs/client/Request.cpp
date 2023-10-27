@@ -85,7 +85,7 @@ void	Request::parseHeader()
 		std::cout << "BODY :" << std::endl << _body << std::endl;
 }
 
-size_t	Request::checkBody()
+int	Request::checkBody()
 {
 	std::string	content_length = getValue("Content-Length");
 	if (content_length == "")
@@ -100,6 +100,11 @@ size_t	Request::checkBody()
 		return (TOO_SHORT);
 	}
 	return (ERROR);
+}
+
+void	Request::appendBody(std::string const& to_add)
+{
+	_body += to_add;
 }
 
 void	Request::setBody(std::string const& new_body)
