@@ -85,8 +85,6 @@ int	Client::readHandler(void)
 	else if (_headerOk && _request->getMethod() == "POST")
 	{
 		_request->appendBody(buffer);
-		std::cout << "Expected Content-Length: " << _request->getValue("Content-Length") << std::endl;
-		std::cout << "Body until now: " << _request->getBody() << std::endl;
 		int check = _request->checkBody();
 		switch (check)
 		{

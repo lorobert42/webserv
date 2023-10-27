@@ -30,9 +30,12 @@ class Request
 		const std::string	&getVersion(void) const;
 		const std::string	getValue(const std::string &key) const;
 		const std::string &getBody() const;
+		int								getError() const;
 
 	private :
 		Request(void);
+		int	_checkBodyContentLength(size_t content_length);
+		int	_checkBodyChunked();
 
 		std::string _rawRequest;
 		std::map<std::string, std::string>	_header;
@@ -40,4 +43,5 @@ class Request
 		std::string	_index;
 		std::string	_version;
 		std::string	_body;
+		int					_error;
 };

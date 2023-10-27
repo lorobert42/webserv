@@ -87,19 +87,45 @@ void	Request::parseHeader()
 
 int	Request::checkBody()
 {
+	std::cout << "Expected Content-Length: " << getValue("Content-Length") << std::endl;
+	std::cout << "Body until now: " << getBody() << std::endl;
 	std::string	content_length = getValue("Content-Length");
-	if (content_length == "")
+	std::string transfer_encoding = getValue("Transfer-Encoding");
+	if ((content_length == "" && transfer_encoding == "") || (content_length != "" && transfer_encoding != ""))
+	{
+		setBody("");
+		_error = 400;
 		return (ERROR);
-	size_t size = std::strtol(getValue("Content-Length").c_str(), NULL, 10);
-	if (_body.length() == size)
+	}
+	else if (transfer_encoding != "" && transfer_encoding != "chunked")
+	{
+		setBody("");
+		_error = 501;
+		return (ERROR);
+	}
+	if (content_length != "")
+	{
+		return (_checkBodyContentLength(std::strtol(content_length.c_str(), NULL, 10)));
+	}
+	return (_checkBodyChunked());
+}
+
+int	Request::_checkBodyContentLength(size_t content_length)
+{
+	if (_body.length() == content_length)
 	{
 		return (OK);
 	}
-	else if (_body.length() < size)
+	else if (_body.length() < content_length)
 	{
 		return (TOO_SHORT);
 	}
 	return (ERROR);
+}
+
+int	Request::_checkBodyChunked()
+{
+	return OK;
 }
 
 void	Request::appendBody(std::string const& to_add)
