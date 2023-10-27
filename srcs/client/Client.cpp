@@ -83,21 +83,22 @@ int	Client::readHandler(void)
 	return (1);
 }
 
-static std::string	readHtmlFile(std::string pathWithIndex)
-{
-	std::string		line;
-	std::string		all;
-	std::ifstream	ifs(pathWithIndex.c_str());
-
-	if (!ifs)
-	{
-		std::cout << "file cannot be read" << std::endl;
-		return (NULL);
-	}
-	while (std::getline(ifs, line))
-		all.append(line);
-	return (all);
-}
+//static std::string	readHtmlFile(std::string path_with_index)
+//{
+//	std::cout << "Path with index: " << path_with_index << std::endl;
+//	std::string		line;
+//	std::string		all;
+//	std::ifstream	ifs(path_with_index.c_str());
+//
+//	if (!ifs)
+//	{
+//		std::cout << "file cannot be read" << std::endl;
+//		return (NULL);
+//	}
+//	while (std::getline(ifs, line))
+//		all.append(line);
+//	return (all);
+//}
 
 int	Client::writeHandler(void)
 {
@@ -105,7 +106,7 @@ int	Client::writeHandler(void)
 	// Need to change server_message by our own
 	std::string	server_message;
 	_uri = _request->getIndex();
-	_route = _config_server->getRouteWithUri(_uri);
+	_route = _config_server->getRouteWithUri("/");
 /*	if (_route == NULL)
 	{
 		std::cout << "Route not found" << std::endl;
@@ -121,7 +122,10 @@ int	Client::writeHandler(void)
 
 	server_message = "HTTP/1.1 200 OK\ncontent-type: text/html\ncontent-length:";
 	// Have to get the set the reponse by the html we need
-	std::string body = readHtmlFile(this->_config_server->getRouteWithUri("/")->getPathWithIndex());
+//	std::string body2 = readHtmlFile(_route->getPathWithIndex());
+	AutoIndex autoindex(_uri, _route->getPath() + _uri);
+	std::string body = autoindex.getBody();
+
 
 	// TODO
 	//CgiHandler cgi(this);

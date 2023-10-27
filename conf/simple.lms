@@ -8,12 +8,12 @@ server:
 
 	route:
 		uri=/
-		path=www/srcs
-		index=index.html
+		path=www/nginx/test
+		index=no.html
 		get=true
 		post=false
 		delete=false
-		autoindex=false
+		autoindex=true
 		cgi_script=www/cgi/env.cgi.php
 		cgi_bin=/usr/bin/php-cgi82
 		client_max_body_size=1K

@@ -20,6 +20,7 @@
 #include "Request.hpp"
 #include "../config/ConfigServer.hpp"
 #include "../cgi/CgiHandler.hpp"
+#include "../autoindex/AutoIndex.hpp"
 
 class CgiHandler;
 
