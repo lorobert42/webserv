@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 #include <vector>
 #include <algorithm>
+#include <sstream>
 
 class AutoIndex {
 	public:
