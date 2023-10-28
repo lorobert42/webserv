@@ -8,15 +8,15 @@ server:
 
 	route:
 		uri=/
-		path=www/nginx/test
-		index=no.html
+		path=www/srcs/
+		index=index.html
 		get=true
-		post=false
+		post=true
 		delete=false
 		autoindex=true
-		cgi_script=www/cgi/env.cgi.php
-		cgi_bin=/usr/bin/php-cgi82
+		cgi_script=www/cgi/form.cgi.php
+		cgi_bin=/usr/bin/php-cgi
 		client_max_body_size=1K
-		upload_dir=www/custom/upload
+		upload_dir=upload/
 	;
 ;

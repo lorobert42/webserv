@@ -38,9 +38,8 @@ CgiHandler::CgiHandler(Client *client) {
 
 	// Set environment variables dedicated for PHP
 	this->_env["REDIRECT_STATUS"] = "200";
-	this->_env["SCRIPT_FILENAME"] = "www/cgi/env.cgi.php"; // TODO: Get the path from the config
-	// TODO: Check extension of script filename and get the right CGI
-	this->_env["SCRIPT_CGI"] = "/usr/bin/php-cgi";
+	this->_env["SCRIPT_FILENAME"] = client->getConfigRoute()->getCgiScript();
+	this->_env["SCRIPT_CGI"] = client->getConfigRoute()->getCgiBin();
 }
 
 CgiHandler::CgiHandler(CgiHandler const &src) {

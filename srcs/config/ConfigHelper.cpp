@@ -20,7 +20,7 @@ int ConfigHelper::convertStringToPort(std::string const &str) {
 	return port;
 }
 
-std::string ConfigHelper::convertStringToPath(std::string const &str) {
+std::string ConfigHelper::checkValidPathFolder(std::string const &str) {
 	if (str[str.size() - 1] != '/')
 		throw InvalidOptionValueException(str);
 	return str;

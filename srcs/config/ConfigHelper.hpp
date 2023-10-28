@@ -7,6 +7,6 @@ class ConfigHelper {
 	public:
 		static bool convertStringToBool(std::string const &str);
 		static int convertStringToPort(std::string const &str);
-		static std::string convertStringToPath(std::string const &str);
+		static std::string checkValidPathFolder(std::string const &str);
 		static double convertStringToClientMaxBodySize(std::string const &str);
 };

@@ -54,6 +54,11 @@ ConfigServer	*Client::getConfigServer(void) const
 	return (this->_config_server);
 }
 
+ConfigRoute		*Client::getConfigRoute(void) const
+{
+	return (this->_route);
+}
+
 Request	*Client::getRequest(void) const
 {
 	return (this->_request);
@@ -122,14 +127,14 @@ int	Client::writeHandler(void)
 
 	server_message = "HTTP/1.1 200 OK\ncontent-type: text/html\ncontent-length:";
 	// Have to get the set the reponse by the html we need
-//	std::string body2 = readHtmlFile(_route->getPathWithIndex());
-	AutoIndex autoindex(_uri, _route->getPath() + _uri);
-	std::string body = autoindex.getBody();
+//	std::string body = readHtmlFile(_route->getPathWithIndex());
+//	AutoIndex autoindex(_uri, _route->getPath() + _uri);
+//	std::string body = autoindex.getBody();
 
 
 	// TODO
-	//CgiHandler cgi(this);
-//	std::string response = cgi.executeCgi();
+	CgiHandler cgi(this);
+	std::string body = cgi.executeCgi();
 
 	server_message.append("\n\n");
 	server_message.append(body);

@@ -39,6 +39,7 @@ class Client
 
 		int				getSocket(void) const;
 		ConfigServer	*getConfigServer(void) const;
+		ConfigRoute		*getConfigRoute(void) const;
 		Request			*getRequest(void) const;
 
 		int	readHandler(void);
