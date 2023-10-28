@@ -12,7 +12,7 @@ server:
 		index=index.html
 		get=true
 		post=true
-		delete=false
+		delete=true
 		autoindex=true
 		cgi_script=www/cgi/form.cgi.php
 		cgi_bin=/usr/bin/php-cgi

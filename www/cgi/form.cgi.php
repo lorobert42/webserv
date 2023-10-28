@@ -2,25 +2,10 @@
 	ob_start();
 ?>
 <?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file'])) {
-    $uploadDirectory = 'upload/'; // Define the directory where you want to save the uploaded files
-    $uploadedFile = $_FILES['file'];
-
-    if ($uploadedFile['error'] === UPLOAD_ERR_OK) {
-        $originalFileName = $uploadedFile['name'];
-        $fileExtension = pathinfo($originalFileName, PATHINFO_EXTENSION);
-        $newFileName = uniqid() . '.' . $fileExtension; // Generate a unique filename
-        $destination = $uploadDirectory . $newFileName;
-
-        if (move_uploaded_file($uploadedFile['tmp_name'], $destination)) {
-            echo 'File uploaded successfully.';
-        } else {
-            echo 'Error uploading the file.';
-        }
-    } else {
-        echo 'Error: ' . $uploadedFile['error'];
-    }
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+	echo 'POST';
 }
+echo 'salut';
 ?>
 <!DOCTYPE html>
 <html lang="en">

@@ -133,12 +133,14 @@ int	Client::writeHandler(void)
 
 
 	// TODO
+	std::cout << "URI: " << _uri << std::endl;
 	CgiHandler cgi(this);
 	std::string body = cgi.executeCgi();
 
 	server_message.append("\n\n");
 	server_message.append(body);
-	
+
+	std::cout << "Server message: 💚" << server_message << std::endl;
 	int	bytes_send = 0;
 	int	total_bytes_send = 0;
 	while (total_bytes_send <static_cast<int>(server_message.size()))
