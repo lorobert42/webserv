@@ -5,12 +5,12 @@ server:
 
 	route:
 		uri=/
-		path=www/srcs/asda
-		index=index.html
+		path=www/srcs/
+		index=home2.html
 	;
 	route:
 		uri=/foo
 		path=www/srcs/
-		index=truc.html
+		index=form.html
 	;
 ;

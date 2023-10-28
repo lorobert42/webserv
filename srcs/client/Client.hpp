@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/28 16:00:09 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/28 16:34:26 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,6 +35,7 @@ enum	code_error {
 #define D_BUFF_SIZE 4096
 #define D_200_MESSAGE "HTTP/1.1 200 OK"
 #define D_404_MESSAGE "HTTP/1.1 404"
+#define D_403_MESSAGE "HTTP/1.1 403"
 
 class Client
 {

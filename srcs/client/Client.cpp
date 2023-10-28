@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/28 16:12:51 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/28 17:19:31 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -148,7 +148,6 @@ int	Client::writeHandler(void)
 		_fileNotFound();
 	if (_body.size() == 0)
 		_body = readHtmlFile(_route->getPathWithIndex());
-
 	_sendRespond();
 	return (0);
 }
@@ -159,36 +158,25 @@ int	Client::_checkFile(void)
 {
 	struct	stat s;
 
-	if (stat(_path.c_str(), &s) == 0)
+	if (stat(_path.c_str(), &s) == -1)
+		return (E_FAIL);
+	if (s.st_mode & S_IFDIR) // it's a directory
 	{
-		if (s.st_mode & S_IFDIR) // it's a directory
-		{
-			if (opendir(_path.c_str()) == NULL)
-				return (E_ACCESS);
-			else
-			{
-				_path.append(_route->getIndex());
-				if (stat(_path.c_str(), &s) == 0)
-				{
-					std::cout << _path << std::endl;
-					if (access(_path.c_str(), R_OK) == 0)
-						return (E_SUCCESS);
-					else
-						return (E_ACCESS);
-				}
-				else
-					return (E_FAIL);
-			}
-		}
-		else if (s.st_mode & S_IFREG) // it's a file
-		{
-			if (access(_path.c_str(), R_OK) == 0)
-				return (E_SUCCESS);
-			else
-				return (E_ACCESS);
-		}
+		if (opendir(_path.c_str()) == NULL)
+			return (E_ACCESS);
 		else
-			return (E_FAIL);
+			_path.append(_route->getIndex());
+	}
+	else
+		return (E_FAIL);
+	if (stat(_path.c_str(), &s) == -1)
+		return (E_FAIL);
+	if (s.st_mode & S_IFREG) // it's a file
+	{
+		if (access(_path.c_str(), R_OK) == 0)
+			return (E_SUCCESS);
+		else
+			return (E_ACCESS);
 	}
 	else
 		return (E_FAIL);
@@ -216,12 +204,16 @@ void	Client::_fileNotFound(void)
 
 	_header.append("\ncontent-type: text/html\ncontent_length: ");
 	_body = readHtmlFile(_config_server->getErrorPage404());
-	std::cout << _body.size() << std::endl;
 }
 
 void	Client::_fileNotAccess(void)
 {
 	std::cout << "File no access" << std::endl;
+
+	_header = D_403_MESSAGE;
+
+	_header.append("\ncontent-type: text/html\ncontent_length: ");
+	_body = readHtmlFile(_config_server->getErrorPage403());
 }
 
 void	Client::_sendRespond(void)

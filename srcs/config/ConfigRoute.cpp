@@ -111,7 +111,7 @@ std::string ConfigRoute::getPath() const {
 }
 
 std::string ConfigRoute::getPathWithIndex() const {
-	return this->_path + "/" + this->_index;
+	return this->_path + this->_index;
 }
 
 std::string ConfigRoute::getIndex() const {
