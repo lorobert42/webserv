@@ -55,7 +55,7 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 		if (option == "uri")
 			this->_uri = value;
 		else if (option == "path")
-			this->_path = value;
+			this->_path = ConfigHelper::convertStringToPath(value);
 		else if (option == "index")
 			this->_index = value;
 		else if (option == "get")

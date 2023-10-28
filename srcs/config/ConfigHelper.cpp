@@ -20,6 +20,12 @@ int ConfigHelper::convertStringToPort(std::string const &str) {
 	return port;
 }
 
+std::string ConfigHelper::convertStringToPath(std::string const &str) {
+	if (str[str.size() - 1] != '/')
+		throw InvalidOptionValueException(str);
+	return str;
+}
+
 double ConfigHelper::convertStringToClientMaxBodySize(std::string const &str) {
 	std::string value = str.substr(0, str.size() - 1);
 	std::string unit = str.substr(str.size() - 1);
