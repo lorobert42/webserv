@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/26 15:55:17 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/28 16:12:51 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -124,40 +124,32 @@ static std::string	readHtmlFile(std::string path_with_index)
 int	Client::writeHandler(void)
 {
 	std::cout << "Write handler" << std::endl;
-	// Need to change server_message by our own
-	std::string	server_message;
-	_route = _config_server->getRouteWithUri(_request->getIndex());
-	_path = _route->getPath();
-	if (_route == NULL)
-	{
-		std::cout << "Route not find" << std::endl;
-		return (_requestNotFound());
-	}
-	if (_checkFile() == E_SUCCESS)
-		server_message = _requestFound();
-	else
-		return (_requestNotFound());
-
 	// Have to get the set the reponse by the html we need
-	std::string response = readHtmlFile(_route->getPathWithIndex());
-
-	// TODO
+	// TODO if th cgi is on need the send all info to the cgi to get the body  
 	//CgiHandler cgi(this);
 	//std::string response = cgi.executeCgi();
 
-	server_message.append("\n\n");
-	server_message.append(response);
-
-	int	bytes_send = 0;
-	int	total_bytes_send = 0;
-	while (total_bytes_send <static_cast<int>(server_message.size()))
+	int	code_error;
+	_route = _config_server->getRouteWithUri(_request->getIndex());
+	if (_route == NULL)
 	{
-		bytes_send = send(_socket, server_message.c_str(), server_message.size(), 0);
-		if (bytes_send < 0)
-			std::cout << "Could not send reposne" << std::endl;
-		total_bytes_send += bytes_send;
+		std::cout << "Route not find" << std::endl;
+		_fileNotFound();
+		_sendRespond();
+		return (0);
 	}
+	_path = _route->getPath();
+	code_error = _checkFile();
+	if (code_error == E_SUCCESS)
+		_header = _fileFound();
+	else if (code_error == E_ACCESS)
+		_fileNotAccess();
+	else
+		_fileNotFound();
+	if (_body.size() == 0)
+		_body = readHtmlFile(_route->getPathWithIndex());
 
+	_sendRespond();
 	return (0);
 }
 
@@ -171,27 +163,38 @@ int	Client::_checkFile(void)
 	{
 		if (s.st_mode & S_IFDIR) // it's a directory
 		{
-			_path.append(_route->getIndex());
-			if (access(_path.c_str(), R_OK))
-				return (E_SUCCESS);
+			if (opendir(_path.c_str()) == NULL)
+				return (E_ACCESS);
 			else
-				return (E_NO_FILE);
+			{
+				_path.append(_route->getIndex());
+				if (stat(_path.c_str(), &s) == 0)
+				{
+					std::cout << _path << std::endl;
+					if (access(_path.c_str(), R_OK) == 0)
+						return (E_SUCCESS);
+					else
+						return (E_ACCESS);
+				}
+				else
+					return (E_FAIL);
+			}
 		}
-		if (s.st_mode & S_IFREG) // it's a file
+		else if (s.st_mode & S_IFREG) // it's a file
 		{
-			if (access(_path.c_str(), R_OK))
+			if (access(_path.c_str(), R_OK) == 0)
 				return (E_SUCCESS);
 			else
-				return (E_NO_FILE);
+				return (E_ACCESS);
 		}
 		else
-			return (E_NO_FILE);
+			return (E_FAIL);
 	}
 	else
 		return (E_FAIL);
 }
 
-std::string	Client::_requestFound(void)
+std::string	Client::_fileFound(void)
 {
 	std::string	header_message = D_200_MESSAGE;
 	std::string	content_type;
@@ -205,8 +208,36 @@ std::string	Client::_requestFound(void)
 	return (header_message);
 }
 
-int	Client::_requestNotFound(void)
+void	Client::_fileNotFound(void)
 {
-	std::cout << "Request not Found" << std::endl;
-	return (0);
+	std::cout << "File not Found" << std::endl;
+
+	_header = D_404_MESSAGE;
+
+	_header.append("\ncontent-type: text/html\ncontent_length: ");
+	_body = readHtmlFile(_config_server->getErrorPage404());
+	std::cout << _body.size() << std::endl;
+}
+
+void	Client::_fileNotAccess(void)
+{
+	std::cout << "File no access" << std::endl;
+}
+
+void	Client::_sendRespond(void)
+{
+	std::string	server_message;
+	server_message.append(_header);
+	server_message.append("\n\n");
+	server_message.append(_body);
+
+	int	bytes_send = 0;
+	int	total_bytes_send = 0;
+	while (total_bytes_send <static_cast<int>(server_message.size()))
+	{
+		bytes_send = send(_socket, server_message.c_str(), server_message.size(), 0);
+		if (bytes_send < 0)
+			std::cout << "Could not send reposne" << std::endl;
+		total_bytes_send += bytes_send;
+	}
 }

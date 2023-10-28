@@ -4,5 +4,13 @@ server:
 	port=8080
 
 	route:
+		uri=/
+		path=www/srcs/asda
+		index=index.html
+	;
+	route:
+		uri=/foo
+		path=www/srcs/
+		index=truc.html
 	;
 ;
