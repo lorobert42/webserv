@@ -1,5 +1,7 @@
 
 #include "Request.hpp"
+#include <cstddef>
+#include <cstdlib>
 
 //	### Static Member Function
 
@@ -16,10 +18,33 @@ Request::Request() {}
 
 Request::Request(std::string request)
 {
-	std::cout << request << std::endl;
-	
+	_rawRequest = request;
+}
+
+// ### Copy Constructor ###
+Request::Request(Request const& other) :
+	_header(other._header)
+{}
+
+// ### Destructor ###
+Request::~Request()
+{}
+
+// ### Overload operator ###
+Request& Request::operator=(Request const& other)
+{
+	if (this == &other)
+		return (*this);
+	this->_header = other._header;
+	return (*this);
+}
+
+//	### Member Function [PUBLIC] ###
+// ### Header parser
+void	Request::parseHeader()
+{
 	// Get all the Request 
-	std::stringstream	ss(request);
+	std::stringstream	ss(_rawRequest);
 	ss >> _method;
 	ss >> _index;
 	ss >> _version;
@@ -60,25 +85,58 @@ Request::Request(std::string request)
 		std::cout << "BODY :" << std::endl << _body << std::endl;
 }
 
-// ### Copy Constructor ###
-Request::Request(Request const& other) :
-	_header(other._header)
-{}
-
-// ### Destructor ###
-Request::~Request()
-{}
-
-// ### Overload operator ###
-Request& Request::operator=(Request const& other)
+int	Request::checkBody()
 {
-	if (this == &other)
-		return (*this);
-	this->_header = other._header;
-	return (*this);
+	std::cout << "Expected Content-Length: " << getValue("Content-Length") << std::endl;
+	std::cout << "Body until now: " << getBody() << std::endl;
+	std::string	content_length = getValue("Content-Length");
+	std::string transfer_encoding = getValue("Transfer-Encoding");
+	if ((content_length == "" && transfer_encoding == "") || (content_length != "" && transfer_encoding != ""))
+	{
+		setBody("");
+		_error = 400;
+		return (ERROR);
+	}
+	else if (transfer_encoding != "" && transfer_encoding != "chunked")
+	{
+		setBody("");
+		_error = 501;
+		return (ERROR);
+	}
+	if (content_length != "")
+	{
+		return (_checkBodyContentLength(std::strtol(content_length.c_str(), NULL, 10)));
+	}
+	return (_checkBodyChunked());
 }
 
-//	### Member Function [PUBLIC] ###
+int	Request::_checkBodyContentLength(size_t content_length)
+{
+	if (_body.length() == content_length)
+	{
+		return (OK);
+	}
+	else if (_body.length() < content_length)
+	{
+		return (TOO_SHORT);
+	}
+	return (ERROR);
+}
+
+int	Request::_checkBodyChunked()
+{
+	return OK;
+}
+
+void	Request::appendBody(std::string const& to_add)
+{
+	_body += to_add;
+}
+
+void	Request::setBody(std::string const& new_body)
+{
+	_body = new_body;
+}
 
 //	### GETTER ###
 const std::string	&Request::getMethod(void) const
@@ -104,5 +162,10 @@ const std::string	Request::getValue(const std::string &key) const
 	if (find != _header.end())
 		return (find->second);
 	else
-		return (NULL);
+		return ("");
+}
+
+const std::string &Request::getBody() const
+{
+	return (_body);
 }

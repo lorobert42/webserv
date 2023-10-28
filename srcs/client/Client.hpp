@@ -14,6 +14,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
+#include <sstream>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
@@ -25,13 +26,12 @@
 class CgiHandler;
 
 #define D_BUFF_SIZE 4096
-#define D_200_MESSAGE "200 ok"
-#define D_404_MESSAGE "404"
+#define D_200_MESSAGE "HTTP/1.1 200 OK"
+#define D_404_MESSAGE "HTTP/1.1 404"
 
 class Client
 {
 	public:
-		Client(void);
 		Client(ConfigServer *config, int &client_socket);
 		Client(Client const& other);
 		Client& operator=(Client const& other);
@@ -55,5 +55,9 @@ class Client
 		ConfigRoute		*_route;
 		int				_socket;
 		std::string		_read;
+		bool		_headerOk;
 		std::string		_uri;
+
+		Client(void);
+		std::string		_path;
 };
