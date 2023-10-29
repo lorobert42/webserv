@@ -2,16 +2,17 @@
 	ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
+    $UPLOAD_DIR = "upload/";
 
 	// Handle POST request
 	if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
-	    $uploadDirectory = "upload/";
 
-	    $targetFile = $uploadDirectory . basename($_FILES['file']['name']);
+	    $targetFile = $UPLOAD_DIR . basename($_FILES['file']['name']);
 
 	    // Move the uploaded file to the target directory
 	    if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
 	        $upload_message = "File uploaded successfully.";
+	        header("Location: /"); // Add this line to reload the page after successful upload
 	    } else {
 	        $upload_message = "There was an error uploading the file, please try again!";
 	    }
@@ -22,24 +23,16 @@
 
 	// Handle DELETE request
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        $deleteData = json_decode(file_get_contents("php://input"), true);
-        $filename = $deleteData['filename'] ?? null;
+		$filename = $_SERVER['HTTP_X_FILENAME'];
+		$targetFile = $UPLOAD_DIR . $filename;
 
-        if ($filename) {
-            $filePath = "upload/" . basename($filename);
+		if (file_exists($targetFile)) {
+			unlink($targetFile);
+			echo "File deleted successfully.";
+		} else {
+			echo "File does not exist.";
+		}
 
-            // Ensure the file exists and is within the expected directory
-            if (realpath($filePath) === $filePath && file_exists($filePath)) {
-                unlink($filePath);
-                echo "File deleted successfully.";
-            } else {
-                http_response_code(404);
-                echo "File not found.";
-            }
-        } else {
-            http_response_code(400);
-            echo "Filename not provided.";
-        }
     }
 
 	ob_start();
@@ -83,13 +76,12 @@
 	<h1 class="text-2xl text-center mb-4 font-bold">Uploaded files</h1>
 		<div class="flex flex-col gap-6 mt-4">
 		<?php
-	        $uploadDirectory = "upload/";
-	        $files = scandir($uploadDirectory);
+	        $files = scandir($UPLOAD_DIR);
 	        foreach ($files as $file) {
 	            if ($file != "." && $file != "..") {
 	                echo '<div class="flex flex-row gap-4 justify-between items-center">';
 	                echo '<span class="ml-2">' . $file . '</span>';
-	                echo '<button type="button" data-filename="' . $file . '" class="deleteButton bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded w-min self-end">Delete</button>';
+	                echo '<button type="button" class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded w-min self-end" onclick="deleteFile(\'' . $file . '\')">Delete</button>';
 	                echo '</div>';
 	            }
 	        }
@@ -122,31 +114,36 @@
             fileInput.value = '';
         });
 
-		document.querySelectorAll('.deleteButton').forEach(button => {
-            button.addEventListener('click', function() {
-                const filename = this.getAttribute('data-filename');
-                console.log(filename);
+        const form = document.querySelector('form');
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
 
-                // Add a confirmation alert before performing the DELETE action
-                if (window.confirm("Do you really want to delete this resource?")) {
-                    fetch('/', {
-                        method: 'DELETE',
-                        body: JSON.stringify({ filename: filename }),
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    }).then(response => {
-                        return response.text();
-                    }).then(data => {
-                        alert(data);
-                    }).catch(error => {
-                        console.error('Error:', error);
-                    });
-                } else {
-                    console.log("Deletion cancelled by user.");
-                }
-            });
+            const formData = new FormData(form);
+
+            fetch('/', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                fileInput.value = '';
+				window.location.reload();
+			})
         });
+
+		function deleteFile(filename) {
+			if (window.confirm("Are you sure you want to delete " + filename + "?")) {
+				fetch('/', {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Filename': filename,
+                    },
+                })
+                .then(response => {
+                   window.location.reload();
+                })
+			}
+		}
 
     </script>
 </body>

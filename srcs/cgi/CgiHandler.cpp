@@ -20,6 +20,7 @@ CgiHandler::CgiHandler(Client *client) : _client(client) {
 	this->_env["REMOTE_IDENT"] = client->getRequest()->getValue("Authorization");
 	this->_env["CONTENT_TYPE"] = client->getRequest()->getValue("Content-Type");
 	this->_env["CONTENT_LENGTH"] = client->getRequest()->getValue("Content-Length");
+	this->_env["HTTP_X_FILENAME"] = client->getRequest()->getValue("X-Filename");
 
 	// TODO: Set environment variables from the client
 	this->_env["HTTP_ACCEPT"] = client->getRequest()->getValue("Accept");
