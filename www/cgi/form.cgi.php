@@ -11,14 +11,14 @@
 
 	    // Move the uploaded file to the target directory
 	    if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
-// 	        echo "File uploaded successfully.";
+	        $upload_message = "File uploaded successfully.";
 	    } else {
-// 	        echo "Failed to upload the file.";
+	        $upload_message = "There was an error uploading the file, please try again!";
 	    }
 	}
-// 	elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-// 	    echo "No file uploaded or there was an error uploading.";
-// 	}
+	elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		$upload_message = "No file uploaded or there was an error uploading.";
+	}
 
 	// Handle DELETE request
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
@@ -61,6 +61,9 @@
                 <div class="flex flex-col">
                     <label for="file" class="text-sm text-gray-500 ml-2">File</label>
                     <input type="file" id="file" name="file" class="border border-gray-300 rounded-md p-2" accept=".txt" required>
+                    <?php if (isset($upload_message)) { ?>
+						<span class="text-sm text-gray-500 ml-2 mt-1"><?php echo $upload_message; ?></span>
+					<?php } ?>
                 </div>
             </div>
             <div class="flex flex-col mt-4 hidden">
@@ -77,9 +80,9 @@
     </div>
 
     <div class="mx-auto p-6 bg-white shadow-md rounded-lg w-full max-w-[600px] flex flex-col mt-4">
-      <h1 class="text-2xl text-center mb-4 font-bold">Uploaded files</h1>
-			<div class="flex flex-col gap-6 mt-4">
-				<?php
+	<h1 class="text-2xl text-center mb-4 font-bold">Uploaded files</h1>
+		<div class="flex flex-col gap-6 mt-4">
+		<?php
 	        $uploadDirectory = "upload/";
 	        $files = scandir($uploadDirectory);
 	        foreach ($files as $file) {
@@ -93,8 +96,8 @@
 	        if (count($files) == 2) {
 	            echo '<span class="text-center">There are no files uploaded yet...</span>';
 	        }
-	      ?>
-			</div>
+		?>
+		</div>
     </div>
 
     <script>
