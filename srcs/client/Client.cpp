@@ -84,8 +84,7 @@ int	Client::readHandler(void)
 		_request = new Request(_read);
 		_request->parseHeader();
 		_headerOk = true;
-		if (_request->getMethod() != "POST")
-			return (0);
+		return (0);
 	}
 	else if (_headerOk && _request->getMethod() == "POST")
 	{
@@ -106,23 +105,23 @@ int	Client::readHandler(void)
 	return (1);
 }
 
-static std::string	readHtmlFile(std::string path_with_index)
-{
-	std::string		line;
-	std::string		all;
-	std::ifstream	ifs(path_with_index.c_str());
-
-	std::cout << path_with_index << std::endl;
-	if (!ifs)
-	{
-		std::cout << "file cannot be read" << std::endl;
-		//TODO better error handling
-		return (NULL);
-	}
-	while (std::getline(ifs, line))
-		all.append(line);
-	return (all);
-}
+//static std::string	readHtmlFile(std::string path_with_index)
+//{
+//	std::string		line;
+//	std::string		all;
+//	std::ifstream	ifs(path_with_index.c_str());
+//
+//	std::cout << path_with_index << std::endl;
+//	if (!ifs)
+//	{
+//		std::cout << "file cannot be read" << std::endl;
+//		//TODO better error handling
+//		return (NULL);
+//	}
+//	while (std::getline(ifs, line))
+//		all.append(line);
+//	return (all);
+//}
 
 int	Client::writeHandler(void)
 {
@@ -130,7 +129,7 @@ int	Client::writeHandler(void)
 	// Need to change server_message by our own
 	std::string	server_message;
 	_uri = _request->getIndex();
-	_route = _config_server->getRouteWithUri(_uri);
+	_route = _config_server->getRouteWithUri("/");
 /*	if (_route == NULL)
 	{
 		std::cout << "Route not found" << std::endl;
@@ -144,7 +143,6 @@ int	Client::writeHandler(void)
 		return (_requestNotFound());
 	}*/
 
-	server_message = "HTTP/1.1 200 OK\ncontent-type: text/html\ncontent-length:";
 	// Have to get the set the reponse by the html we need
 //	std::string body = readHtmlFile(_route->getPathWithIndex());
 //	AutoIndex autoindex(_uri, _route->getPath() + _uri);
@@ -154,12 +152,13 @@ int	Client::writeHandler(void)
 	// TODO
 	std::cout << "URI: " << _uri << std::endl;
 	CgiHandler cgi(this);
+	cgi.displayEnv();
 	std::string body = cgi.executeCgi();
 
-	server_message.append("\n\n");
+	server_message = "HTTP/1.1 200 OK\n";
 	server_message.append(body);
 
-	std::cout << "Server message: 💚" << server_message << std::endl;
+//	std::cout << "Server message: 💚" << server_message << std::endl;
 	int	bytes_send = 0;
 	int	total_bytes_send = 0;
 	while (total_bytes_send <static_cast<int>(server_message.size()))

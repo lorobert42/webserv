@@ -6,35 +6,32 @@ CgiHandler::CgiHandler(Client *client) {
 
 	// TODO: Set environment variables dedicated for the server
 	this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
-	this->_env["SERVER_NAME"] = "TODO";
+	this->_env["SERVER_NAME"] = client->getConfigServer()->getName();
 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 
 	// TODO: Set environment variables dedicated for the request
 	this->_env["SERVER_PROTOCOL"] = client->getRequest()->getVersion();
-	this->_env["SERVER_PORT"] = client->getConfigServer()->getPort();
+	this->_env["SERVER_PORT"] = client->getConfigServer()->getPortAsString();
 	this->_env["REQUEST_METHOD"] = client->getRequest()->getMethod();
-	this->_env["PATH_INFO"] = "TODO";
-	this->_env["PATH_TRANSLATED"] = "TODO";
-	this->_env["SCRIPT_NAME"] = "TODO";
-	this->_env["QUERY_STRING"] = "TODO";
-	this->_env["REMOTE_HOST"] = "TODO";
-	this->_env["REMOTE_ADDR"] = "TODO";
-	this->_env["AUTH_TYPE"] = "TODO";
-	this->_env["REMOTE_USER"] = "TODO";
-	this->_env["REMOTE_IDENT"] = "TODO";
-	this->_env["CONTENT_TYPE"] = "TODO";
-	this->_env["CONTENT_LENGTH"] = "TODO";
+	this->_env["REMOTE_HOST"] = ""; // TODO: Get the hostname of the client
+	this->_env["REMOTE_ADDR"] = ""; // TODO: Get the IP address of the client
+	this->_env["AUTH_TYPE"] = client->getRequest()->getValue("Authorization");
+	this->_env["REMOTE_USER"] = client->getRequest()->getValue("Authorization");
+	this->_env["REMOTE_IDENT"] = client->getRequest()->getValue("Authorization");
+	this->_env["CONTENT_TYPE"] = client->getRequest()->getValue("Content-Type");
+//	this->_env["CONTENT_LENGTH"] = client->getRequest()->getValue("Content-Length");
+//	this->_env["CONTENT_LENGTH"] = client->getRequest()->getValue("Content-Length");
 
 	// TODO: Set environment variables from the client
 	this->_env["HTTP_ACCEPT"] = client->getRequest()->getValue("Accept");
-	this->_env["HTTP_ACCEPT_CHARSET"] = "TODO";
+	this->_env["HTTP_ACCEPT_CHARSET"] = client->getRequest()->getValue("Accept-Charset");
 	this->_env["HTTP_ACCEPT_ENCODING"] = client->getRequest()->getValue("Accept-Encoding");
 	this->_env["HTTP_ACCEPT_LANGUAGE"] = client->getRequest()->getValue("Accept-Language");
 	this->_env["HTTP_CONNECTION"] = client->getRequest()->getValue("Connection");
 	this->_env["HTTP_HOST"] = client->getRequest()->getValue("Host");
-	this->_env["HTTP_REFERER"] = "TODO"; // client->getRequest()->getValue("Referer");
+	this->_env["HTTP_REFERER"] = client->getRequest()->getValue("Referer");
 	this->_env["HTTP_USER_AGENT"] = client->getRequest()->getValue("User-Agent");
-	this->_env["HTTP_COOKIE"] = "TODO";
+	this->_env["HTTP_COOKIE"] = client->getRequest()->getValue("Cookie");
 
 	// Set environment variables dedicated for PHP
 	this->_env["REDIRECT_STATUS"] = "200";
@@ -120,9 +117,12 @@ std::string CgiHandler::executeCgi() {
 		// Read the output from the pipe into the 'body' variable
 		char buffer[4096];
 		ssize_t bytesRead;
+		std::cout << "💚" << std::endl;
 		while ((bytesRead = read(fd[0], buffer, sizeof(buffer))) > 0) {
+			std::cout << "bytesRead: " << bytesRead << std::endl;
 			body.append(buffer, bytesRead);
 		}
+		std::cout << "❌" << std::endl;
 
 		// Wait for the child process to finish
 		int status;
@@ -135,6 +135,7 @@ std::string CgiHandler::executeCgi() {
 			if (status != 0) {
 				return ("502 Bad Gateway\r\n");
 			}
+			return (body);
 		}
 		// Close the read end of the pipe
 		close(fd[0]);

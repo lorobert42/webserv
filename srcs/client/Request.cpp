@@ -1,7 +1,5 @@
 
 #include "Request.hpp"
-#include <cstddef>
-#include <cstdlib>
 
 //	### Static Member Function
 
@@ -69,7 +67,21 @@ void	Request::parseHeader()
 			_header[key] = value;
 		}
 	}
-	ss >> _body;
+	if (_header.find("Content-Length") != _header.end()) {
+		int content_length = 0;
+		std::istringstream iss(_header["Content-Length"]);
+		std::cout << "💚Content-Length: " << _header["Content-Length"] << std::endl;
+		iss >> content_length;
+
+		char* bodyBuffer = new char[content_length + 1];
+		ss.read(bodyBuffer, content_length);
+		bodyBuffer[content_length] = '\0';
+		_body = std::string(bodyBuffer);
+		delete[] bodyBuffer;
+	} else {
+		// If no Content-Length header, assume no body or use your existing method
+		ss >> _body;
+	}
 	//	### Printing ###
 	std::cout << "Method : [" << _method << "]" << std::endl \
 			  << "Index : [" << _index  << "]" << std::endl \
@@ -83,6 +95,8 @@ void	Request::parseHeader()
 	}
 	if (_body.size() != 0)
 		std::cout << "BODY :" << std::endl << _body << std::endl;
+	else
+		std::cout << "BODY : [EMPTY]" << std::endl;
 }
 
 int	Request::checkBody()

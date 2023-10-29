@@ -7,6 +7,9 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <cstddef>
+#include <cstdlib>
+
 
 #define OK 1
 #define TOO_SHORT 2

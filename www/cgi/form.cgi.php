@@ -1,11 +1,46 @@
 <?php
+	ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+
+	if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
+	    $uploadDirectory = "upload/";
+
+	    $targetFile = $uploadDirectory . basename($_FILES['file']['name']);
+
+	    // Move the uploaded file to the target directory
+	    if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
+	        echo "File uploaded successfully.";
+	    } else {
+	        echo "Failed to upload the file.";
+	    }
+	} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+	    echo "No file uploaded or there was an error uploading.";
+	}
+
+	// Handle DELETE request
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $deleteData = json_decode(file_get_contents("php://input"), true);
+        $filename = $deleteData['filename'] ?? null;
+
+        if ($filename) {
+            $filePath = "upload/" . basename($filename);
+
+            // Ensure the file exists and is within the expected directory
+            if (realpath($filePath) === $filePath && file_exists($filePath)) {
+                unlink($filePath);
+                echo "File deleted successfully.";
+            } else {
+                http_response_code(404);
+                echo "File not found.";
+            }
+        } else {
+            http_response_code(400);
+            echo "Filename not provided.";
+        }
+    }
+
 	ob_start();
-?>
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-	echo 'POST';
-}
-echo 'salut';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -48,7 +83,7 @@ echo 'salut';
 	            if ($file != "." && $file != "..") {
 	                echo '<div class="flex flex-row gap-4 justify-between items-center">';
 	                echo '<span class="ml-2">' . $file . '</span>';
-	                echo '<button type="button" class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded w-min self-center">Delete</button>';
+	                echo '<button type="button" data-filename="' . $file . '" class="deleteButton bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded w-min self-end">Delete</button>';
 	                echo '</div>';
 	            }
 	        }
@@ -77,6 +112,28 @@ echo 'salut';
             imagePreview.parentElement.classList.add('hidden');
             fileInput.value = '';
         });
+
+		document.querySelectorAll('.deleteButton').forEach(button => {
+		    button.addEventListener('click', function() {
+		        const filename = this.getAttribute('data-filename');
+		        console.log(filename);
+
+		        fetch('/', {
+		            method: 'DELETE',
+		            body: JSON.stringify({ filename: filename }),
+		            headers: {
+		                'Content-Type': 'application/json'
+		            }
+		        }).then(response => {
+		            return response.text();
+		        }).then(data => {
+		            alert(data);
+		        }).catch(error => {
+		            console.error('Error:', error);
+		        });
+		    });
+		});
+
     </script>
 </body>
 </html>
