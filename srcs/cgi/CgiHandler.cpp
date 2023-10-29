@@ -2,7 +2,7 @@
 
 CgiHandler::CgiHandler() {}
 
-CgiHandler::CgiHandler(Client *client) {
+CgiHandler::CgiHandler(Client *client) : _client(client) {
 
 	// TODO: Set environment variables dedicated for the server
 	this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
@@ -19,8 +19,7 @@ CgiHandler::CgiHandler(Client *client) {
 	this->_env["REMOTE_USER"] = client->getRequest()->getValue("Authorization");
 	this->_env["REMOTE_IDENT"] = client->getRequest()->getValue("Authorization");
 	this->_env["CONTENT_TYPE"] = client->getRequest()->getValue("Content-Type");
-//	this->_env["CONTENT_LENGTH"] = client->getRequest()->getValue("Content-Length");
-//	this->_env["CONTENT_LENGTH"] = client->getRequest()->getValue("Content-Length");
+	this->_env["CONTENT_LENGTH"] = client->getRequest()->getValue("Content-Length");
 
 	// TODO: Set environment variables from the client
 	this->_env["HTTP_ACCEPT"] = client->getRequest()->getValue("Accept");
@@ -79,66 +78,66 @@ char	**CgiHandler::_getEnv() {
 
 std::string CgiHandler::executeCgi() {
 	pid_t pid;
-	int fd[2];  // File descriptor array for the pipe
+	int fd[2];
+	char buffer[4096];
+	int bytesRead;
+	std::string response;
 	char** env = this->_getEnv();
-	std::string body;
 
+	// Create a pipe
 	if (pipe(fd) == -1) {
 		throw std::runtime_error("[CGI] pipe() failed");
 	}
-
-	pid = fork();
-
-	if (pid < 0) {
+	// Fork a child process
+	if ((pid = fork()) == -1) {
 		throw std::runtime_error("[CGI] fork() failed");
 	}
-	// This code will be executed by the child process
-	else if (pid == 0) {
-		// Close the read end of the pipe
-		close(fd[0]);
+	// Child process
+	if (pid == 0) {
+		close(fd[0]); // Close the read end of the pipe
 
 		// Redirect stdout to the write end of the pipe
-		dup2(fd[1], STDOUT_FILENO);
+		if (dup2(fd[1], STDOUT_FILENO) == -1) {
+			perror("dup2");
+			exit(EXIT_FAILURE);
+		}
 		close(fd[1]);
-		// Prepare the argument list
-		char* argv[3] = {const_cast<char*>(this->_env["SCRIPT_CGI"].c_str()), const_cast<char*>(this->_env["SCRIPT_FILENAME"].c_str()), NULL};
 
-		// Execute the CGI script
-		if (execve(this->_env["SCRIPT_CGI"].c_str(), argv, env) == -1) {
-			perror("[CGI] execve() failed");
-			_exit(EXIT_FAILURE);
+		int input_fd[2];
+		if (pipe(input_fd) == -1) {
+			perror("input pipe");
+			exit(EXIT_FAILURE);
+		}
+
+		write(input_fd[1], _client->getRequest()->getBody().c_str(), _client->getRequest()->getBody().size());
+		close(input_fd[1]);
+
+		if (dup2(input_fd[0], STDIN_FILENO) == -1) {
+			perror("dup2 stdin");
+			exit(EXIT_FAILURE);
+		}
+		close(input_fd[0]);
+
+		char* argv[3];
+		argv[0] = const_cast<char*>(this->_env["SCRIPT_CGI"].c_str());
+		argv[1] = const_cast<char*>(this->_env["SCRIPT_FILENAME"].c_str());
+		argv[2] = NULL;
+
+		if (execve(argv[0], argv, env) == -1) {
+			perror("execve");
+			exit(EXIT_FAILURE);
 		}
 	}
-	// This code will be executed by the parent process
+	// Parent process
 	else {
-		// Close the write end of the pipe
-		close(fd[1]);
+		close(fd[1]); // Close the write end of the pipe
 
-		// Read the output from the pipe into the 'body' variable
-		char buffer[4096];
-		ssize_t bytesRead;
-		std::cout << "💚" << std::endl;
 		while ((bytesRead = read(fd[0], buffer, sizeof(buffer))) > 0) {
-			std::cout << "bytesRead: " << bytesRead << std::endl;
-			body.append(buffer, bytesRead);
+			response.append(buffer, bytesRead);
 		}
-		std::cout << "❌" << std::endl;
 
-		// Wait for the child process to finish
-		int status;
-		if (waitpid(pid, &status, 0) == -1)
-			perror("[CGI] waitpid() failed");
-		else {
-			if (status == 2) {
-				return ("508 Loop Detected\r\n");
-			}
-			if (status != 0) {
-				return ("502 Bad Gateway\r\n");
-			}
-			return (body);
-		}
-		// Close the read end of the pipe
 		close(fd[0]);
+		waitpid(pid, NULL, 0); // Wait for the child process to finish
 	}
 
 	// Free env
@@ -147,5 +146,6 @@ std::string CgiHandler::executeCgi() {
 	}
 	delete[] env;
 
-	return body;
+	return response;
 }
+

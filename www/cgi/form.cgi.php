@@ -3,6 +3,7 @@
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
 
+	// Handle POST request
 	if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
 	    $uploadDirectory = "upload/";
 
@@ -10,13 +11,14 @@
 
 	    // Move the uploaded file to the target directory
 	    if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
-	        echo "File uploaded successfully.";
+// 	        echo "File uploaded successfully.";
 	    } else {
-	        echo "Failed to upload the file.";
+// 	        echo "Failed to upload the file.";
 	    }
-	} elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-	    echo "No file uploaded or there was an error uploading.";
 	}
+// 	elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// 	    echo "No file uploaded or there was an error uploading.";
+// 	}
 
 	// Handle DELETE request
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
@@ -52,18 +54,19 @@
 </head>
 <body class="bg-gray-50 flex flex-col pt-10 p-4">
     <div class="mx-auto p-6 bg-white shadow-md rounded-lg w-full max-w-[600px] flex flex-col">
-        <h1 class="text-2xl text-center mb-4 font-bold">Upload a file</h1>
+        <h1 class="text-2xl text-center mb-4 font-bold">Upload a file.txt</h1>
 
         <form method="POST" class="flex flex-col" enctype="multipart/form-data" action="/">
             <div class="flex flex-col gap-4">
                 <div class="flex flex-col">
                     <label for="file" class="text-sm text-gray-500 ml-2">File</label>
-                    <input type="file" id="file" name="file" class="border border-gray-300 rounded-md p-2" accept="image/*">
+                    <input type="file" id="file" name="file" class="border border-gray-300 rounded-md p-2" accept=".txt" required>
                 </div>
             </div>
-            <div class="flex flex-col gap-2 mt-4 justify-center items-center hidden">
-                <img id="image_preview" class="rounded-md w-[200px]" alt="image_preview" src="">
-                <button id="clear" type="button" class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded w-min">
+            <div class="flex flex-col mt-4 hidden">
+            	<label for="image_preview" class="text-sm text-gray-500 ml-2">Preview</label>
+                <div id="text_preview" class="border border-gray-300 rounded-md w-full p-2"></div>
+                <button id="clear" type="button" class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded w-min self-center mt-2">
                     Remove
                 </button>
             </div>
@@ -87,6 +90,9 @@
 	                echo '</div>';
 	            }
 	        }
+	        if (count($files) == 2) {
+	            echo '<span class="text-center">There are no files uploaded yet...</span>';
+	        }
 	      ?>
 			</div>
     </div>
@@ -100,39 +106,44 @@
             const reader = new FileReader();
 
             reader.addEventListener('load', (e) => {
-                imagePreview.src = e.target.result;
-                imagePreview.parentElement.classList.remove('hidden');
+                document.getElementById('text_preview').textContent = e.target.result;
+                document.getElementById('text_preview').parentElement.classList.remove('hidden');
             });
 
-            reader.readAsDataURL(file);
+            reader.readAsText(file);
         });
 
         document.getElementById('clear').addEventListener('click', (e) => {
-            imagePreview.src = '';
-            imagePreview.parentElement.classList.add('hidden');
+            document.getElementById('text_preview').textContent = '';
+            document.getElementById('text_preview').parentElement.classList.add('hidden');
             fileInput.value = '';
         });
 
 		document.querySelectorAll('.deleteButton').forEach(button => {
-		    button.addEventListener('click', function() {
-		        const filename = this.getAttribute('data-filename');
-		        console.log(filename);
+            button.addEventListener('click', function() {
+                const filename = this.getAttribute('data-filename');
+                console.log(filename);
 
-		        fetch('/', {
-		            method: 'DELETE',
-		            body: JSON.stringify({ filename: filename }),
-		            headers: {
-		                'Content-Type': 'application/json'
-		            }
-		        }).then(response => {
-		            return response.text();
-		        }).then(data => {
-		            alert(data);
-		        }).catch(error => {
-		            console.error('Error:', error);
-		        });
-		    });
-		});
+                // Add a confirmation alert before performing the DELETE action
+                if (window.confirm("Do you really want to delete this resource?")) {
+                    fetch('/', {
+                        method: 'DELETE',
+                        body: JSON.stringify({ filename: filename }),
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    }).then(response => {
+                        return response.text();
+                    }).then(data => {
+                        alert(data);
+                    }).catch(error => {
+                        console.error('Error:', error);
+                    });
+                } else {
+                    console.log("Deletion cancelled by user.");
+                }
+            });
+        });
 
     </script>
 </body>
