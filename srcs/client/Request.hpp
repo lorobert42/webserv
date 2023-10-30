@@ -34,6 +34,7 @@ class Request
 
 	private :
 		Request(void);
+		bool	_parseFirstLine(std::string& line);
 		int	_checkBodyContentLength(size_t content_length);
 		int	_checkBodyChunked();
 

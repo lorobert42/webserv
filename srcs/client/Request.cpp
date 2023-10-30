@@ -42,31 +42,24 @@ Request& Request::operator=(Request const& other)
 void	Request::parseHeader()
 {
 	// Get all the Request 
-	// TODO: check the line exists before reading
-	// TODO: should be METHOD uri-without-space version -> 400
 	// TODO: if method is not implemented, send 501 Not Implemented, if not allowed, send 405
 	// TODO: if uri is in absolute form, replace Host with the host of the uri
 	// TODO: Host field must be present -> 400
+	std::string	read;
 	std::stringstream	ss(_rawRequest);
-	ss >> _method;
-	ss >> _index;
-	ss >> _version;
-	if (_method == "" || _index == "" || _version == "")
-	{
-		_error = 400;
+	std::getline(ss, read);
+	if (_parseFirstLine(read) == false)
 		return;
-	}
 
 	char		c = ':';
 	std::string	key;
 	std::string	value;
-	std::string	read;
 
 	// TODO: keys and values are case-insensitive
 	// TODO: no whitespace allowed between key and : -> 400
-	std::getline(ss,read); // SKIP the \r\n after dada collected in the first line
 	while (std::getline(ss, read))
 	{
+		std::cout << read << std::endl;
 		if (read.size() != 0)
 		{
 			if (read.size() == 1 && read == "\r") // STOP reading when the header is done
@@ -93,6 +86,35 @@ void	Request::parseHeader()
 	}
 	if (_body.size() != 0)
 		std::cout << "BODY :" << std::endl << _body << std::endl;
+}
+
+bool	Request::_parseFirstLine(std::string& line)
+{
+	size_t space = line.find(" ");
+	if (space == std::string::npos)
+	{
+		_error = 400;
+		return (false);
+	}
+	_method = line.substr(0, space);
+	line = line.substr(space + 1);
+	space = line.find(" ");
+	if (space == std::string::npos)
+	{
+		_error = 400;
+		return (false);
+	}
+	_index = line.substr(0, space);
+	_version = line.substr(space + 1, line.size() - 3);
+	if (_method == "" || _index == "" || _version == "" ||
+			_method.find(" ") != std::string::npos ||
+			_index.find(" ") != std::string::npos ||
+			_version.find(" ") != std::string::npos)
+	{
+		_error = 400;
+		return (false);
+	}
+	return (true);
 }
 
 int	Request::checkBody()
