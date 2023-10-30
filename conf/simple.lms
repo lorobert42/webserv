@@ -2,14 +2,11 @@ server:
 	name=custom
 	host=127.0.0.1
 	port=8080
-	error_page_400=custom/400.html
-	error_page_404=custom/404.html
-	error_page_500=custom/500.html
 
 	route:
 		uri=/
-		path=www/nginx/test
-		index=no.html
+		path=www/srcs/
+		index=home.html
 		get=true
 		post=true
 		delete=true
@@ -17,11 +14,6 @@ server:
 		cgi_script=www/cgi/form.cgi.php
 		cgi_bin=/usr/bin/php-cgi
 		client_max_body_size=1K
-		upload_dir=www/custom/upload
-	;
-	route:
-		uri=/foo
-		path=www/srcs/
-		index=form.html
+		upload_dir=www/custom/upload/
 	;
 ;
