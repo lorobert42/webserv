@@ -1,5 +1,7 @@
 
 #include "Request.hpp"
+#include <exception>
+#include <stdexcept>
 
 //	### Static Member Function
 
@@ -38,6 +40,17 @@ Request& Request::operator=(Request const& other)
 }
 
 //	### Member Function [PUBLIC] ###
+
+std::string	Request::_getline(std::string& data)
+{
+	size_t ret = data.find("\r\n");
+	if (ret == std::string::npos)
+		throw std::runtime_error("No end of line");
+	std::string line = data.substr(0, ret);
+	data = data.substr(ret + 2);
+	return (line);
+}
+
 // ### Header parser
 void	Request::parseHeader()
 {
@@ -45,9 +58,7 @@ void	Request::parseHeader()
 	// TODO: if method is not implemented, send 501 Not Implemented, if not allowed, send 405
 	// TODO: if uri is in absolute form, replace Host with the host of the uri
 	// TODO: Host field must be present -> 400
-	std::string	read;
-	std::stringstream	ss(_rawRequest);
-	std::getline(ss, read);
+	std::string	read = _getline(_rawRequest);
 	if (_parseFirstLine(read) == false)
 		return;
 
@@ -57,22 +68,27 @@ void	Request::parseHeader()
 
 	// TODO: keys and values are case-insensitive
 	// TODO: no whitespace allowed between key and : -> 400
-	while (std::getline(ss, read))
+	while (true)
 	{
-		std::cout << read << std::endl;
-		if (read.size() != 0)
-		{
-			if (read.size() == 1 && read == "\r") // STOP reading when the header is done
-				break;
-			read.erase(remove_if(read.begin(), read.end(), ::isspace), read.end());
-			read.find(c) < read.size() ? key.assign(read, 0, read.find(c)) : \
-				key = "none";
-			read.find(c) < read.size() ? value.assign(read, read.find(c) + 1, read.size() - 1) : \
-				value = "none";
-			_header[key] = value;
+		try {
+			read = _getline(_rawRequest);
 		}
+		catch (const std::exception& e)
+		{
+			_error = 400;
+			return;
+		}
+		std::cout << read << std::endl;
+		if (read == "")
+			break;
+		read.erase(remove_if(read.begin(), read.end(), ::isspace), read.end());
+		read.find(c) != std::string::npos ? key.assign(read, 0, read.find(c)) : \
+			key = "none";
+		read.find(c) != std::string::npos ? value.assign(read, read.find(c) + 1, read.size() - 1) : \
+			value = "none";
+		_header[key] = value;
 	}
-	ss >> _body;
+	_body = _rawRequest;
 	//	### Printing ###
 	std::cout << "Method : [" << _method << "]" << std::endl \
 			  << "Uri : [" << _uri  << "]" << std::endl \
@@ -85,7 +101,7 @@ void	Request::parseHeader()
 			      << "[VALUE] : " << it->second << std::endl;
 	}
 	if (_body.size() != 0)
-		std::cout << "BODY :" << std::endl << _body << std::endl;
+		std::cout << "BODY :\n" << _body << std::endl;
 	else
 		std::cout << "BODY : [EMPTY]" << std::endl;
 }
@@ -107,7 +123,7 @@ bool	Request::_parseFirstLine(std::string& line)
 		return (false);
 	}
 	_uri = line.substr(0, space);
-	_version = line.substr(space + 1, line.size() - 3);
+	_version = line.substr(space + 1, line.size());
 	if (_method == "" || _uri == "" || _version == "" ||
 			_method.find(" ") != std::string::npos ||
 			_uri.find(" ") != std::string::npos ||
