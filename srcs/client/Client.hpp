@@ -24,6 +24,7 @@
 #include "../config/ConfigServer.hpp"
 #include "../cgi/CgiHandler.hpp"
 #include "../autoindex/AutoIndex.hpp"
+#include "ClientHelper.hpp"
 
 class CgiHandler;
 
@@ -37,6 +38,7 @@ enum	code_error {
 #define D_200_MESSAGE "HTTP/1.1 200 OK"
 #define D_404_MESSAGE "HTTP/1.1 404"
 #define D_403_MESSAGE "HTTP/1.1 403"
+#define D_405_MESSAGE "HTTP/1.1 405"
 
 class Client
 {
@@ -73,6 +75,7 @@ class Client
 		std::string		_fileFound(void);
 		void			_fileNotFound(void);
 		void			_fileNotAccess(void);
+		void			_methodNotAllowed(void);
 		void			_sendRespond(bool CGI);
 
 		Client(void);

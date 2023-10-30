@@ -155,6 +155,13 @@ int	Client::writeHandler(void)
 		return (0);
 	}
 
+	// Check if method is allowed
+	if (!ClientHelper::isMethodAllowed(_route, _request->getMethod())) {
+		this->_methodNotAllowed();
+		this->_sendRespond(false);
+		return (0);
+	}
+
 	// Check if the route has a CGI
 	if(_route->getCgiScript() != "" && _route->getCgiBin() != "")
 	{
@@ -249,6 +256,16 @@ void	Client::_fileNotAccess(void)
 
 	_header.append("\ncontent-type: text/html\ncontent_length: ");
 	_body = readFile(_config_server->getErrorPage403());
+}
+
+void	Client::_methodNotAllowed(void)
+{
+	std::cout << "Method not allowed" << std::endl;
+
+	_header = D_405_MESSAGE;
+
+	_header.append("\ncontent-type: text/html\ncontent_length: ");
+	_body = readFile(_config_server->getErrorPage405());
 }
 
 void	Client::_sendRespond(bool CGI)
