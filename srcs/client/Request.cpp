@@ -44,7 +44,7 @@ void	Request::parseHeader()
 	// Get all the Request 
 	std::stringstream	ss(_rawRequest);
 	ss >> _method;
-	ss >> _index;
+	ss >> _uri;
 	ss >> _version;
 
 	char		c = ':';
@@ -84,7 +84,7 @@ void	Request::parseHeader()
 	}
 	//	### Printing ###
 	std::cout << "Method : [" << _method << "]" << std::endl \
-			  << "Index : [" << _index  << "]" << std::endl \
+			  << "Uri : [" << _uri  << "]" << std::endl \
 			  << "Version : [" << _version << "]" << std::endl \
 			  << "HEADER : " << std::endl;
 	for (std::map<std::string, std::string>::iterator it = _header.begin(); \
@@ -158,9 +158,9 @@ const std::string	&Request::getMethod(void) const
 	return (_method);
 }
 
-const std::string	&Request::getIndex(void) const
+const std::string	&Request::getUri(void) const
 {
-	return (_index);
+	return (_uri);
 }
 
 const std::string	&Request::getVersion(void) const

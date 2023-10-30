@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/23 20:20:13 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/30 10:17:15 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 #include <fstream>
 #include <sstream>
 #include <unistd.h>
+#include <sys/types.h>
+#include <dirent.h>
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include "Request.hpp"
@@ -25,9 +27,16 @@
 
 class CgiHandler;
 
+enum	code_error {
+		E_SUCCESS = 0,
+		E_ACCESS = 1,
+		E_FAIL = 2
+};
+
 #define D_BUFF_SIZE 4096
 #define D_200_MESSAGE "HTTP/1.1 200 OK"
 #define D_404_MESSAGE "HTTP/1.1 404"
+#define D_403_MESSAGE "HTTP/1.1 403"
 
 class Client
 {
@@ -42,22 +51,28 @@ class Client
 		ConfigRoute		*getConfigRoute(void) const;
 		Request			*getRequest(void) const;
 
-		int	readHandler(void);
-		int writeHandler(void);
-	
-		bool		_checkFile(void);
-		std::string	_requestFound(void);
-		int			_requestNotFound(void);
+		int				readHandler(void);
+		int 			writeHandler(void);
 
 	private:
 		ConfigServer	*_config_server;
 		Request			*_request;
 		ConfigRoute		*_route;
 		int				_socket;
+
 		std::string		_read;
-		bool		_headerOk;
+		bool			_headerOk;
 		std::string		_uri;
+		std::string		_path;
+		std::string		_header;
+		std::string		_body;
+	
+		bool			_checkPath(void);
+		int				_checkFile(void);
+		std::string		_fileFound(void);
+		void			_fileNotFound(void);
+		void			_fileNotAccess(void);
+		void			_sendRespond(void);
 
 		Client(void);
-		std::string		_path;
 };

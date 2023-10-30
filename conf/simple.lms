@@ -8,8 +8,8 @@ server:
 
 	route:
 		uri=/
-		path=www/srcs/
-		index=index.html
+		path=www/nginx/test
+		index=no.html
 		get=true
 		post=true
 		delete=true
@@ -17,6 +17,11 @@ server:
 		cgi_script=www/cgi/form.cgi.php
 		cgi_bin=/usr/bin/php-cgi
 		client_max_body_size=1K
-		upload_dir=upload/
+		upload_dir=www/custom/upload
+	;
+	route:
+		uri=/foo
+		path=www/srcs/
+		index=form.html
 	;
 ;
