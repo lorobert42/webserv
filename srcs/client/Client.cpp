@@ -54,9 +54,14 @@ ConfigServer	*Client::getConfigServer(void) const
 	return (this->_config_server);
 }
 
-Request*	Client::getRequest(void) const
+ConfigRoute		*Client::getConfigRoute(void) const
 {
-	return (_request);
+	return (this->_route);
+}
+
+Request	*Client::getRequest(void) const
+{
+	return (this->_request);
 }
 
 int	Client::readHandler(void)
@@ -79,14 +84,11 @@ int	Client::readHandler(void)
 		_request = new Request(_read);
 		_request->parseHeader();
 		_headerOk = true;
-		if (_request->getMethod() != "POST")
-			return (0);
+		return (0);
 	}
 	else if (_headerOk && _request->getMethod() == "POST")
 	{
-		_request->setBody(_request->getBody() + buffer);
-		std::cout << "Expected Content-Length: " << _request->getValue("Content-Length") << std::endl;
-		std::cout << "Body until now: " << _request->getBody() << std::endl;
+		_request->appendBody(buffer);
 		int check = _request->checkBody();
 		switch (check)
 		{

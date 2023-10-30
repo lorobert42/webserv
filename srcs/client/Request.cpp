@@ -1,7 +1,5 @@
 
 #include "Request.hpp"
-#include <cstddef>
-#include <cstdlib>
 
 //	### Static Member Function
 
@@ -69,7 +67,21 @@ void	Request::parseHeader()
 			_header[key] = value;
 		}
 	}
-	ss >> _body;
+	if (_header.find("Content-Length") != _header.end()) {
+		int content_length = 0;
+		std::istringstream iss(_header["Content-Length"]);
+		std::cout << "💚Content-Length: " << _header["Content-Length"] << std::endl;
+		iss >> content_length;
+
+		char* bodyBuffer = new char[content_length + 1];
+		ss.read(bodyBuffer, content_length);
+		bodyBuffer[content_length] = '\0';
+		_body = std::string(bodyBuffer);
+		delete[] bodyBuffer;
+	} else {
+		// If no Content-Length header, assume no body or use your existing method
+		ss >> _body;
+	}
 	//	### Printing ###
 	std::cout << "Method : [" << _method << "]" << std::endl \
 			  << "Uri : [" << _uri  << "]" << std::endl \
@@ -83,23 +95,56 @@ void	Request::parseHeader()
 	}
 	if (_body.size() != 0)
 		std::cout << "BODY :" << std::endl << _body << std::endl;
+	else
+		std::cout << "BODY : [EMPTY]" << std::endl;
 }
 
-size_t	Request::checkBody()
+int	Request::checkBody()
 {
+	std::cout << "Expected Content-Length: " << getValue("Content-Length") << std::endl;
+	std::cout << "Body until now: " << getBody() << std::endl;
 	std::string	content_length = getValue("Content-Length");
-	if (content_length == "")
+	std::string transfer_encoding = getValue("Transfer-Encoding");
+	if ((content_length == "" && transfer_encoding == "") || (content_length != "" && transfer_encoding != ""))
+	{
+		setBody("");
+		_error = 400;
 		return (ERROR);
-	size_t size = std::strtol(getValue("Content-Length").c_str(), NULL, 10);
-	if (_body.length() == size)
+	}
+	else if (transfer_encoding != "" && transfer_encoding != "chunked")
+	{
+		setBody("");
+		_error = 501;
+		return (ERROR);
+	}
+	if (content_length != "")
+	{
+		return (_checkBodyContentLength(std::strtol(content_length.c_str(), NULL, 10)));
+	}
+	return (_checkBodyChunked());
+}
+
+int	Request::_checkBodyContentLength(size_t content_length)
+{
+	if (_body.length() == content_length)
 	{
 		return (OK);
 	}
-	else if (_body.length() < size)
+	else if (_body.length() < content_length)
 	{
 		return (TOO_SHORT);
 	}
 	return (ERROR);
+}
+
+int	Request::_checkBodyChunked()
+{
+	return OK;
+}
+
+void	Request::appendBody(std::string const& to_add)
+{
+	_body += to_add;
 }
 
 void	Request::setBody(std::string const& new_body)

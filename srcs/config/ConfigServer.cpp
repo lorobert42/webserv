@@ -128,6 +128,12 @@ int	ConfigServer::getPort() const {
 	return this->_port;
 }
 
+std::string	ConfigServer::getPortAsString() const {
+	std::stringstream ss;
+	ss << this->_port;
+	return ss.str();
+}
+
 std::string	ConfigServer::getErrorPage400() const {
 	return this->_error_page_400;
 }

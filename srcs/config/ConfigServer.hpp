@@ -18,6 +18,7 @@ class ConfigServer {
 		std::string					getName() const;
 		std::string					getHost() const;
 		int							getPort() const;
+		std::string					getPortAsString() const;
 		std::string					getErrorPage400() const;
 		std::string					getErrorPage403() const;
 		std::string					getErrorPage404() const;

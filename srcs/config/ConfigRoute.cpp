@@ -55,7 +55,7 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 		if (option == "uri")
 			this->_uri = value;
 		else if (option == "path")
-			this->_path = value;
+			this->_path = ConfigHelper::checkValidPathFolder(value);
 		else if (option == "index")
 			this->_index = value;
 		else if (option == "get")
@@ -73,7 +73,7 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 		else if (option == "client_max_body_size")
 			this->_client_max_body_size = ConfigHelper::convertStringToClientMaxBodySize(value);
 		else if (option == "upload_dir")
-			this->_upload_dir = value;
+			this->_upload_dir = ConfigHelper::checkValidPathFolder(value);
 		else
 			throw InvalidOptionKeyException(option);
 	}
