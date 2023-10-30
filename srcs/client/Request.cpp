@@ -1,7 +1,5 @@
 
 #include "Request.hpp"
-#include <cstddef>
-#include <cstdlib>
 
 //	### Static Member Function
 
@@ -44,16 +42,28 @@ Request& Request::operator=(Request const& other)
 void	Request::parseHeader()
 {
 	// Get all the Request 
+	// TODO: check the line exists before reading
+	// TODO: should be METHOD uri-without-space version -> 400
+	// TODO: if method is not implemented, send 501 Not Implemented, if not allowed, send 405
+	// TODO: if uri is in absolute form, replace Host with the host of the uri
+	// TODO: Host field must be present -> 400
 	std::stringstream	ss(_rawRequest);
 	ss >> _method;
 	ss >> _index;
 	ss >> _version;
+	if (_method == "" || _index == "" || _version == "")
+	{
+		_error = 400;
+		return;
+	}
 
 	char		c = ':';
 	std::string	key;
 	std::string	value;
 	std::string	read;
 
+	// TODO: keys and values are case-insensitive
+	// TODO: no whitespace allowed between key and : -> 400
 	std::getline(ss,read); // SKIP the \r\n after dada collected in the first line
 	while (std::getline(ss, read))
 	{
@@ -125,7 +135,12 @@ int	Request::_checkBodyContentLength(size_t content_length)
 
 int	Request::_checkBodyChunked()
 {
-	return OK;
+	if (_body.rfind("0\r\n\r\n") != std::string::npos)
+	{
+		// TODO: decode chunked body
+		return (OK);
+	}
+	return (TOO_SHORT);
 }
 
 void	Request::appendBody(std::string const& to_add)
