@@ -87,7 +87,7 @@ int	Client::readHandler(void)
 		if (_request->getMethod() != "POST")
 			return (0);
 	}
-	if (_headerOk && _request->getMethod() == "POST")
+	else if (_headerOk && _request->getMethod() == "POST")
 	{
 		_request->appendBody(buffer);
 		int check = _request->checkBody();
