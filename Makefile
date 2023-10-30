@@ -12,6 +12,7 @@ SRCS		= srcs/main.cpp \
 			srcs/config/ConfigRoute.cpp \
 			srcs/config/ConfigHelper.cpp \
 			srcs/cgi/CgiHandler.cpp \
+			srcs/autoindex/AutoIndex.cpp \
 
 SRCS_TEST	= srcs/epoll_serv.cpp
 
@@ -24,7 +25,7 @@ else
  CC			= c++ -g
 endif
 
-CPPFLAGS	= -Wall -Werror -Wextra -std=c++98 #-fsanitize=address
+CPPFLAGS	= -Wall -Werror -Wextra -std=c++98 -fsanitize=address
 
 EXE_NAME	= -o $(NAME)
 EXE_NAME_T	= -o $(NAME_TEST)
@@ -59,5 +60,9 @@ docker-up:
 
 docker-down:
 			docker-compose -p webserv down
+
+docker:
+			docker-compose -p webserv build
+			docker-compose -p webserv up -d
 
 .PHONY:		all clean fclean re

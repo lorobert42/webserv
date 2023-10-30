@@ -72,10 +72,24 @@ void	Request::parseHeader()
 			_header[key] = value;
 		}
 	}
-	ss >> _body;
+	if (_header.find("Content-Length") != _header.end()) {
+		int content_length = 0;
+		std::istringstream iss(_header["Content-Length"]);
+		std::cout << "💚Content-Length: " << _header["Content-Length"] << std::endl;
+		iss >> content_length;
+
+		char* bodyBuffer = new char[content_length + 1];
+		ss.read(bodyBuffer, content_length);
+		bodyBuffer[content_length] = '\0';
+		_body = std::string(bodyBuffer);
+		delete[] bodyBuffer;
+	} else {
+		// If no Content-Length header, assume no body or use your existing method
+		ss >> _body;
+	}
 	//	### Printing ###
 	std::cout << "Method : [" << _method << "]" << std::endl \
-			  << "Index : [" << _index  << "]" << std::endl \
+			  << "Uri : [" << _uri  << "]" << std::endl \
 			  << "Version : [" << _version << "]" << std::endl \
 			  << "HEADER : " << std::endl;
 	for (std::map<std::string, std::string>::iterator it = _header.begin(); \
@@ -86,6 +100,8 @@ void	Request::parseHeader()
 	}
 	if (_body.size() != 0)
 		std::cout << "BODY :" << std::endl << _body << std::endl;
+	else
+		std::cout << "BODY : [EMPTY]" << std::endl;
 }
 
 bool	Request::_parseFirstLine(std::string& line)
@@ -181,9 +197,9 @@ const std::string	&Request::getMethod(void) const
 	return (_method);
 }
 
-const std::string	&Request::getIndex(void) const
+const std::string	&Request::getUri(void) const
 {
-	return (_index);
+	return (_uri);
 }
 
 const std::string	&Request::getVersion(void) const

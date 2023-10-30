@@ -7,6 +7,9 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
+#include <cstddef>
+#include <cstdlib>
+
 
 #define OK 1
 #define TOO_SHORT 2
@@ -26,11 +29,11 @@ class Request
 		void	appendBody(std::string const& to_add);
 		void	setBody(std::string const& new_body);
 		const std::string	&getMethod(void) const;
-		const std::string	&getIndex(void) const;
+		const std::string	&getUri(void) const;
 		const std::string	&getVersion(void) const;
 		const std::string	getValue(const std::string &key) const;
-		const std::string &getBody() const;
-		int								getError() const;
+		const std::string 	&getBody() const;
+		int					getError() const;
 
 	private :
 		Request(void);
@@ -41,7 +44,7 @@ class Request
 		std::string _rawRequest;
 		std::map<std::string, std::string>	_header;
 		std::string	_method;
-		std::string	_index;
+		std::string	_uri;
 		std::string	_version;
 		std::string	_body;
 		int					_error;
