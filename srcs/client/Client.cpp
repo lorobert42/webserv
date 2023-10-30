@@ -84,7 +84,8 @@ int	Client::readHandler(void)
 		_request = new Request(_read);
 		_request->parseHeader();
 		_headerOk = true;
-		return (0);
+		if (_request->getMethod() != "POST")
+			return (0);
 	}
 	else if (_headerOk && _request->getMethod() == "POST")
 	{
@@ -128,8 +129,8 @@ int	Client::writeHandler(void)
 	std::cout << "Write handler" << std::endl;
 	// Have to get the set the reponse by the html we need
 	// TODO if th cgi is on need the send all info to the cgi to get the body  
-	//CgiHandler cgi(this);
-	//std::string response = cgi.executeCgi();
+//	CgiHandler cgi(this);
+//	std::string response = cgi.executeCgi();
 
 	int	code_error;
 	_route = _config_server->getRouteWithUri(_request->getUri());
