@@ -25,5 +25,5 @@ server:
 		cgi_bin=/usr/bin/python
 		client_max_body_size=1K
 		upload_dir=www/cgi/upload/
-    ;
+	;
 ;

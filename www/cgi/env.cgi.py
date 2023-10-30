@@ -1,4 +1,8 @@
-#!/usr/bin/python3
-print('Content-Type: text/plain')
+import os
+
+print('Content-Type: text/html')
 print('')
-print('This is my test!')
+print('<h1>Environment Variables</h1>')
+env = os.environ
+for k in env.keys():
+    print('<b>%s</b>: %s<br>' % (k, env[k]))
