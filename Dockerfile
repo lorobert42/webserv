@@ -10,6 +10,7 @@ RUN apk update && apk upgrade && apk add --no-cache \
     php \
     php-fpm \
     php-cgi \
+    python3 \
     && rm -rf /var/cache/apk/*
 
 COPY . /home/webserv
