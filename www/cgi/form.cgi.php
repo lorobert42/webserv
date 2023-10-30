@@ -47,7 +47,7 @@
 </head>
 <body class="bg-gray-50 flex flex-col pt-10 p-4">
     <div class="mx-auto p-6 bg-white shadow-md rounded-lg w-full max-w-[600px] flex flex-col">
-        <h1 class="text-2xl text-center mb-4 font-bold">Upload a file.txt</h1>
+        <h1 class="text-2xl text-center mb-4 font-bold">Upload a file</h1>
 
         <form method="POST" class="flex flex-col" enctype="multipart/form-data" action="/">
             <div class="flex flex-col gap-4">
@@ -58,13 +58,6 @@
 						<span class="text-sm text-gray-500 ml-2 mt-1"><?php echo $upload_message; ?></span>
 					<?php } ?>
                 </div>
-            </div>
-            <div class="flex flex-col mt-4 hidden">
-            	<label for="image_preview" class="text-sm text-gray-500 ml-2">Preview</label>
-//                 <div id="text_preview" class="border border-gray-300 rounded-md w-full p-2"></div>
-                <button id="clear" type="button" class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded w-min self-center mt-2">
-                    Remove
-                </button>
             </div>
             <button id="submit" type="submit" class="mt-8 bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded w-min self-end">
                 Upload
@@ -94,25 +87,6 @@
 
     <script>
         const fileInput = document.getElementById('file');
-        const imagePreview = document.getElementById('image_preview');
-
-//         fileInput.addEventListener('change', (e) => {
-//             const file = e.target.files[0];
-//             const reader = new FileReader();
-//
-//             reader.addEventListener('load', (e) => {
-//                 document.getElementById('text_preview').textContent = e.target.result;
-//                 document.getElementById('text_preview').parentElement.classList.remove('hidden');
-//             });
-//
-//             reader.readAsText(file);
-//         });
-
-        document.getElementById('clear').addEventListener('click', (e) => {
-            document.getElementById('text_preview').textContent = '';
-            document.getElementById('text_preview').parentElement.classList.add('hidden');
-            fileInput.value = '';
-        });
 
         const form = document.querySelector('form');
         form.addEventListener('submit', function(e) {
@@ -125,8 +99,10 @@
                 body: formData
             })
             .then(response => {
-                fileInput.value = '';
-				window.location.reload();
+				if (response.ok) {
+					fileInput.value = '';
+					window.location.reload();
+				}
 			})
         });
 
@@ -140,7 +116,9 @@
                     },
                 })
                 .then(response => {
-                   window.location.reload();
+					if (response.ok) {
+						window.location.reload();
+					}
                 })
 			}
 		}
