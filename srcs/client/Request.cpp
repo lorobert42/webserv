@@ -42,19 +42,24 @@ Request& Request::operator=(Request const& other)
 void	Request::parseHeader()
 {
 	// Get all the Request 
+	// TODO: if method is not implemented, send 501 Not Implemented, if not allowed, send 405
+	// TODO: if uri is in absolute form, replace Host with the host of the uri
+	// TODO: Host field must be present -> 400
+	std::string	read;
 	std::stringstream	ss(_rawRequest);
-	ss >> _method;
-	ss >> _uri;
-	ss >> _version;
+	std::getline(ss, read);
+	if (_parseFirstLine(read) == false)
+		return;
 
 	char		c = ':';
 	std::string	key;
 	std::string	value;
-	std::string	read;
 
-	std::getline(ss,read); // SKIP the \r\n after dada collected in the first line
+	// TODO: keys and values are case-insensitive
+	// TODO: no whitespace allowed between key and : -> 400
 	while (std::getline(ss, read))
 	{
+		std::cout << read << std::endl;
 		if (read.size() != 0)
 		{
 			if (read.size() == 1 && read == "\r") // STOP reading when the header is done
@@ -99,6 +104,35 @@ void	Request::parseHeader()
 		std::cout << "BODY : [EMPTY]" << std::endl;
 }
 
+bool	Request::_parseFirstLine(std::string& line)
+{
+	size_t space = line.find(" ");
+	if (space == std::string::npos)
+	{
+		_error = 400;
+		return (false);
+	}
+	_method = line.substr(0, space);
+	line = line.substr(space + 1);
+	space = line.find(" ");
+	if (space == std::string::npos)
+	{
+		_error = 400;
+		return (false);
+	}
+	_index = line.substr(0, space);
+	_version = line.substr(space + 1, line.size() - 3);
+	if (_method == "" || _index == "" || _version == "" ||
+			_method.find(" ") != std::string::npos ||
+			_index.find(" ") != std::string::npos ||
+			_version.find(" ") != std::string::npos)
+	{
+		_error = 400;
+		return (false);
+	}
+	return (true);
+}
+
 int	Request::checkBody()
 {
 	std::cout << "Expected Content-Length: " << getValue("Content-Length") << std::endl;
@@ -139,7 +173,12 @@ int	Request::_checkBodyContentLength(size_t content_length)
 
 int	Request::_checkBodyChunked()
 {
-	return OK;
+	if (_body.rfind("0\r\n\r\n") != std::string::npos)
+	{
+		// TODO: decode chunked body
+		return (OK);
+	}
+	return (TOO_SHORT);
 }
 
 void	Request::appendBody(std::string const& to_add)
