@@ -138,6 +138,7 @@ bool	Request::_parseFirstLine(std::string& line)
 int	Request::checkBody()
 {
 	std::cout << "Expected Content-Length: " << getValue("Content-Length") << std::endl;
+	std::cout << "Body length: " << getBody().length() << std::endl;
 	std::cout << "Body until now: " << getBody() << std::endl;
 	std::string	content_length = getValue("Content-Length");
 	std::string transfer_encoding = getValue("Transfer-Encoding");
