@@ -2,9 +2,9 @@
 
 CgiHandler::CgiHandler() {}
 
-CgiHandler::CgiHandler(Client *client) : _client(client) {
+CgiHandler::CgiHandler(Client *client) : _client(client), _bodyContent(client->getRequest()->getBody()) {
 
-	// TODO: Set environment variables dedicated for the server
+	// Set environment variables dedicated for the server
 	this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
 	this->_env["SERVER_NAME"] = client->getConfigServer()->getName();
 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
@@ -22,7 +22,7 @@ CgiHandler::CgiHandler(Client *client) : _client(client) {
 	this->_env["CONTENT_LENGTH"] = client->getRequest()->getValue("Content-Length");
 	this->_env["HTTP_X_FILENAME"] = client->getRequest()->getValue("X-Filename");
 
-	// TODO: Set environment variables from the client
+	// Set environment variables from the client
 	this->_env["HTTP_ACCEPT"] = client->getRequest()->getValue("Accept");
 	this->_env["HTTP_ACCEPT_CHARSET"] = client->getRequest()->getValue("Accept-Charset");
 	this->_env["HTTP_ACCEPT_ENCODING"] = client->getRequest()->getValue("Accept-Encoding");
@@ -50,7 +50,8 @@ CgiHandler   	&CgiHandler::operator=(CgiHandler const &rhs)
 	if (this != &rhs)
 	{
 		this->_env = rhs._env;
-		this->_body = rhs._body;
+		this->_client = rhs._client;
+		this->_bodyContent = rhs._bodyContent;
 	}
 	return (*this);
 }
@@ -79,45 +80,29 @@ char	**CgiHandler::_getEnv() {
 
 std::string CgiHandler::executeCgi() {
 	pid_t pid;
-	int fd[2];
+	int inpipefd[2]; // For writing input to CGI script
+	int outpipefd[2]; // For reading output from CGI script
 	char buffer[4096];
 	int bytesRead;
 	std::string response;
 	char** env = this->_getEnv();
 
-	// Create a pipe
-	if (pipe(fd) == -1) {
+	if (pipe(inpipefd) == -1 || pipe(outpipefd) == -1) {
 		throw std::runtime_error("[CGI] pipe() failed");
 	}
-	// Fork a child process
 	if ((pid = fork()) == -1) {
 		throw std::runtime_error("[CGI] fork() failed");
 	}
-	// Child process
 	if (pid == 0) {
-		close(fd[0]); // Close the read end of the pipe
+		close(outpipefd[0]); // Close the read end of the out pipe
+		close(inpipefd[1]);  // Close the write end of the in pipe
 
-		// Redirect stdout to the write end of the pipe
-		if (dup2(fd[1], STDOUT_FILENO) == -1) {
+		if (dup2(inpipefd[0], STDIN_FILENO) == -1 || dup2(outpipefd[1], STDOUT_FILENO) == -1) {
 			perror("dup2");
 			exit(EXIT_FAILURE);
 		}
-		close(fd[1]);
-
-		int input_fd[2];
-		if (pipe(input_fd) == -1) {
-			perror("input pipe");
-			exit(EXIT_FAILURE);
-		}
-
-		write(input_fd[1], _client->getRequest()->getBody().c_str(), _client->getRequest()->getBody().size());
-		close(input_fd[1]);
-
-		if (dup2(input_fd[0], STDIN_FILENO) == -1) {
-			perror("dup2 stdin");
-			exit(EXIT_FAILURE);
-		}
-		close(input_fd[0]);
+		close(inpipefd[0]);
+		close(outpipefd[1]);
 
 		char* argv[3];
 		argv[0] = const_cast<char*>(this->_env["SCRIPT_CGI"].c_str());
@@ -128,17 +113,22 @@ std::string CgiHandler::executeCgi() {
 			perror("execve");
 			exit(EXIT_FAILURE);
 		}
-	}
-	// Parent process
-	else {
-		close(fd[1]); // Close the write end of the pipe
+	} else {
+		close(outpipefd[1]); // Close the write end of the out pipe
+		close(inpipefd[0]);  // Close the read end of the in pipe
 
-		while ((bytesRead = read(fd[0], buffer, sizeof(buffer))) > 0) {
+		// If there's body content, write it to the input of the child process.
+		if (!_bodyContent.empty()) {
+			write(inpipefd[1], _bodyContent.c_str(), _bodyContent.length());
+		}
+		close(inpipefd[1]); // Close the write end once data is written
+
+		while ((bytesRead = read(outpipefd[0], buffer, sizeof(buffer))) > 0) {
 			response.append(buffer, bytesRead);
 		}
 
-		close(fd[0]);
-		waitpid(pid, NULL, 0); // Wait for the child process to finish
+		close(outpipefd[0]);
+		waitpid(pid, NULL, 0);
 	}
 
 	// Free env
@@ -149,4 +139,3 @@ std::string CgiHandler::executeCgi() {
 
 	return response;
 }
-
