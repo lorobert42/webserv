@@ -18,7 +18,7 @@
 class Request
 {
 	public :
-		Request(std::string read);
+		Request();
 		Request(Request const &other);
 		Request &operator=(Request const &other);
 		~Request(void);
@@ -26,8 +26,10 @@ class Request
 		void	parseHeader();
 		int	checkBody();
 
-		void	appendBody(std::string const& to_add);
+		void	appendRawRequest(char* to_add, int size);
+		void	appendBody(char* to_add, int size);
 		void	setBody(std::string const& new_body);
+		const std::string &getRawRequest() const;
 		const std::string	&getMethod(void) const;
 		const std::string	&getUri(void) const;
 		const std::string	&getVersion(void) const;
@@ -36,7 +38,6 @@ class Request
 		int					getError() const;
 
 	private :
-		Request(void);
 		std::string	_getline(std::string& data);
 		bool	_parseFirstLine(std::string& line);
 		int	_checkBodyContentLength(size_t content_length);

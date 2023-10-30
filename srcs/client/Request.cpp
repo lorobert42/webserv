@@ -14,12 +14,10 @@ bool	isSpace(char c)
 }
 
 // ### Constructor ###
-Request::Request() {}
-
-Request::Request(std::string request)
-{
-	_rawRequest = request;
-}
+Request::Request() :
+	_rawRequest(""),
+	_body("")
+{}
 
 // ### Copy Constructor ###
 Request::Request(Request const& other) :
@@ -139,7 +137,7 @@ int	Request::checkBody()
 {
 	std::cout << "Expected Content-Length: " << getValue("Content-Length") << std::endl;
 	std::cout << "Body length: " << getBody().length() << std::endl;
-	std::cout << "Body until now: " << getBody() << std::endl;
+	// std::cout << "Body until now: " << getBody() << std::endl;
 	std::string	content_length = getValue("Content-Length");
 	std::string transfer_encoding = getValue("Transfer-Encoding");
 	if ((content_length == "" && transfer_encoding == "") || (content_length != "" && transfer_encoding != ""))
@@ -184,9 +182,15 @@ int	Request::_checkBodyChunked()
 	return (TOO_SHORT);
 }
 
-void	Request::appendBody(std::string const& to_add)
+void Request::appendRawRequest(char* to_add, int size)
 {
-	_body += to_add;
+	_rawRequest.insert(_rawRequest.length(), to_add, size);
+}
+
+void	Request::appendBody(char* to_add, int size)
+{
+	_body.insert(_body.length(), to_add, size);
+	// std::cout << "--- NEW BODY ---\n" << _body << std::endl;
 }
 
 void	Request::setBody(std::string const& new_body)
@@ -195,6 +199,11 @@ void	Request::setBody(std::string const& new_body)
 }
 
 //	### GETTER ###
+const std::string &Request::getRawRequest() const
+{
+	return (_rawRequest);
+}
+
 const std::string	&Request::getMethod(void) const
 {
 	return (_method);
