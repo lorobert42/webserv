@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "Client.hpp"
+#include "Request.hpp"
 
 // ### Constructor ###
 Client::Client()
@@ -18,7 +19,9 @@ Client::Client()
 
 Client::Client(ConfigServer *config, int &client_socket) :
 	_config_server(config), _socket(client_socket), _nb_read(0), _headerOk(false)
-{}
+{
+	_request = new Request();
+}
 
 // ### Copy Constructor ###
 Client::Client(Client const& other) :
@@ -82,12 +85,11 @@ int	Client::readHandler(void)
 	}
 	if (read != 0)
 	{
-		_read.append(buffer);
+		_request->appendRawRequest(buffer, read);
 		_nb_read++;
 	}
-	if (!_headerOk && _read.rfind("\r\n\r\n") != std::string::npos)
+	if (!_headerOk && _request->getRawRequest().rfind("\r\n\r\n") != std::string::npos)
 	{
-		_request = new Request(_read);
 		_request->parseHeader();
 		_headerOk = true;
 		if (_request->getMethod() != "POST")
@@ -99,7 +101,8 @@ int	Client::readHandler(void)
 		if (_nb_read > 1)
 		{
 			std::cout << "Second time coming, should add buffer to body" << std::endl;
-			_request->appendBody(buffer);
+			// std::cout << "buffer to add:\n" << buffer << std::endl;
+			_request->appendBody(buffer, read);
 		}
 		int check = _request->checkBody();
 		std::cout << "Check result: " << check << std::endl;
