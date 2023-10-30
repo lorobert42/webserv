@@ -17,12 +17,13 @@ Client::Client()
 {}
 
 Client::Client(ConfigServer *config, int &client_socket) :
-	_config_server(config), _socket(client_socket), _headerOk(false)
+	_config_server(config), _socket(client_socket), _nb_read(0), _headerOk(false)
 {}
 
 // ### Copy Constructor ###
 Client::Client(Client const& other) :
-	_config_server(other._config_server), _socket(other._socket), _headerOk(other._headerOk)
+	_config_server(other._config_server), _socket(other._socket), 
+	_nb_read(other._nb_read), _headerOk(other._headerOk)
 {}
 
 // ### Destructor ###
@@ -39,6 +40,7 @@ Client& Client::operator=(Client const& other)
 	this->_config_server = other._config_server;
 	this->_socket = other._socket;
 	_headerOk = other._headerOk;
+	_nb_read = other._nb_read;
 	return (*this);
 }
 
@@ -68,6 +70,7 @@ int	Client::readHandler(void)
 {
 	std::cout << "Read Handler" << std::endl;
 	char buffer[D_BUFF_SIZE] = {0};
+	std::cout << "nb_read: " << _nb_read << std::endl;
 
 	int read = recv(_socket, buffer, D_BUFF_SIZE, MSG_DONTWAIT);
 	if (read < 0)
@@ -78,7 +81,10 @@ int	Client::readHandler(void)
 		return (-1);
 	}
 	if (read != 0)
+	{
 		_read.append(buffer);
+		_nb_read++;
+	}
 	if (!_headerOk && _read.rfind("\r\n\r\n") != std::string::npos)
 	{
 		_request = new Request(_read);
@@ -87,10 +93,16 @@ int	Client::readHandler(void)
 		if (_request->getMethod() != "POST")
 			return (0);
 	}
-	else if (_headerOk && _request->getMethod() == "POST")
+	if (_headerOk && _request->getMethod() == "POST")
 	{
-		_request->appendBody(buffer);
+		std::cout << "Should check body" << std::endl;
+		if (_nb_read > 1)
+		{
+			std::cout << "Second time coming, should add buffer to body" << std::endl;
+			_request->appendBody(buffer);
+		}
 		int check = _request->checkBody();
+		std::cout << "Check result: " << check << std::endl;
 		switch (check)
 		{
 			case ERROR:
