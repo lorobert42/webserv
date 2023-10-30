@@ -5,8 +5,6 @@ server:
 
 	route:
 		uri=/
-		path=www/srcs/
-		index=home.html
 		get=true
 		post=true
 		delete=true
@@ -14,6 +12,18 @@ server:
 		cgi_script=www/cgi/form.cgi.php
 		cgi_bin=/usr/bin/php-cgi
 		client_max_body_size=1K
-		upload_dir=www/custom/upload/
+		upload_dir=www/cgi/upload/
 	;
+
+	route:
+		uri=/python
+		get=true
+		post=true
+		delete=true
+		autoindex=true
+		cgi_script=www/cgi/env.cgi.py
+		cgi_bin=/usr/bin/python
+		client_max_body_size=1K
+		upload_dir=www/cgi/upload/
+    ;
 ;
