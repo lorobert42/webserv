@@ -32,8 +32,8 @@ class Request
 		const std::string	&getUri(void) const;
 		const std::string	&getVersion(void) const;
 		const std::string	getValue(const std::string &key) const;
-		const std::string &getBody() const;
-		int								getError() const;
+		const std::string 	&getBody() const;
+		int					getError() const;
 
 	private :
 		Request(void);
