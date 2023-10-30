@@ -14,6 +14,6 @@ server:
 		cgi_script=www/cgi/form.cgi.php
 		cgi_bin=/usr/bin/php-cgi
 		client_max_body_size=1K
-		upload_dir=www/custom/upload/
+		upload_dir=www/cgi/upload/
 	;
 ;

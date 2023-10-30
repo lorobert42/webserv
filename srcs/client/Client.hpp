@@ -61,6 +61,7 @@ class Client
 		int				_socket;
 
 		std::string		_read;
+		int	_nb_read;
 		bool			_headerOk;
 		std::string		_uri;
 		std::string		_path;
