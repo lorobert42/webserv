@@ -5,12 +5,12 @@ server:
 
 	route:
 		uri=/
-		path=srcs/config/www
-		index=index.html
+		path=www/srcs/
+		index=home.html
 	;
 	route:
 		uri=/foo
-		path=www/srcs
-		index=home.html
+		path=www/srcs/
+		index=form.html
 	;
 ;
