@@ -1,5 +1,7 @@
 
 #include "Request.hpp"
+#include <cstddef>
+#include <cstdlib>
 
 //	### Static Member Function
 
@@ -16,12 +18,35 @@ Request::Request() {}
 
 Request::Request(std::string request)
 {
-	std::cout << request << std::endl;
-	
+	_rawRequest = request;
+}
+
+// ### Copy Constructor ###
+Request::Request(Request const& other) :
+	_header(other._header)
+{}
+
+// ### Destructor ###
+Request::~Request()
+{}
+
+// ### Overload operator ###
+Request& Request::operator=(Request const& other)
+{
+	if (this == &other)
+		return (*this);
+	this->_header = other._header;
+	return (*this);
+}
+
+//	### Member Function [PUBLIC] ###
+// ### Header parser
+void	Request::parseHeader()
+{
 	// Get all the Request 
-	std::stringstream	ss(request);
+	std::stringstream	ss(_rawRequest);
 	ss >> _method;
-	ss >> _index;
+	ss >> _uri;
 	ss >> _version;
 
 	char		c = ':';
@@ -47,7 +72,7 @@ Request::Request(std::string request)
 	ss >> _body;
 	//	### Printing ###
 	std::cout << "Method : [" << _method << "]" << std::endl \
-			  << "Index : [" << _index  << "]" << std::endl \
+			  << "Uri : [" << _uri  << "]" << std::endl \
 			  << "Version : [" << _version << "]" << std::endl \
 			  << "HEADER : " << std::endl;
 	for (std::map<std::string, std::string>::iterator it = _header.begin(); \
@@ -60,25 +85,27 @@ Request::Request(std::string request)
 		std::cout << "BODY :" << std::endl << _body << std::endl;
 }
 
-// ### Copy Constructor ###
-Request::Request(Request const& other) :
-	_header(other._header)
-{}
-
-// ### Destructor ###
-Request::~Request()
-{}
-
-// ### Overload operator ###
-Request& Request::operator=(Request const& other)
+size_t	Request::checkBody()
 {
-	if (this == &other)
-		return (*this);
-	this->_header = other._header;
-	return (*this);
+	std::string	content_length = getValue("Content-Length");
+	if (content_length == "")
+		return (ERROR);
+	size_t size = std::strtol(getValue("Content-Length").c_str(), NULL, 10);
+	if (_body.length() == size)
+	{
+		return (OK);
+	}
+	else if (_body.length() < size)
+	{
+		return (TOO_SHORT);
+	}
+	return (ERROR);
 }
 
-//	### Member Function [PUBLIC] ###
+void	Request::setBody(std::string const& new_body)
+{
+	_body = new_body;
+}
 
 //	### GETTER ###
 const std::string	&Request::getMethod(void) const
@@ -86,9 +113,9 @@ const std::string	&Request::getMethod(void) const
 	return (_method);
 }
 
-const std::string	&Request::getIndex(void) const
+const std::string	&Request::getUri(void) const
 {
-	return (_index);
+	return (_uri);
 }
 
 const std::string	&Request::getVersion(void) const
@@ -104,5 +131,10 @@ const std::string	Request::getValue(const std::string &key) const
 	if (find != _header.end())
 		return (find->second);
 	else
-		return (NULL);
+		return ("");
+}
+
+const std::string &Request::getBody() const
+{
+	return (_body);
 }

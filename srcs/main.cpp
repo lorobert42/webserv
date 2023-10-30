@@ -1,3 +1,4 @@
+
 #include <csignal>
 #include <iostream>
 #include "config/Config.hpp"
@@ -26,7 +27,7 @@ int	main(int argc, char **argv)
 			std::cerr << "Cannot handle signal" << std::endl;
 		}
 		Config *config = argc == 2 ? new Config(argv[1]) : new Config();
-		//std::cout << *config;
+		std::cout << *config;
 		ServerManager server_manager(config);
 		server_manager.start();
 		delete config;
