@@ -6,7 +6,7 @@
 /*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/28 17:19:31 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/30 10:48:13 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,7 @@ int	Client::readHandler(void)
 	return (1);
 }
 
-static std::string	readHtmlFile(std::string path_with_index)
+static std::string	readFile(std::string path_with_index)
 {
 	std::string		line;
 	std::string		all;
@@ -130,9 +130,11 @@ int	Client::writeHandler(void)
 	//std::string response = cgi.executeCgi();
 
 	int	code_error;
-	_route = _config_server->getRouteWithUri(_request->getIndex());
+	_route = _config_server->getRouteWithUri(_request->getUri());
 	if (_route == NULL)
 	{
+		if (_checkPath() == true)
+			return (0);
 		std::cout << "Route not find" << std::endl;
 		_fileNotFound();
 		_sendRespond();
@@ -147,33 +149,42 @@ int	Client::writeHandler(void)
 	else
 		_fileNotFound();
 	if (_body.size() == 0)
-		_body = readHtmlFile(_route->getPathWithIndex());
+		_body = readFile(_route->getPathWithIndex());
 	_sendRespond();
 	return (0);
 }
 
 //	### Member Function [PRIVATE]
 
+bool	Client::_checkPath(void)
+{
+	return (false);
+}
+
 int	Client::_checkFile(void)
 {
 	struct	stat s;
+	DIR		*fd;
 
 	if (stat(_path.c_str(), &s) == -1)
 		return (E_FAIL);
-	if (s.st_mode & S_IFDIR) // it's a directory
+	if (s.st_mode & S_IFDIR) // check the path for a existing dir
 	{
-		if (opendir(_path.c_str()) == NULL)
+		if ((fd = opendir(_path.c_str())) == NULL) // check if we can open the dir
 			return (E_ACCESS);
 		else
-			_path.append(_route->getIndex());
+		{
+			closedir(fd);
+			_path.append(_route->getIndex()); // if both is ok will append the the index to the path
+		}
 	}
 	else
 		return (E_FAIL);
 	if (stat(_path.c_str(), &s) == -1)
 		return (E_FAIL);
-	if (s.st_mode & S_IFREG) // it's a file
+	if (s.st_mode & S_IFREG) // check the path for a existing file
 	{
-		if (access(_path.c_str(), R_OK) == 0)
+		if (access(_path.c_str(), R_OK) == 0) // check if we can read the file
 			return (E_SUCCESS);
 		else
 			return (E_ACCESS);
@@ -203,7 +214,7 @@ void	Client::_fileNotFound(void)
 	_header = D_404_MESSAGE;
 
 	_header.append("\ncontent-type: text/html\ncontent_length: ");
-	_body = readHtmlFile(_config_server->getErrorPage404());
+	_body = readFile(_config_server->getErrorPage404());
 }
 
 void	Client::_fileNotAccess(void)
@@ -213,7 +224,7 @@ void	Client::_fileNotAccess(void)
 	_header = D_403_MESSAGE;
 
 	_header.append("\ncontent-type: text/html\ncontent_length: ");
-	_body = readHtmlFile(_config_server->getErrorPage403());
+	_body = readFile(_config_server->getErrorPage403());
 }
 
 void	Client::_sendRespond(void)

@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/28 16:34:26 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/10/30 10:17:15 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ class CgiHandler;
 enum	code_error {
 		E_SUCCESS = 0,
 		E_ACCESS = 1,
-		E_FAIL =2
+		E_FAIL = 2
 };
 
 #define D_BUFF_SIZE 4096
@@ -65,6 +65,7 @@ class Client
 		std::string		_header;
 		std::string		_body;
 	
+		bool			_checkPath(void);
 		int				_checkFile(void);
 		std::string		_fileFound(void);
 		void			_fileNotFound(void);

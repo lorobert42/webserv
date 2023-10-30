@@ -6,7 +6,7 @@ server:
 	route:
 		uri=/
 		path=www/srcs/
-		index=home2.html
+		index=home.html
 	;
 	route:
 		uri=/foo

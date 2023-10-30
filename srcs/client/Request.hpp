@@ -25,10 +25,10 @@ class Request
 
 		void	setBody(std::string const& new_body);
 		const std::string	&getMethod(void) const;
-		const std::string	&getIndex(void) const;
+		const std::string	&getUri(void) const;
 		const std::string	&getVersion(void) const;
 		const std::string	getValue(const std::string &key) const;
-		const std::string &getBody() const;
+		const std::string	&getBody() const;
 
 	private :
 		Request(void);
@@ -36,7 +36,7 @@ class Request
 		std::string _rawRequest;
 		std::map<std::string, std::string>	_header;
 		std::string	_method;
-		std::string	_index;
+		std::string	_uri;
 		std::string	_version;
 		std::string	_body;
 };
