@@ -127,10 +127,6 @@ static std::string	readFile(std::string path_with_index)
 int	Client::writeHandler(void)
 {
 	std::cout << "Write handler" << std::endl;
-	// Have to get the set the reponse by the html we need
-	// TODO if th cgi is on need the send all info to the cgi to get the body  
-//	CgiHandler cgi(this);
-//	std::string response = cgi.executeCgi();
 
 	int	code_error;
 	_route = _config_server->getRouteWithUri(_request->getUri());
@@ -140,7 +136,17 @@ int	Client::writeHandler(void)
 			return (0);
 		std::cout << "Route not find" << std::endl;
 		_fileNotFound();
-		_sendRespond();
+		_sendRespond(false);
+		return (0);
+	}
+
+	// Check if the route has a CGI
+	if(_route->getCgiScript() != "" && _route->getCgiBin() != "")
+	{
+		std::cout << "CGI" << std::endl;
+		CgiHandler cgi(this);
+		_body = cgi.executeCgi();
+		_sendRespond(true);
 		return (0);
 	}
 	_path = _route->getPath();
@@ -153,7 +159,7 @@ int	Client::writeHandler(void)
 		_fileNotFound();
 	if (_body.size() == 0)
 		_body = readFile(_route->getPathWithIndex());
-	_sendRespond();
+	_sendRespond(false);
 	return (0);
 }
 
@@ -230,11 +236,17 @@ void	Client::_fileNotAccess(void)
 	_body = readFile(_config_server->getErrorPage403());
 }
 
-void	Client::_sendRespond(void)
+void	Client::_sendRespond(bool CGI)
 {
 	std::string	server_message;
-	server_message.append(_header);
-	server_message.append("\n\n");
+
+	if (CGI) {
+		server_message.append(D_200_MESSAGE);
+		server_message.append("\n");
+	} else {
+		server_message.append(_header);
+		server_message.append("\n\n");
+	}
 	server_message.append(_body);
 
 	int	bytes_send = 0;

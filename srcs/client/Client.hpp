@@ -72,7 +72,7 @@ class Client
 		std::string		_fileFound(void);
 		void			_fileNotFound(void);
 		void			_fileNotAccess(void);
-		void			_sendRespond(void);
+		void			_sendRespond(bool CGI);
 
 		Client(void);
 };
