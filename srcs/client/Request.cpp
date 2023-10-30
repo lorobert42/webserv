@@ -120,11 +120,11 @@ bool	Request::_parseFirstLine(std::string& line)
 		_error = 400;
 		return (false);
 	}
-	_index = line.substr(0, space);
+	_uri = line.substr(0, space);
 	_version = line.substr(space + 1, line.size() - 3);
-	if (_method == "" || _index == "" || _version == "" ||
+	if (_method == "" || _uri == "" || _version == "" ||
 			_method.find(" ") != std::string::npos ||
-			_index.find(" ") != std::string::npos ||
+			_uri.find(" ") != std::string::npos ||
 			_version.find(" ") != std::string::npos)
 	{
 		_error = 400;
