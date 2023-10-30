@@ -53,7 +53,7 @@
             <div class="flex flex-col gap-4">
                 <div class="flex flex-col">
                     <label for="file" class="text-sm text-gray-500 ml-2">File</label>
-                    <input type="file" id="file" name="file" class="border border-gray-300 rounded-md p-2" accept=".txt" required>
+                    <input type="file" id="file" name="file" class="border border-gray-300 rounded-md p-2" required>
                     <?php if (isset($upload_message)) { ?>
 						<span class="text-sm text-gray-500 ml-2 mt-1"><?php echo $upload_message; ?></span>
 					<?php } ?>
@@ -61,7 +61,7 @@
             </div>
             <div class="flex flex-col mt-4 hidden">
             	<label for="image_preview" class="text-sm text-gray-500 ml-2">Preview</label>
-                <div id="text_preview" class="border border-gray-300 rounded-md w-full p-2"></div>
+//                 <div id="text_preview" class="border border-gray-300 rounded-md w-full p-2"></div>
                 <button id="clear" type="button" class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded w-min self-center mt-2">
                     Remove
                 </button>
@@ -96,17 +96,17 @@
         const fileInput = document.getElementById('file');
         const imagePreview = document.getElementById('image_preview');
 
-        fileInput.addEventListener('change', (e) => {
-            const file = e.target.files[0];
-            const reader = new FileReader();
-
-            reader.addEventListener('load', (e) => {
-                document.getElementById('text_preview').textContent = e.target.result;
-                document.getElementById('text_preview').parentElement.classList.remove('hidden');
-            });
-
-            reader.readAsText(file);
-        });
+//         fileInput.addEventListener('change', (e) => {
+//             const file = e.target.files[0];
+//             const reader = new FileReader();
+//
+//             reader.addEventListener('load', (e) => {
+//                 document.getElementById('text_preview').textContent = e.target.result;
+//                 document.getElementById('text_preview').parentElement.classList.remove('hidden');
+//             });
+//
+//             reader.readAsText(file);
+//         });
 
         document.getElementById('clear').addEventListener('click', (e) => {
             document.getElementById('text_preview').textContent = '';

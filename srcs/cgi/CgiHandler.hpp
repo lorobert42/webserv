@@ -26,6 +26,6 @@ class CgiHandler
 		CgiHandler();
 		char**								_getEnv();
 		std::map<std::string, std::string>	_env;
-		std::string							_body;
 		Client								*_client;
+		std::string							_bodyContent;
 };
