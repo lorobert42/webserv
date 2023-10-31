@@ -73,8 +73,11 @@
 	        foreach ($files as $file) {
 	            if ($file != "." && $file != "..") {
 	                echo '<div class="flex flex-row gap-4 justify-between items-center">';
-	                echo '<span class="ml-2">' . $file . '</span>';
-	                echo '<button type="button" class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded w-min self-end" onclick="deleteFile(\'' . $file . '\')">Delete</button>';
+	                echo '<span>' . $file . '</span>';
+	                echo '<div class="flex flex-row gap-2 justify-between items-center">';
+	                    echo '<a href="' . $UPLOAD_DIR . $file . '" download="' . $file . '" class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded w-min">Download</a>';
+	                    echo '<button type="button" class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded w-min" onclick="deleteFile(\'' . $file . '\')">Delete</button>';
+                    echo '</div>';
 	                echo '</div>';
 	            }
 	        }
