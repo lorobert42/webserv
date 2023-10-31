@@ -34,4 +34,9 @@ server:
 		path=www/path/
 		index=index.html
 	;
+
+	route:
+		uri=/path/1
+		redirect=/python
+	;
 ;
