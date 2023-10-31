@@ -20,7 +20,7 @@ Client::Client()
 Client::Client(ConfigServer *config, int &client_socket) :
 	_config_server(config), _socket(client_socket), _nb_read(0), _headerOk(false)
 {
-	_request = new Request();
+	_request = new Request(config->getClientMaxBodySize());
 }
 
 // ### Copy Constructor ###

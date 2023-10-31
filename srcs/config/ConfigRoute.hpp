@@ -25,7 +25,6 @@ class ConfigRoute {
 		bool		getAutoindex() const;
 		std::string getCgiScript() const;
 		std::string getCgiBin() const;
-		double		getClientMaxBodySize() const;
 		std::string getUploadDir() const;
     private:
 		std::string	_uri;
@@ -38,7 +37,6 @@ class ConfigRoute {
 		bool		_autoindex;
 		std::string	_cgi_script;
 		std::string	_cgi_bin;
-		double 		_client_max_body_size;
 		std::string	_upload_dir;
 };
 

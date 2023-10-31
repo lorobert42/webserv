@@ -21,6 +21,7 @@ class Request
 {
 	public :
 		Request();
+		Request(double client_max_body_size);
 		Request(Request const &other);
 		Request &operator=(Request const &other);
 		~Request(void);
@@ -53,5 +54,6 @@ class Request
 		std::string	_uri;
 		std::string	_version;
 		std::string	_body;
-		int					_error;
+		int			_error;
+		double		_client_max_body_size;
 };

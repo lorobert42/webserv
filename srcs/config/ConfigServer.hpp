@@ -18,6 +18,7 @@ class ConfigServer {
 		std::string					getName() const;
 		std::string					getHost() const;
 		int							getPort() const;
+		double						getClientMaxBodySize() const;
 		std::string					getPortAsString() const;
 		std::string					getErrorPage400() const;
 		std::string					getErrorPage403() const;
@@ -32,6 +33,7 @@ class ConfigServer {
 		std::string					_name;
 		std::string					_host;
 		int							_port;
+		double 						_client_max_body_size;
 		std::string					_error_page_400;
 		std::string					_error_page_403;
 		std::string					_error_page_404;
