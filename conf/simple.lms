@@ -8,7 +8,6 @@ server:
 		get=true
 		post=true
 		delete=true
-		autoindex=true
 		cgi_script=www/cgi/form.cgi.php
 		cgi_bin=/usr/bin/php-cgi
 		client_max_body_size=1K
@@ -16,14 +15,16 @@ server:
 	;
 
 	route:
-		uri=/python
+		uri=/counter
 		get=true
 		post=true
-		delete=true
-		autoindex=true
+		cgi_script=www/cgi/counter.cgi.php
+		cgi_bin=/usr/bin/php-cgi
+	;
+
+	route:
+		uri=/python
 		cgi_script=www/cgi/env.cgi.py
 		cgi_bin=/usr/bin/python
-		client_max_body_size=1K
-		upload_dir=www/cgi/upload/
 	;
 ;
