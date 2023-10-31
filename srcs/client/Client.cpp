@@ -127,10 +127,9 @@ static std::string	readFile(std::string path_with_index)
 	std::string		all;
 	std::ifstream	ifs(path_with_index.c_str());
 
-	std::cout << path_with_index << std::endl;
 	if (!ifs)
 	{
-		std::cout << "file cannot be read" << std::endl;
+		std::cout << "file cannot be read: " << path_with_index << std::endl;
 		//TODO better error handling
 		return (NULL);
 	}
@@ -144,7 +143,18 @@ int	Client::writeHandler(void)
 	std::cout << "Write handler" << std::endl;
 
 	int	code_error;
+
 	_route = _config_server->getRouteWithUri(_request->getUri());
+	if (_route == NULL) {
+		// Get the route using uri segments
+		_parseRoute(_request->getUri());
+		for (std::vector<std::string>::iterator it = _uriSegments.begin(); it != _uriSegments.end(); it++) {
+			std::cout << "🔵Segment: " << *it << std::endl;
+			_route = _config_server->getRouteWithUri(*it);
+			if (_route != NULL)
+				break;
+		}
+	}
 
 	// Check if route has redirection
 	if (_route != NULL && _route->getRedirect() != "")
@@ -176,7 +186,7 @@ int	Client::writeHandler(void)
 		_sendRespond(true);
 		return (0);
 	}
-	_path = _route->getPath();
+	_path = this->_calculatePathFromUri(_request->getUri());
 	code_error = _checkFile();
 	if (code_error == E_SUCCESS)
 		_header = _fileFound();
@@ -185,7 +195,7 @@ int	Client::writeHandler(void)
 	else
 		_fileNotFound();
 	if (_body.size() == 0)
-		_body = readFile(_route->getPathWithIndex());
+		_body = readFile(_path);
 	_sendRespond(false);
 	return (0);
 }
@@ -295,4 +305,31 @@ void	Client::_sendRespond(bool CGI)
 			std::cout << "Could not send reposne" << std::endl;
 		total_bytes_send += bytes_send;
 	}
+}
+
+
+void	Client::_parseRoute(const std::string &uri) {
+	std::stringstream ss(uri);
+	std::string segment;
+	std::string tempUri = "";
+
+	this->_uriSegments.clear();  // Clearing the existing segments to avoid any unexpected behavior
+
+	while (std::getline(ss, segment, '/')) {
+		if (!segment.empty()) {
+			tempUri += "/" + segment;
+			this->_uriSegments.insert(this->_uriSegments.begin(), tempUri);
+		}
+	}
+}
+
+std::string Client::_calculatePathFromUri(const std::string &uri) {
+	std::string calculatedPath = _route->getPath();
+	if (uri != _route->getUri()) {
+		std::string uriWithoutRoute = uri.substr(_route->getUri().length() + 1);
+		calculatedPath.append(uriWithoutRoute);
+		calculatedPath.append("/");
+	}
+
+	return calculatedPath;
 }

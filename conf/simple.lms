@@ -28,4 +28,10 @@ server:
 		cgi_script=www/cgi/env.cgi.py
 		cgi_bin=/usr/bin/python
 	;
+
+	route:
+		uri=/path
+		path=www/path/
+		index=index.html
+	;
 ;
