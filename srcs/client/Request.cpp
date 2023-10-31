@@ -1,5 +1,6 @@
 
 #include "Request.hpp"
+#include <cstdlib>
 
 //	### Static Member Function
 bool	isSpace(char c)
@@ -57,7 +58,6 @@ void	Request::parseHeader()
 	// Get all the Request 
 	// TODO: if method is not implemented, send 501 Not Implemented, if not allowed, send 405
 	// TODO: if uri is in absolute form, replace Host with the host of the uri
-	// TODO: Host field must be present -> 400
 	std::string	read = _getline(_rawRequest);
 	if (_parseFirstLine(read) == false)
 		return;
@@ -131,13 +131,16 @@ bool	Request::_parseFields()
 		strtolower(value);
 		_header[key] = value;
 	}
+	if (getValue("host") == "")
+	{
+		_error = 400;
+		return (false);
+	}
 	return (true);
 }
 
 int	Request::checkBody()
 {
-	std::cout << "Expected Content-Length: " << getValue("content-length") << std::endl;
-	std::cout << "Body length: " << getBody().length() << std::endl;
 	std::string	content_length = getValue("content-length");
 	std::string transfer_encoding = getValue("transfer-encoding");
 	if ((content_length == "" && transfer_encoding == "") || (content_length != "" && transfer_encoding != ""))
@@ -154,6 +157,8 @@ int	Request::checkBody()
 	}
 	if (content_length != "")
 	{
+		std::cout << "Expected Content-Length: " << getValue("content-length") << std::endl;
+		std::cout << "Body length: " << getBody().length() << std::endl;
 		if (content_length.find_first_not_of("0123456789") != std::string::npos)
 		{
 			_error = 400;
@@ -181,7 +186,40 @@ int	Request::_checkBodyChunked()
 {
 	if (_body.rfind("0\r\n\r\n") != std::string::npos)
 	{
-		// TODO: decode chunked body
+		std::string line;
+		std::string new_body = "";
+		int size = -1;
+		while (true)
+		{
+			try
+			{
+				line = _getline(_body);
+			}
+			catch (const std::exception& e)
+			{
+				_error = 400;
+				return (ERROR);
+			}
+			if (line == "\r\n" || line == "\n" || line == "")
+			{
+				std::cout << "Ignoring empty line" << std::endl;
+				continue;
+			}
+			std::cout << "Should get chunk size: [" << line << "]" << std::endl;
+			if (line.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
+			{
+				_error = 400;
+				return (ERROR);
+			}
+			size = std::strtol(line.c_str(), NULL, 16);
+			if (size == 0)
+				break;
+			std::cout << "Chunk size: " << size << std::endl;
+			std::cout << "Should insert: [" << _body.substr(0, size) << "]" << std::endl;
+			new_body += _body.substr(0, size);
+			_body = _body.substr(size + 1);
+			size = -1;
+		}
 		return (OK);
 	}
 	return (TOO_SHORT);
