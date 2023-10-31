@@ -7,9 +7,11 @@
 #include <string>
 #include <sstream>
 #include <algorithm>
-#include <cstddef>
 #include <cstdlib>
-
+#include <cctype>
+#include <exception>
+#include <stdexcept>
+#include "../utils/strtolower.hpp"
 
 #define OK 1
 #define TOO_SHORT 2
@@ -40,8 +42,10 @@ class Request
 	private :
 		std::string	_getline(std::string& data);
 		bool	_parseFirstLine(std::string& line);
+		bool	_parseFields();
 		int	_checkBodyContentLength(size_t content_length);
 		int	_checkBodyChunked();
+		void	_printRequest() const;
 
 		std::string _rawRequest;
 		std::map<std::string, std::string>	_header;

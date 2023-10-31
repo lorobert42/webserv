@@ -14,6 +14,7 @@ SRCS		= srcs/main.cpp \
 			srcs/config/ConfigHelper.cpp \
 			srcs/cgi/CgiHandler.cpp \
 			srcs/autoindex/AutoIndex.cpp \
+			srcs/utils/strtolower.cpp \
 
 SRCS_TEST	= srcs/epoll_serv.cpp
 
