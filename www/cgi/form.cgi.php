@@ -44,11 +44,9 @@
         }
     }
 
-
-
 	// Handle DELETE request
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-		$filename = $_SERVER['HTTP_X_FILENAME'];
+		$filename = urldecode($_SERVER['HTTP_X_FILENAME']);
 		$targetFile = $UPLOAD_DIR . $filename;
 
 		if (file_exists($targetFile)) {
@@ -142,7 +140,7 @@
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-Filename': filename,
+                        'X-Filename': encodeURIComponent(filename),
                     },
                 })
                 .then(response => {
