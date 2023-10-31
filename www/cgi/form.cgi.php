@@ -4,22 +4,47 @@
     error_reporting(E_ALL);
     $UPLOAD_DIR = "upload/";
 
-	// Handle POST request
-	if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-	    $targetFile = $UPLOAD_DIR . basename($_FILES['file']['name']);
+        // File upload handling
+        if (isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
+            $targetFile = $UPLOAD_DIR . basename($_FILES['file']['name']);
 
-	    // Move the uploaded file to the target directory
-	    if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
-	        $upload_message = "File uploaded successfully.";
-	        header("Location: /"); // Add this line to reload the page after successful upload
-	    } else {
-	        $upload_message = "There was an error uploading the file, please try again!";
-	    }
-	}
-	elseif ($_SERVER['REQUEST_METHOD'] === 'POST') {
-		$upload_message = "No file uploaded or there was an error uploading.";
-	}
+            // Move the uploaded file to the target directory
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
+                $upload_message = "File uploaded successfully.";
+                header("Location: /");
+                exit;  // Exit after sending the header to ensure no further processing
+            } else {
+                $upload_message = "There was an error uploading the file, please try again!";
+            }
+        }
+        // File download handling
+        elseif (isset($_POST['download'])) {
+            $filename = basename($_POST['download']); // Using basename() to prevent directory traversal attacks
+            $targetFile = $UPLOAD_DIR . $filename;
+
+            if (file_exists($targetFile)) {
+                header('Content-Description: File Transfer');
+                header('Content-Type: application/octet-stream');
+                header('Content-Disposition: attachment; filename="'. $filename .'"');
+                header('Expires: 0');
+                header('Cache-Control: must-revalidate');
+                header('Pragma: public');
+                header('Content-Length: ' . filesize($targetFile));
+                readfile($targetFile);
+                exit;
+            } else {
+                $upload_message = "File does not exist.";
+            }
+        }
+        // No file uploaded or other POST actions
+        else {
+            $upload_message = "No file uploaded or there was an error uploading.";
+        }
+    }
+
+
 
 	// Handle DELETE request
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
@@ -75,7 +100,9 @@
 	                echo '<div class="flex flex-row gap-4 justify-between items-center">';
 	                echo '<span>' . $file . '</span>';
 	                echo '<div class="flex flex-row gap-2 justify-between items-center">';
-	                    echo '<a href="' . $UPLOAD_DIR . $file . '" download="' . $file . '" class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded w-min">Download</a>';
+	                    echo '<form method="POST">';
+	                        echo '<button type="submit" name="download" value="' . $file . '" class="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded w-min">Download</button>';
+	                    echo '</form>';
 	                    echo '<button type="button" class="bg-red-500 hover:bg-red-700 text-white py-2 px-4 rounded w-min" onclick="deleteFile(\'' . $file . '\')">Delete</button>';
                     echo '</div>';
 	                echo '</div>';
