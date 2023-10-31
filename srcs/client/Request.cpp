@@ -136,11 +136,10 @@ bool	Request::_parseFields()
 
 int	Request::checkBody()
 {
-	std::cout << "Expected Content-Length: " << getValue("Content-Length") << std::endl;
+	std::cout << "Expected Content-Length: " << getValue("content-length") << std::endl;
 	std::cout << "Body length: " << getBody().length() << std::endl;
-	// std::cout << "Body until now: " << getBody() << std::endl;
-	std::string	content_length = getValue("Content-Length");
-	std::string transfer_encoding = getValue("Transfer-Encoding");
+	std::string	content_length = getValue("content-length");
+	std::string transfer_encoding = getValue("transfer-encoding");
 	if ((content_length == "" && transfer_encoding == "") || (content_length != "" && transfer_encoding != ""))
 	{
 		setBody("");
@@ -155,6 +154,11 @@ int	Request::checkBody()
 	}
 	if (content_length != "")
 	{
+		if (content_length.find_first_not_of("0123456789") != std::string::npos)
+		{
+			_error = 400;
+			return (ERROR);
+		}
 		return (_checkBodyContentLength(std::strtol(content_length.c_str(), NULL, 10)));
 	}
 	return (_checkBodyChunked());
