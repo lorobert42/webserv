@@ -61,7 +61,7 @@ option=value
 
 #### Sub-directives
 - `route`: Route configuration.
-  - Default: A simple route with the URI `/`, path `srcs/config/www` and index `index.html`.
+  - Default: A simple route with the URI `/`, path `srcs/config/www/` and index `index.html`.
 
 #### Options
 - `name`: The name of the server.
@@ -89,7 +89,7 @@ option=value
 - `uri`: The URI of the route.
   - Default: `/`
 - `path`: The path to the resource.
-  - Default: `srcs/config/www`
+  - Default: `srcs/config/www/`
 - `index`: The index of the route.
   - Default: `index.html`
 - `redirect`: The URI to redirect to.
