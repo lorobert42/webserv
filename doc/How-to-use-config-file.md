@@ -92,6 +92,8 @@ option=value
   - Default: `srcs/config/www`
 - `index`: The index of the route.
   - Default: `index.html`
+- `redirect`: The URI to redirect to.
+  - Default: `none`
 - `get`: Enable or disable the GET method.
   - Default: `true`
 - `post`: Enable or disable the POST method.

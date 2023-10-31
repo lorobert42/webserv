@@ -145,6 +145,11 @@ int	Client::writeHandler(void)
 
 	int	code_error;
 	_route = _config_server->getRouteWithUri(_request->getUri());
+
+	// Check if route has redirection
+	if (_route != NULL && _route->getRedirect() != "")
+		_route = _config_server->getRouteWithUri(_route->getRedirect());
+
 	if (_route == NULL)
 	{
 		if (_checkPath() == true)
