@@ -131,7 +131,7 @@ bool	Request::_parseFields()
 		strtolower(value);
 		_header[key] = value;
 	}
-	if (getValue("host") == "")
+	if (getValue("Host") == "")
 	{
 		_error = 400;
 		return (false);
@@ -141,8 +141,8 @@ bool	Request::_parseFields()
 
 int	Request::checkBody()
 {
-	std::string	content_length = getValue("content-length");
-	std::string transfer_encoding = getValue("transfer-encoding");
+	std::string	content_length = getValue("Content-Length");
+	std::string transfer_encoding = getValue("Transfer-Encoding");
 	if ((content_length == "" && transfer_encoding == "") || (content_length != "" && transfer_encoding != ""))
 	{
 		setBody("");
@@ -157,7 +157,7 @@ int	Request::checkBody()
 	}
 	if (content_length != "")
 	{
-		std::cout << "Expected Content-Length: " << getValue("content-length") << std::endl;
+		std::cout << "Expected Content-Length: " << getValue("Content-Length") << std::endl;
 		std::cout << "Body length: " << getBody().length() << std::endl;
 		if (content_length.find_first_not_of("0123456789") != std::string::npos)
 		{
@@ -293,8 +293,10 @@ const std::string	&Request::getVersion(void) const
 const std::string	Request::getValue(const std::string &key) const
 {
 	std::map<std::string,std::string>::const_iterator	find;
+	std::string	to_find = key;
 
-	find = _header.find(key);
+	strtolower(to_find);
+	find = _header.find(to_find);
 	if (find != _header.end())
 		return (find->second);
 	else
