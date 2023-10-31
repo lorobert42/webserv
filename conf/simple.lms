@@ -16,6 +16,7 @@ server:
 
 	route:
 		uri=/counter
+		redirect=/python
 		get=true
 		post=true
 		cgi_script=www/cgi/counter.cgi.php
@@ -26,5 +27,16 @@ server:
 		uri=/python
 		cgi_script=www/cgi/env.cgi.py
 		cgi_bin=/usr/bin/python
+	;
+
+	route:
+		uri=/path
+		path=www/path/
+		index=index.html
+	;
+
+	route:
+		uri=/path/1
+		redirect=/python
 	;
 ;

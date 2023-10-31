@@ -62,14 +62,14 @@ class Client
 		ConfigRoute		*_route;
 		int				_socket;
 
-		std::string		_read;
-		int	_nb_read;
-		bool			_headerOk;
-		std::string		_uri;
-		std::string		_path;
-		std::string		_header;
-		std::string		_body;
-	
+		std::string					_read;
+		int							_nb_read;
+		bool						_headerOk;
+		std::string					_path;
+		std::string					_header;
+		std::string					_body;
+		std::vector<std::string>	_uriSegments;
+
 		bool			_checkPath(void);
 		int				_checkFile(void);
 		std::string		_fileFound(void);
@@ -77,6 +77,8 @@ class Client
 		void			_fileNotAccess(void);
 		void			_methodNotAllowed(void);
 		void			_sendRespond(bool CGI);
+		void			_parseRoute(const std::string &uri);
+		std::string		_calculatePathFromUri(const std::string &uri);
 
 		Client(void);
 };

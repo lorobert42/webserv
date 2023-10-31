@@ -3,6 +3,7 @@
 const std::string	DEFAULT_URI 					= "/";
 const std::string	DEFAULT_PATH 					= "srcs/config/www";
 const std::string	DEFAULT_INDEX 					= "index.html";
+const std::string	DEFAULT_REDIRECT 				= "";
 const bool			DEFAULT_GET 					= true;
 const bool			DEFAULT_POST 					= false;
 const bool			DEFAULT_DELETE 					= false;
@@ -16,6 +17,7 @@ ConfigRoute::ConfigRoute() :
 	_uri(DEFAULT_URI),
 	_path(DEFAULT_PATH),
 	_index(DEFAULT_INDEX),
+	_redirect(DEFAULT_REDIRECT),
 	_get(DEFAULT_GET),
 	_post(DEFAULT_POST),
 	_delete(DEFAULT_DELETE),
@@ -31,6 +33,7 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 	this->_uri = DEFAULT_URI;
 	this->_path = DEFAULT_PATH;
 	this->_index = DEFAULT_INDEX;
+	this->_redirect = DEFAULT_REDIRECT;
 	this->_get = DEFAULT_GET;
 	this->_post = DEFAULT_POST;
 	this->_delete = DEFAULT_DELETE;
@@ -58,6 +61,8 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 			this->_path = ConfigHelper::checkValidPathFolder(value);
 		else if (option == "index")
 			this->_index = value;
+		else if (option == "redirect")
+			this->_redirect = value;
 		else if (option == "get")
 			this->_get = ConfigHelper::convertStringToBool(value);
 		else if (option == "post")
@@ -90,6 +95,7 @@ ConfigRoute	&ConfigRoute::operator=(ConfigRoute const &rhs) {
 		this->_uri = rhs._uri;
 		this->_path = rhs._path;
 		this->_index = rhs._index;
+		this->_redirect = rhs._redirect;
 		this->_get = rhs._get;
 		this->_post = rhs._post;
 		this->_delete = rhs._delete;
@@ -116,6 +122,10 @@ std::string ConfigRoute::getPathWithIndex() const {
 
 std::string ConfigRoute::getIndex() const {
 	return this->_index;
+}
+
+std::string ConfigRoute::getRedirect() const {
+	return this->_redirect;
 }
 
 bool	ConfigRoute::getGet() const {
@@ -155,6 +165,7 @@ std::ostream &operator<<(std::ostream &o, ConfigRoute const &rhs) {
 	o << "uri: " << rhs.getUri() << std::endl;
 	o << "path: " << rhs.getPath() << std::endl;
 	o << "index: " << rhs.getIndex() << std::endl;
+	o << "redirect: " << rhs.getRedirect() << std::endl;
 	o << "get: " << rhs.getGet() << std::endl;
 	o << "post: " << rhs.getPost() << std::endl;
 	o << "delete: " << rhs.getDelete() << std::endl;
