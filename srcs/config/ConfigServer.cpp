@@ -3,6 +3,7 @@
 const std::string   DEFAULT_SERVER_NAME             = "webserv";
 const std::string   DEFAULT_HOST                    = "localhost";
 const int           DEFAULT_PORT                    = 8080;
+const double		DEFAULT_CLIENT_MAX_BODY_SIZE	= 1 * 1024 * 1024;
 const std::string   DEFAULT_ERROR_PAGE_400          = "srcs/config/www/400.html";
 const std::string   DEFAULT_ERROR_PAGE_403          = "srcs/config/www/403.html";
 const std::string   DEFAULT_ERROR_PAGE_404          = "srcs/config/www/404.html";
@@ -14,6 +15,7 @@ ConfigServer::ConfigServer():
 	_name(DEFAULT_SERVER_NAME),
 	_host(DEFAULT_HOST),
 	_port(DEFAULT_PORT),
+	_client_max_body_size(DEFAULT_CLIENT_MAX_BODY_SIZE),
 	_error_page_400(DEFAULT_ERROR_PAGE_400),
 	_error_page_403(DEFAULT_ERROR_PAGE_403),
 	_error_page_404(DEFAULT_ERROR_PAGE_404),
@@ -29,6 +31,7 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 	this->_name = DEFAULT_SERVER_NAME;
 	this->_host = DEFAULT_HOST;
 	this->_port = DEFAULT_PORT;
+	this->_client_max_body_size = DEFAULT_CLIENT_MAX_BODY_SIZE;
 	this->_error_page_400 = DEFAULT_ERROR_PAGE_400;
 	this->_error_page_403 = DEFAULT_ERROR_PAGE_403;
 	this->_error_page_404 = DEFAULT_ERROR_PAGE_404;
@@ -69,6 +72,8 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 			this->_host = value;
 		else if (option == "port")
 			this->_port = ConfigHelper::convertStringToPort(value);
+		else if (option == "client_max_body_size")
+			this->_client_max_body_size = ConfigHelper::convertStringToClientMaxBodySize(value);
 		else if (option == "error_page_400")
 			this->_error_page_400 = value;
 		else if (option == "error_page_403")
@@ -105,6 +110,7 @@ ConfigServer	&ConfigServer::operator=(ConfigServer const &rhs) {
 		this->_name = rhs._name;
 		this->_host = rhs._host;
 		this->_port = rhs._port;
+		this->_client_max_body_size = rhs._client_max_body_size;
 		this->_error_page_400 = rhs._error_page_400;
 		this->_error_page_403 = rhs._error_page_403;
 		this->_error_page_404 = rhs._error_page_404;
@@ -132,6 +138,10 @@ std::string	ConfigServer::getPortAsString() const {
 	std::stringstream ss;
 	ss << this->_port;
 	return ss.str();
+}
+
+double	ConfigServer::getClientMaxBodySize() const {
+	return this->_client_max_body_size;
 }
 
 std::string	ConfigServer::getErrorPage400() const {
@@ -175,6 +185,7 @@ std::ostream    &operator<<(std::ostream &o, ConfigServer const &rhs) {
 	o << "name: " << rhs.getName() << std::endl;
 	o << "host: " << rhs.getHost() << std::endl;
 	o << "port: " << rhs.getPort() << std::endl;
+	o << "client_max_body_size: " << rhs.getClientMaxBodySize() << std::endl;
 	o << "error_page_400: " << rhs.getErrorPage400() << std::endl;
 	o << "error_page_403: " << rhs.getErrorPage403() << std::endl;
 	o << "error_page_404: " << rhs.getErrorPage404() << std::endl;

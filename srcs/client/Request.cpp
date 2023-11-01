@@ -18,7 +18,18 @@ Request::Request() :
 	_uri(""),
 	_version(""),
 	_body(""),
-	_error(0)
+	_error(0),
+	_client_max_body_size(1 * 1024 * 1024)
+{}
+
+Request::Request(double client_max_body_size) :
+	_rawRequest(""),
+	_method(""),
+	_uri(""),
+	_version(""),
+	_body(""),
+	_error(0),
+	_client_max_body_size(client_max_body_size)
 {}
 
 // ### Copy Constructor ###
@@ -164,7 +175,14 @@ int	Request::checkBody()
 			_error = 400;
 			return (ERROR);
 		}
-		return (_checkBodyContentLength(std::strtol(content_length.c_str(), NULL, 10)));
+		size_t expectedContentLength = std::strtol(content_length.c_str(), NULL, 10);
+		if (expectedContentLength > _client_max_body_size)
+		{
+			std::cout << "Client max body size reached" << std::endl;
+			_error = 413;
+			return (ERROR);
+		}
+		return (_checkBodyContentLength(expectedContentLength));
 	}
 	return (_checkBodyChunked());
 }

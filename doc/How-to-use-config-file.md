@@ -70,6 +70,8 @@ option=value
   - Default: `localhost`
 - `port`: The port of the server.
   - Default: `8080`
+- `client_max_body_size`: The maximum size of the body of a request. You can use the suffixes `K`, `M` and `G` to specify the size in kilobytes, megabytes and gigabytes.
+  - Default: `1M`
 - `error_page_400`: Set the path to the 400 error page.
   - Default: `srcs/config/www/400.html`
 - `error_page_403`: Set the path to the 403 error page.
@@ -108,5 +110,3 @@ option=value
   - Default: `none`
 - `upload_dir`: Path to the directory where the uploaded files will be stored.
   - Default: `none`
-- `client_max_body_size`: The maximum size of the body of a request. You can use the suffixes `K`, `M` and `G` to specify the size in kilobytes, megabytes and gigabytes.
-  - Default: `1M`
