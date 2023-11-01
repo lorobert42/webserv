@@ -26,7 +26,7 @@ class Request
 		Request &operator=(Request const &other);
 		~Request(void);
 
-		void	parseHeader();
+		bool	parseHeader();
 		int	checkBody();
 
 		void	appendRawRequest(char* to_add, int size);

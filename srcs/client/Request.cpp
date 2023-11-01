@@ -64,21 +64,22 @@ Request& Request::operator=(Request const& other)
 
 //	### Member Function [PUBLIC] ###
 // ### Header parser
-void	Request::parseHeader()
+bool	Request::parseHeader()
 {
 	// Get all the Request 
 	// TODO: if method is not implemented, send 501 Not Implemented, if not allowed, send 405
 	// TODO: if uri is in absolute form, replace Host with the host of the uri
 	std::string	read = _getline(_rawRequest);
 	if (_parseFirstLine(read) == false)
-		return;
+		return (false);
 
 	if (_parseFields() == false)
-		return;
+		return (false);
 
 	_body = _rawRequest;
 
 	_printRequest();
+	return (true);
 }
 
 bool	Request::_parseFirstLine(std::string& line)
@@ -206,7 +207,7 @@ int	Request::_checkBodyChunked()
 	{
 		std::string line;
 		std::string new_body = "";
-		int size = -1;
+		size_t size = 0;
 		while (true)
 		{
 			try
@@ -218,25 +219,25 @@ int	Request::_checkBodyChunked()
 				_error = 400;
 				return (ERROR);
 			}
-			if (line == "\r\n" || line == "\n" || line == "")
-			{
-				std::cout << "Ignoring empty line" << std::endl;
-				continue;
-			}
 			std::cout << "Should get chunk size: [" << line << "]" << std::endl;
 			if (line.find_first_not_of("0123456789abcdefABCDEF") != std::string::npos)
 			{
 				_error = 400;
 				return (ERROR);
 			}
-			size = std::strtol(line.c_str(), NULL, 16);
+			size = std::strtoul(line.c_str(), NULL, 16);
 			if (size == 0)
 				break;
+			else if (size + 2 > _body.length())
+			{
+				_error = 400;
+				return (ERROR);
+			}
 			std::cout << "Chunk size: " << size << std::endl;
 			std::cout << "Should insert: [" << _body.substr(0, size) << "]" << std::endl;
 			new_body += _body.substr(0, size);
-			_body = _body.substr(size + 1);
-			size = -1;
+			_body = _body.substr(size + 2);
+			size = 0;
 		}
 		return (OK);
 	}
