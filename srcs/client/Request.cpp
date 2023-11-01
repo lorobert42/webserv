@@ -1,6 +1,5 @@
 
 #include "Request.hpp"
-#include <cstdlib>
 
 //	### Static Member Function
 bool	isSpace(char c)
@@ -40,7 +39,8 @@ Request::Request(Request const& other) :
 	_uri(other._uri),
 	_version(other._version),
 	_body(other._body),
-	_error(other._error)
+	_error(other._error),
+	_client_max_body_size(other._client_max_body_size)
 {}
 
 // ### Destructor ###
@@ -59,6 +59,7 @@ Request& Request::operator=(Request const& other)
 	_version = other._version;
 	_body = other._body;
 	_error = other._error;
+	_client_max_body_size = other._client_max_body_size;
 	return (*this);
 }
 
@@ -100,7 +101,7 @@ bool	Request::_parseFirstLine(std::string& line)
 	}
 	_uri = line.substr(0, space);
 	_version = line.substr(space + 1, line.size());
-	if (_method == "" || _uri == "" || _version == "" ||
+	if (_method == "" || _uri == "" || _version.compare("HTTP/1.1") != 0 ||
 			_method.find(" ") != std::string::npos ||
 			_uri.find(" ") != std::string::npos ||
 			_version.find(" ") != std::string::npos)
@@ -155,19 +156,13 @@ int	Request::checkBody()
 {
 	std::string	content_length = getValue("Content-Length");
 	std::string transfer_encoding = getValue("Transfer-Encoding");
-	if ((content_length == "" && transfer_encoding == "") || (content_length != "" && transfer_encoding != ""))
+	if (content_length != "" && transfer_encoding != "")
 	{
 		setBody("");
 		_error = 400;
 		return (ERROR);
 	}
-	else if (transfer_encoding != "" && transfer_encoding != "chunked")
-	{
-		setBody("");
-		_error = 501;
-		return (ERROR);
-	}
-	if (content_length != "")
+	else if (content_length != "")
 	{
 		std::cout << "Expected Content-Length: " << getValue("Content-Length") << std::endl;
 		std::cout << "Body length: " << getBody().length() << std::endl;
@@ -185,7 +180,26 @@ int	Request::checkBody()
 		}
 		return (_checkBodyContentLength(expectedContentLength));
 	}
-	return (_checkBodyChunked());
+	else if (transfer_encoding != "" && transfer_encoding.substr(transfer_encoding.length() - 7) != "chunked")
+	{
+		setBody("");
+		_error = 400;
+		return (ERROR);
+	}
+	else if (transfer_encoding != "")
+	{
+		if (_body.length() == 0)
+			return (TOO_SHORT);
+		return (_checkBodyChunked());
+	}
+	else if (content_length == "" && _body.length() != 0)
+	{
+		_error = 411;
+		return (ERROR);
+	}
+	_body = "";
+	_header["content-length"] = "0";
+	return (OK);
 }
 
 int	Request::_checkBodyContentLength(size_t content_length)
