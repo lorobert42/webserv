@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: mjulliat <marvin@42lausanne.ch>            +#+  +:+       +#+        */
+/*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/10/30 10:48:13 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/01 10:02:42 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,11 @@ int	Client::readHandler(void)
 	}
 	if (!_headerOk && _request->getRawRequest().rfind("\r\n\r\n") != std::string::npos)
 	{
-		_request->parseHeader();
+		if (_request->parseHeader() == false)
+		{
+			std::cerr << "Error parsing header" << std::endl;
+			return (-1);
+		}
 		_headerOk = true;
 		if (_request->getMethod() != "POST")
 			return (0);
