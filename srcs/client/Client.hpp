@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/02 12:42:43 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/02 16:09:19 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,7 @@ enum	code_error {
 		E_FAIL = 2
 };
 
-#define D_BUFF_SIZE 4096
+#define D_BUFF_SIZE 1024
 #define D_200_MESSAGE "HTTP/1.1 200 OK"
 #define D_201_MESSAGE "HTTP/1.1 201 Created"
 #define D_301_MESSAGE "HTTP/1.1 301 Moved Permanently"
@@ -72,17 +72,22 @@ class Client
 
 		std::string					_read;
 		int							_nb_read;
+		int							_total_bytes_send;
 		bool						_headerOk;
+		bool						_respondOK;
+		bool						_CGI_on;
+		bool						_should_close;
 		std::string					_path;
 		std::string					_header;
 		std::string					_body;
+		std::string					_server_message;
 		std::vector<std::string>	_uriSegments;
 
+		void			_createRespond(void);
 		bool			_checkPath(void);
 		int				_checkFile(void);
 		std::string		_fileFound(void);
 		void			_createErrorResponse(int status);
-		void			_sendRespond(bool CGI);
 		void			_parseRoute(const std::string &uri);
 		std::string		_calculatePathFromUri(const std::string &uri);
 		void			_clear();

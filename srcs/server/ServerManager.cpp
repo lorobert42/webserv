@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/02 13:14:44 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/02 15:57:51 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -179,9 +179,12 @@ bool	ServerManager::_handleWrite(int fd)
 			return (false);
 		return (true);
 	}
-	if (!_epollCtlDel(_epfd, fd))
-		return (false);
-	_closeClient(fd);
+	else if (res == -1)
+	{
+		if (!_epollCtlDel(_epfd, fd))
+			return (false);
+		_closeClient(fd);
+	}
 	return (true);
 }
 
