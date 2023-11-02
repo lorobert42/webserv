@@ -6,6 +6,11 @@ server:
 	error_page_404=www/custom_errors_pages/404.html
 
 	route:
+		uri=/
+		path=www/srcs/
+		index=home.html
+	;
+	route:
 		uri=/form
 		get=true
 		post=true

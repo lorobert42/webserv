@@ -1,4 +1,5 @@
-/* ************************************************************************** */
+/*
+ * ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
@@ -6,7 +7,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/11/02 13:28:25 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/02 14:32:42 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +19,7 @@ Client::Client()
 {}
 
 Client::Client(ConfigServer *config, int &client_socket) :
-	_config_server(config), _socket(client_socket), _nb_read(0), _headerOk(false)
+	_config_server(config), _socket(client_socket), _nb_read(0), _total_bytes_send(0), _headerOk(false), _respondOK(false)
 {
 	_request = new Request(config->getClientMaxBodySize());
 }
@@ -26,7 +27,7 @@ Client::Client(ConfigServer *config, int &client_socket) :
 // ### Copy Constructor ###
 Client::Client(Client const& other) :
 	_config_server(other._config_server), _socket(other._socket), 
-	_nb_read(other._nb_read), _headerOk(other._headerOk)
+	_nb_read(other._nb_read), _total_bytes_send(other._total_bytes_send), _headerOk(other._headerOk), _respondOK(other._respondOK)
 {}
 
 // ### Destructor ###
@@ -146,17 +147,50 @@ int	Client::writeHandler(void)
 {
 	std::cout << "Write handler" << std::endl;
 
-	bool	should_close = _request->getValue("connection") == "close";
+	if (_respondOK == false)
+	{
+		_createRespond();
+		if (_CGI_on == true) {
+			_server_message.append(D_200_MESSAGE);
+			_server_message.append("\n");
+		} else {
+			_server_message.append(_header);
+			_server_message.append("\n\n");
+		}
+		_server_message.append(_body);
+	}
+	_respondOK = true;
 
+	int	bytes_send = 0;
+	std::string	buffer;
+	buffer.assign(_server_message, _total_bytes_send, _total_bytes_send + D_BUFF_SIZE);
+	bytes_send = send(_socket, buffer.c_str(), buffer.size(), 0); 
+	if (bytes_send < 0)
+		return (-1);
+	_total_bytes_send += bytes_send;
+	if (_total_bytes_send < static_cast<int>(_server_message.size()))
+		return (1);
+	if (_should_close == true)
+		return (-1);
+	else
+	{
+		_clear();
+		return (0);
+	}
+}
+
+//	### Member Function [PRIVATE]
+
+void	Client::_createRespond(void)
+{
+	_should_close = _request->getValue("connection") == "close";
+	_total_bytes_send = 0;
 	if (_request->getError() != 0)
 	{
 		_createErrorResponse(_request->getError());
-		_sendRespond(false);
-		return (1);
+		_should_close = true;
+		return ;
 	}
-
-	int	code_error;
-
 	_route = _config_server->getRouteWithUri(_request->getUri());
 	if (_route == NULL) {
 		// Get the route using uri segments
@@ -168,56 +202,49 @@ int	Client::writeHandler(void)
 				break;
 		}
 	}
-
 	// Check if route has redirection
 	if (_route != NULL && _route->getRedirect() != "")
 		_route = _config_server->getRouteWithUri(_route->getRedirect());
-
 	if (_route == NULL)
 	{
 		std::cout << "Route not found" << std::endl;
 		_createErrorResponse(404);
-		_sendRespond(false);
-		return (1);
+		_should_close = true;
+		return ;
 	}
-
 	// Check if method is allowed
 	if (!ClientHelper::isMethodAllowed(_route, _request->getMethod())) {
 		_createErrorResponse(405);
-		this->_sendRespond(false);
-		return (1);
+		_should_close = true;
+		return ;
 	}
-
 	// Check if the route has a CGI
 	if(_route->getCgiScript() != "" && _route->getCgiBin() != "")
 	{
 		std::cout << "CGI" << std::endl;
+		_CGI_on = true;
 		CgiHandler cgi(this);
 		_body = cgi.executeCgi();
-		_sendRespond(true);
-		if (should_close)
-			return (1);
-		return (0);
+		return ;
 	}
 	_path = this->_calculatePathFromUri(_request->getUri());
+	int	code_error;
 	code_error = _checkFile();
 	if (code_error == E_SUCCESS)
 		_header = _fileFound();
 	else if (code_error == E_ACCESS)
+	{
 		_createErrorResponse(403);
+		_should_close = true;
+	}
 	else
+	{
 		_createErrorResponse(404);
+		_should_close = true;
+	}
 	if (_body.size() == 0)
 		_body = readFile(_path);
-	_sendRespond(false);
-	if (code_error != E_SUCCESS)
-		return (1);
-	if (should_close)
-		return (1);
-	return (0);
 }
-
-//	### Member Function [PRIVATE]
 
 int	Client::_checkFile(void)
 {
@@ -304,32 +331,6 @@ void	Client::_createErrorResponse(int status)
 	std::sprintf(str, "%ld", _body.length());
 	_header.append(str);
 }
-
-void	Client::_sendRespond(bool CGI)
-{
-	std::string	server_message;
-
-	if (CGI) {
-		server_message.append(D_200_MESSAGE);
-		server_message.append("\n");
-	} else {
-		server_message.append(_header);
-		server_message.append("\n\n");
-	}
-	server_message.append(_body);
-
-	int	bytes_send = 0;
-	int	total_bytes_send = 0;
-	while (total_bytes_send <static_cast<int>(server_message.size()))
-	{
-		bytes_send = send(_socket, server_message.c_str(), server_message.size(), 0);
-		if (bytes_send < 0)
-			std::cout << "Could not send response" << std::endl;
-		total_bytes_send += bytes_send;
-	}
-	_clear();
-}
-
 
 void	Client::_parseRoute(const std::string &uri) {
 	std::stringstream ss(uri);
