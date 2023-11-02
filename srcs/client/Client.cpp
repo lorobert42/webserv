@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
+/*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/11/01 10:02:42 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/02 12:54:14 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ int	Client::readHandler(void)
 		if (_request->parseHeader() == false)
 		{
 			std::cerr << "Error parsing header" << std::endl;
-			return (-1);
+			return (0);
 		}
 		_headerOk = true;
 		if (_request->getMethod() != "POST")
@@ -113,7 +113,7 @@ int	Client::readHandler(void)
 		switch (check)
 		{
 			case ERROR:
-				return (-1);
+				return (0);
 				break;
 			case TOO_SHORT:
 				return (1);
@@ -135,7 +135,7 @@ static std::string	readFile(std::string path_with_index)
 	{
 		std::cout << "file cannot be read: " << path_with_index << std::endl;
 		//TODO better error handling
-		return (NULL);
+		return ("");
 	}
 	while (std::getline(ifs, line))
 		all.append(line);
@@ -145,6 +145,13 @@ static std::string	readFile(std::string path_with_index)
 int	Client::writeHandler(void)
 {
 	std::cout << "Write handler" << std::endl;
+
+	if (_request->getError() != 0)
+	{
+		_createErrorResponse(_request->getError());
+		_sendRespond(false);
+		return (1);
+	}
 
 	int	code_error;
 
@@ -169,14 +176,14 @@ int	Client::writeHandler(void)
 		if (_checkPath() == true)
 			return (0);
 		std::cout << "Route not find" << std::endl;
-		_fileNotFound();
+		_createErrorResponse(404);
 		_sendRespond(false);
 		return (0);
 	}
 
 	// Check if method is allowed
 	if (!ClientHelper::isMethodAllowed(_route, _request->getMethod())) {
-		this->_methodNotAllowed();
+		_createErrorResponse(405);
 		this->_sendRespond(false);
 		return (0);
 	}
@@ -195,9 +202,9 @@ int	Client::writeHandler(void)
 	if (code_error == E_SUCCESS)
 		_header = _fileFound();
 	else if (code_error == E_ACCESS)
-		_fileNotAccess();
+		_createErrorResponse(403);
 	else
-		_fileNotFound();
+		_createErrorResponse(404);
 	if (_body.size() == 0)
 		_body = readFile(_path);
 	_sendRespond(false);
@@ -257,34 +264,44 @@ std::string	Client::_fileFound(void)
 	return (header_message);
 }
 
-void	Client::_fileNotFound(void)
+void	Client::_createErrorResponse(int status)
 {
-	std::cout << "File not Found" << std::endl;
-
-	_header = D_404_MESSAGE;
-
-	_header.append("\ncontent-type: text/html\ncontent_length: ");
-	_body = readFile(_config_server->getErrorPage404());
-}
-
-void	Client::_fileNotAccess(void)
-{
-	std::cout << "File no access" << std::endl;
-
-	_header = D_403_MESSAGE;
-
-	_header.append("\ncontent-type: text/html\ncontent_length: ");
-	_body = readFile(_config_server->getErrorPage403());
-}
-
-void	Client::_methodNotAllowed(void)
-{
-	std::cout << "Method not allowed" << std::endl;
-
-	_header = D_405_MESSAGE;
-
-	_header.append("\ncontent-type: text/html\ncontent_length: ");
-	_body = readFile(_config_server->getErrorPage405());
+	_header = "HTTP/1.1 ";
+	switch (status)
+	{
+		case 400:
+			_header.append("400 Bad Request\n");
+			break;
+		case 403:
+			_header.append("403 Forbidden\n");
+			break;
+		case 404:
+			_header.append("404 Not Found\n");
+			break;
+		case 405:
+			_header.append("405 Method Not Allowed\n");
+			break;
+		case 411:
+			_header.append("411 Length Required\n");
+			break;
+		case 413:
+			_header.append("413 Content Too Large\n");
+			break;
+		case 501:
+			_header.append("501 Not Implemented\n");
+			break;
+		case 505:
+			_header.append("505 HTTP Version Not Supported\n");
+			break;
+		default:
+			_header.append("500 Internal Server Error\n");
+			break;
+	}
+	_header.append("Content-Type: text/html\nContent-Length: ");
+	_body = readFile(_config_server->getErrorPageByCode(status));
+	char	str[4];
+	std::sprintf(str, "%ld", _body.length());
+	_header.append(str);
 }
 
 void	Client::_sendRespond(bool CGI)
@@ -306,9 +323,10 @@ void	Client::_sendRespond(bool CGI)
 	{
 		bytes_send = send(_socket, server_message.c_str(), server_message.size(), 0);
 		if (bytes_send < 0)
-			std::cout << "Could not send reposne" << std::endl;
+			std::cout << "Could not send response" << std::endl;
 		total_bytes_send += bytes_send;
 	}
+	_clear();
 }
 
 
@@ -336,4 +354,16 @@ std::string Client::_calculatePathFromUri(const std::string &uri) {
 	}
 
 	return calculatedPath;
+}
+
+void	Client::_clear()
+{
+	_request->clear();
+	_read = "";
+	_nb_read = 0;
+	_headerOk = false;
+	_path = "";
+	_header = "";
+	_body = "";
+	_uriSegments.clear();
 }

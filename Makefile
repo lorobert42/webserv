@@ -27,7 +27,7 @@ else
  CC			= c++ -g
 endif
 
-CPPFLAGS	= -Wall -Werror -Wextra -std=c++98 #-fsanitize=address
+CPPFLAGS	= -Wall -Werror -Wextra -std=c++98 -fsanitize=address
 
 EXE_NAME	= -o $(NAME)
 EXE_NAME_T	= -o $(NAME_TEST)
@@ -55,7 +55,7 @@ docker-build:
 			docker-compose -p webserv build
 
 docker-up:
-			docker-compose -p webserv up -d
+			docker-compose -p webserv up --build -d
 			docker cp ${PWD}/nginx/nginx.conf webserv:/etc/nginx/nginx.conf
 			docker exec -it webserv /bin/bash -c "make re && nginx -s reload"
 			docker exec -it webserv /bin/bash

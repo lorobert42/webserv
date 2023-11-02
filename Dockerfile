@@ -1,7 +1,6 @@
-FROM alpine:latest
+FROM debian:latest
 
-RUN apk update && apk upgrade && apk add --no-cache \
-    bash \
+RUN apt-get update && apt-get upgrade -y && apt-get install -y \
     make \
     g++ \
     nginx \
@@ -11,10 +10,10 @@ RUN apk update && apk upgrade && apk add --no-cache \
     php-fpm \
     php-cgi \
     python3 \
-    && rm -rf /var/cache/apk/*
+    && rm -rf /var/lib/apt/lists/*
 
 COPY . /home/webserv
-COPY ./docker_conf/php.local.ini /etc/php81/conf.d/php.local.ini
+COPY ./docker_conf/php.local.ini /etc/php/8.2/conf.d/php.local.ini
 
 WORKDIR /home/webserv
 
