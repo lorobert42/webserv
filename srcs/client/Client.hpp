@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/02 16:09:19 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/02 16:43:28 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -77,6 +77,7 @@ class Client
 		bool						_respondOK;
 		bool						_CGI_on;
 		bool						_should_close;
+		bool						_error;
 		std::string					_path;
 		std::string					_header;
 		std::string					_body;

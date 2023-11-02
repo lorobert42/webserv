@@ -19,15 +19,26 @@ Client::Client()
 {}
 
 Client::Client(ConfigServer *config, int &client_socket) :
-	_config_server(config), _socket(client_socket), _nb_read(0), _total_bytes_send(0), _headerOk(false), _respondOK(false)
+	_config_server(config),
+	_socket(client_socket),
+	_nb_read(0),
+	_total_bytes_send(0),
+	_headerOk(false),
+	_respondOK(false),
+	_error(false)
 {
 	_request = new Request(config->getClientMaxBodySize());
 }
 
 // ### Copy Constructor ###
 Client::Client(Client const& other) :
-	_config_server(other._config_server), _socket(other._socket), 
-	_nb_read(other._nb_read), _total_bytes_send(other._total_bytes_send), _headerOk(other._headerOk), _respondOK(other._respondOK)
+	_config_server(other._config_server),
+	_socket(other._socket), 
+	_nb_read(other._nb_read),
+	_total_bytes_send(other._total_bytes_send),
+	_headerOk(other._headerOk),
+	_respondOK(other._respondOK),
+	_error(other._error)
 {}
 
 // ### Destructor ###
@@ -45,6 +56,7 @@ Client& Client::operator=(Client const& other)
 	this->_socket = other._socket;
 	_headerOk = other._headerOk;
 	_nb_read = other._nb_read;
+	_error = other._error;
 	return (*this);
 }
 
@@ -150,12 +162,15 @@ int	Client::writeHandler(void)
 	if (_respondOK == false)
 	{
 		_createRespond();
-		if (_CGI_on == true) {
+		if (_CGI_on == true && _error == false) {
 			_server_message.append(D_200_MESSAGE);
-			_server_message.append("\n");
+			_server_message.append("\r\n");
 		} else {
 			_server_message.append(_header);
-			_server_message.append("\n\n");
+			std::ostringstream	body_len;
+			body_len << _body.length();
+			_server_message.append(body_len.str());
+			_server_message.append("\r\n\r\n");
 		}
 		_server_message.append(_body);
 	}
@@ -188,7 +203,6 @@ void	Client::_createRespond(void)
 	if (_request->getError() != 0)
 	{
 		_createErrorResponse(_request->getError());
-		_should_close = true;
 		return ;
 	}
 	_route = _config_server->getRouteWithUri(_request->getUri());
@@ -209,13 +223,11 @@ void	Client::_createRespond(void)
 	{
 		std::cout << "Route not found" << std::endl;
 		_createErrorResponse(404);
-		_should_close = true;
 		return ;
 	}
 	// Check if method is allowed
 	if (!ClientHelper::isMethodAllowed(_route, _request->getMethod())) {
 		_createErrorResponse(405);
-		_should_close = true;
 		return ;
 	}
 	// Check if the route has a CGI
@@ -235,12 +247,10 @@ void	Client::_createRespond(void)
 	else if (code_error == E_ACCESS)
 	{
 		_createErrorResponse(403);
-		_should_close = true;
 	}
 	else
 	{
 		_createErrorResponse(404);
-		_should_close = true;
 	}
 	if (_body.size() == 0)
 		_body = readFile(_path);
@@ -281,14 +291,9 @@ int	Client::_checkFile(void)
 std::string	Client::_fileFound(void)
 {
 	std::string	header_message = D_200_MESSAGE;
-	std::string	content_type;
-	std::stringstream ss(_request->getValue("Accept"));
-
-
-	std::getline(ss,content_type,',');
-	header_message.append("\ncontent_type: ");
-	header_message.append(content_type);
-	header_message.append("\ncontent_length: ");
+	
+	header_message.append("\r\nContent-Type: text/html");
+	header_message.append("\r\nContent-Length: ");
 	return (header_message);
 }
 
@@ -327,9 +332,8 @@ void	Client::_createErrorResponse(int status)
 	}
 	_header.append("Content-Type: text/html\nContent-Length: ");
 	_body = readFile(_config_server->getErrorPageByCode(status));
-	char	str[4];
-	std::sprintf(str, "%ld", _body.length());
-	_header.append(str);
+	_error = true;
+	_should_close = true;
 }
 
 void	Client::_parseRoute(const std::string &uri) {
@@ -363,9 +367,15 @@ void	Client::_clear()
 	_request->clear();
 	_read = "";
 	_nb_read = 0;
+	_total_bytes_send = 0;
 	_headerOk = false;
+	_respondOK = false;
+	_CGI_on = false;
+	_should_close = false;
+	_error = false;
 	_path = "";
 	_header = "";
 	_body = "";
+	_server_message = "";
 	_uriSegments.clear();
 }
