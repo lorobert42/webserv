@@ -334,6 +334,13 @@ const std::string	&Request::getMethod(void) const
 	return (_method);
 }
 
+std::string	Request::getHostname(void) const
+{
+	std::string	hostnameWithPort = Request::getValue("Host");
+	std::string	hostname = hostnameWithPort.substr(0, hostnameWithPort.find_first_of(":"));
+	return (hostname);
+}
+
 const std::string	&Request::getUri(void) const
 {
 	return (_uri);

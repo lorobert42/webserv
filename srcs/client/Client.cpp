@@ -205,20 +205,21 @@ void	Client::_createRespond(void)
 		_createErrorResponse(_request->getError());
 		return ;
 	}
-	_route = _config_server->getRouteWithUri(_request->getUri());
+	_config_hostname = _config_server->getHostnameWithName(_request->getHostname());
+	_route = _config_hostname->getRouteWithUri(_request->getUri());
 	if (_route == NULL) {
 		// Get the route using uri segments
 		_parseRoute(_request->getUri());
 		for (std::vector<std::string>::iterator it = _uriSegments.begin(); it != _uriSegments.end(); it++) {
 			std::cout << "🔵Segment: " << *it << std::endl;
-			_route = _config_server->getRouteWithUri(*it);
+			_route = _config_hostname->getRouteWithUri(*it);
 			if (_route != NULL)
 				break;
 		}
 	}
 	// Check if route has redirection
 	if (_route != NULL && _route->getRedirect() != "")
-		_route = _config_server->getRouteWithUri(_route->getRedirect());
+		_route = _config_hostname->getRouteWithUri(_route->getRedirect());
 	if (_route == NULL)
 	{
 		std::cout << "Route not found" << std::endl;

@@ -36,11 +36,12 @@ class Server {
 		Server &operator=(Server const& other);
 
 	private:
-		ConfigServer*		_config;
-		std::string			_name;
-		int					_port;
-		int					_socket;
-		struct sockaddr_in	_addr;
+		ConfigServer*					_config;
+		std::vector<ConfigHostname*>	_hostnames;
+		std::string						_name;
+		int								_port;
+		int								_socket;
+		struct sockaddr_in				_addr;
 
 		Server();
 };

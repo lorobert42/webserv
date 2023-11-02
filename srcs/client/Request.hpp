@@ -34,6 +34,7 @@ class Request
 		void	setBody(std::string const& new_body);
 		const std::string &getRawRequest() const;
 		const std::string	&getMethod(void) const;
+		std::string			getHostname(void) const;
 		const std::string	&getUri(void) const;
 		const std::string	&getVersion(void) const;
 		const std::string	getValue(const std::string &key) const;
