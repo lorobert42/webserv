@@ -10,6 +10,7 @@ SRCS		= srcs/main.cpp \
 			srcs/client/Request.cpp \
 			srcs/config/Config.cpp \
 			srcs/config/ConfigServer.cpp \
+			srcs/config/ConfigHostname.cpp \
 			srcs/config/ConfigRoute.cpp \
 			srcs/config/ConfigHelper.cpp \
 			srcs/cgi/CgiHandler.cpp \
@@ -27,7 +28,7 @@ else
  CC			= c++ -g
 endif
 
-CPPFLAGS	= -Wall -Werror -Wextra -std=c++98 -fsanitize=address
+CPPFLAGS	= -Wall -Werror -Wextra -std=c++98 #-fsanitize=address
 
 EXE_NAME	= -o $(NAME)
 EXE_NAME_T	= -o $(NAME_TEST)

@@ -55,19 +55,19 @@ Option is a key-value pair.
 option=value
 ```
 
+---
+
 ## Usage
 
 ### Server
 
 #### Sub-directives
-- `route`: Route configuration.
-  - Default: A simple route with the URI `/`, path `srcs/config/www/` and index `index.html`.
+- `hostname`: The hostname of the server.
+  - Default: `localhost`
 
 #### Options
 - `name`: The name of the server.
   - Default: `webserv`
-- `host`: The host of the server.
-  - Default: `localhost`
 - `port`: The port of the server.
   - Default: `8080`
 - `client_max_body_size`: The maximum size of the body of a request. You can use the suffixes `K`, `M` and `G` to specify the size in kilobytes, megabytes and gigabytes.
@@ -90,6 +90,16 @@ option=value
   - Default: `srcs/config/www/501.html`
 - `error_page_505`: Set the path to the 505 error page.
   - Default: `srcs/config/www/505.html`
+
+### Hostname
+
+#### Sub-directives
+- `route`: Route configuration.
+  - Default: A simple route with the URI `/`, path `srcs/config/www/` and index `index.html`.
+
+#### Options
+- `name`: The name of the hostname.
+  - Default: `localhost`
 
 ### Route
 

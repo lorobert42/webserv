@@ -1,7 +1,6 @@
 #include "ConfigServer.hpp"
 
 const std::string   DEFAULT_SERVER_NAME             = "webserv";
-const std::string   DEFAULT_HOST                    = "localhost";
 const int           DEFAULT_PORT                    = 8080;
 const double		DEFAULT_CLIENT_MAX_BODY_SIZE	= 1 * 1024 * 1024;
 const std::string   DEFAULT_ERROR_PAGE_400          = "srcs/config/www/400.html";
@@ -16,7 +15,6 @@ const std::string   DEFAULT_ERROR_PAGE_505          = "srcs/config/www/505.html"
 
 ConfigServer::ConfigServer():
 	_name(DEFAULT_SERVER_NAME),
-	_host(DEFAULT_HOST),
 	_port(DEFAULT_PORT),
 	_client_max_body_size(DEFAULT_CLIENT_MAX_BODY_SIZE),
 	_error_page_400(DEFAULT_ERROR_PAGE_400),
@@ -29,13 +27,12 @@ ConfigServer::ConfigServer():
 	_error_page_501(DEFAULT_ERROR_PAGE_501),
 	_error_page_505(DEFAULT_ERROR_PAGE_505)
 {
-	this->_routes.push_back(new ConfigRoute());
+	this->_hostnames.push_back(new ConfigHostname());
 }
 
 ConfigServer::ConfigServer(const std::string &serverConfig) {
 	// Set default values
 	this->_name = DEFAULT_SERVER_NAME;
-	this->_host = DEFAULT_HOST;
 	this->_port = DEFAULT_PORT;
 	this->_client_max_body_size = DEFAULT_CLIENT_MAX_BODY_SIZE;
 	this->_error_page_400 = DEFAULT_ERROR_PAGE_400;
@@ -56,18 +53,18 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 		if (line.empty())
 			continue;
 
-		// Check if line contains strictly "route:"
-		if (line == "route:") {
-			std::string routeConfig;
+		// Check if line contains strictly "hostname:"
+		if (line == "hostname:") {
+			std::string hostnameConfig;
 			while (std::getline(serverConfigStream, line) && (line[0] == '\t' || line.empty())) {
 				// Remove tabulation
 				line.erase(0, 1);
-				routeConfig += line + "\n";
+				hostnameConfig += line + "\n";
 			}
 			if (line != ";") {
 				throw InvalidCloseDirectiveException(line);
 			}
-			this->_routes.push_back(new ConfigRoute(routeConfig));
+			this->_hostnames.push_back(new ConfigHostname(hostnameConfig));
 			continue;
 		}
 
@@ -77,8 +74,6 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 		// Set server options
 		if (option == "name")
 			this->_name = value;
-		else if (option == "host")
-			this->_host = value;
 		else if (option == "port")
 			this->_port = ConfigHelper::convertStringToPort(value);
 		else if (option == "client_max_body_size")
@@ -109,8 +104,8 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 }
 
 ConfigServer::~ConfigServer() {
-	if (this->_routes.size() > 0) {
-		for (std::vector<ConfigRoute*>::iterator it = this->_routes.begin(); it != this->_routes.end(); ++it) {
+	if (this->_hostnames.size() > 0) {
+		for (std::vector<ConfigHostname*>::iterator it = this->_hostnames.begin(); it != this->_hostnames.end(); ++it) {
 			delete (*it);
 		}
 	}
@@ -123,7 +118,6 @@ ConfigServer::ConfigServer(ConfigServer const &src) {
 ConfigServer	&ConfigServer::operator=(ConfigServer const &rhs) {
 	if (this != &rhs) {
 		this->_name = rhs._name;
-		this->_host = rhs._host;
 		this->_port = rhs._port;
 		this->_client_max_body_size = rhs._client_max_body_size;
 		this->_error_page_400 = rhs._error_page_400;
@@ -135,17 +129,13 @@ ConfigServer	&ConfigServer::operator=(ConfigServer const &rhs) {
 		this->_error_page_500 = rhs._error_page_500;
 		this->_error_page_501 = rhs._error_page_501;
 		this->_error_page_505 = rhs._error_page_505;
-		this->_routes = rhs._routes;
+		this->_hostnames = rhs._hostnames;
 	}
 	return (*this);
 }
 
 std::string	ConfigServer::getName() const {
 	return this->_name;
-}
-
-std::string	ConfigServer::getHost() const {
-	return this->_host;
 }
 
 int	ConfigServer::getPort() const {
@@ -223,22 +213,25 @@ std::string ConfigServer::getErrorPageByCode(const int &code) const {
 	}
 }
 
-std::vector<ConfigRoute*>	ConfigServer::getRoutes() const {
-	return this->_routes;
+std::vector<ConfigHostname*>	ConfigServer::getHostnames() const {
+	return this->_hostnames;
 }
 
-ConfigRoute	*ConfigServer::getRouteWithUri(const std::string &uri) const {
-	for (std::vector<ConfigRoute*>::const_iterator it = this->_routes.begin(); it != this->_routes.end(); ++it) {
-		if ((*it)->getUri() == uri)
+ConfigHostname	*ConfigServer::getHostnameWithName(const std::string &name) const {
+	for (std::vector<ConfigHostname*>::const_iterator it = this->_hostnames.begin(); it != this->_hostnames.end(); ++it) {
+		if ((*it)->getName() == name) {
+			std::cout << "Hostname found: " << (*it)->getName() << std::endl;
 			return (*it);
+		}
 	}
-	return (NULL);
+	std::cout << "Hostname not found: " << name << ", using first hostname: " << this->_hostnames[0]->getName() << std::endl;
+	// Return the first hostname if no hostname with name is found
+	return this->_hostnames[0];
 }
 
 std::ostream    &operator<<(std::ostream &o, ConfigServer const &rhs) {
 	o << "=== Server ===" << std::endl;
 	o << "name: " << rhs.getName() << std::endl;
-	o << "host: " << rhs.getHost() << std::endl;
 	o << "port: " << rhs.getPort() << std::endl;
 	o << "client_max_body_size: " << rhs.getClientMaxBodySize() << std::endl;
 	o << "error_page_400: " << rhs.getErrorPage400() << std::endl;
@@ -251,8 +244,8 @@ std::ostream    &operator<<(std::ostream &o, ConfigServer const &rhs) {
 	o << "error_page_501: " << rhs.getErrorPage501() << std::endl;
 	o << "error_page_505: " << rhs.getErrorPage505() << std::endl;
 
-	std::vector<ConfigRoute*> routes = rhs.getRoutes();
-	for (std::vector<ConfigRoute*>::iterator it = routes.begin(); it != routes.end(); ++it) {
+	std::vector<ConfigHostname*> hostnames = rhs.getHostnames();
+	for (std::vector<ConfigHostname*>::iterator it = hostnames.begin(); it != hostnames.end(); ++it) {
 		o << *(*it) << std::endl;
 	}
 	return (o);

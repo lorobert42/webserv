@@ -22,6 +22,7 @@
 #include <sys/stat.h>
 #include "Request.hpp"
 #include "../config/ConfigServer.hpp"
+#include "../config/ConfigHostname.hpp"
 #include "../cgi/CgiHandler.hpp"
 #include "../autoindex/AutoIndex.hpp"
 #include "ClientHelper.hpp"
@@ -67,6 +68,7 @@ class Client
 	private:
 		ConfigServer	*_config_server;
 		Request			*_request;
+		ConfigHostname	*_config_hostname;
 		ConfigRoute		*_route;
 		int				_socket;
 
