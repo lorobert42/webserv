@@ -66,8 +66,6 @@ option=value
 #### Options
 - `name`: The name of the server.
   - Default: `webserv`
-- `host`: The host of the server.
-  - Default: `localhost`
 - `port`: The port of the server.
   - Default: `8080`
 - `client_max_body_size`: The maximum size of the body of a request. You can use the suffixes `K`, `M` and `G` to specify the size in kilobytes, megabytes and gigabytes.

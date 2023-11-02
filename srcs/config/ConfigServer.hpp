@@ -17,7 +17,6 @@ class ConfigServer {
         ConfigServer    &operator=(ConfigServer const &rhs);
 
 		std::string					getName() const;
-		std::string					getHost() const;
 		int							getPort() const;
 		double						getClientMaxBodySize() const;
 		std::string					getPortAsString() const;
@@ -36,7 +35,6 @@ class ConfigServer {
 
     private:
 		std::string					_name;
-		std::string					_host;
 		int							_port;
 		double 						_client_max_body_size;
 		std::string					_error_page_400;

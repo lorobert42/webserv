@@ -23,11 +23,6 @@ std::string Server::getName() const
 	return (_name);
 }
 
-std::string Server::getHost() const
-{
-	return (_host);
-}
-
 int Server::getPort() const
 {
 	return (_port);
@@ -51,7 +46,6 @@ Server::Server(ConfigServer* config) :
 	_config(config)
 {
 	_name = config->getName();
-	_host = config->getHost();
 	_port = config->getPort();
 	_socket = -1;
 	// Fill the _addr structure with host and port
@@ -66,7 +60,6 @@ Server::Server(ConfigServer* config) :
 Server::Server(Server const &other) :
 	_config(other._config),
 	_name(other._name),
-	_host(other._host),
 	_port(other._port),
 	_socket(other._socket),
 	_addr(other._addr)
@@ -83,7 +76,6 @@ Server &Server::operator=(Server const &other)
 		return (*this);
 	_config = other._config;
 	_name = other._name;
-	_host = other._host;
 	_port = other._port;
 	_socket = other._socket;
 	_addr = other._addr;

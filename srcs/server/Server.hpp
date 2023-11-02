@@ -24,7 +24,6 @@ class Server {
 	public:
 		ConfigServer* getConfig() const;
 		std::string getName() const;
-		std::string getHost() const;
 		int getPort() const;
 		int getSocket() const;
 		struct sockaddr_in getAddr() const;
@@ -39,7 +38,6 @@ class Server {
 	private:
 		ConfigServer*		_config;
 		std::string			_name;
-		std::string			_host;
 		int					_port;
 		int					_socket;
 		struct sockaddr_in	_addr;
