@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/11/02 12:48:18 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/02 12:54:14 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -298,7 +298,7 @@ void	Client::_createErrorResponse(int status)
 			break;
 	}
 	_header.append("Content-Type: text/html\nContent-Length: ");
-	_body = readFile(_config_server->getErrorPage400());
+	_body = readFile(_config_server->getErrorPageByCode(status));
 	char	str[4];
 	std::sprintf(str, "%ld", _body.length());
 	_header.append(str);
