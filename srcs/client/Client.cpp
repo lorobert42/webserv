@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/11/02 12:54:14 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/02 13:28:25 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,6 +146,8 @@ int	Client::writeHandler(void)
 {
 	std::cout << "Write handler" << std::endl;
 
+	bool	should_close = _request->getValue("connection") == "close";
+
 	if (_request->getError() != 0)
 	{
 		_createErrorResponse(_request->getError());
@@ -173,19 +175,17 @@ int	Client::writeHandler(void)
 
 	if (_route == NULL)
 	{
-		if (_checkPath() == true)
-			return (0);
-		std::cout << "Route not find" << std::endl;
+		std::cout << "Route not found" << std::endl;
 		_createErrorResponse(404);
 		_sendRespond(false);
-		return (0);
+		return (1);
 	}
 
 	// Check if method is allowed
 	if (!ClientHelper::isMethodAllowed(_route, _request->getMethod())) {
 		_createErrorResponse(405);
 		this->_sendRespond(false);
-		return (0);
+		return (1);
 	}
 
 	// Check if the route has a CGI
@@ -195,6 +195,8 @@ int	Client::writeHandler(void)
 		CgiHandler cgi(this);
 		_body = cgi.executeCgi();
 		_sendRespond(true);
+		if (should_close)
+			return (1);
 		return (0);
 	}
 	_path = this->_calculatePathFromUri(_request->getUri());
@@ -208,15 +210,14 @@ int	Client::writeHandler(void)
 	if (_body.size() == 0)
 		_body = readFile(_path);
 	_sendRespond(false);
+	if (code_error != E_SUCCESS)
+		return (1);
+	if (should_close)
+		return (1);
 	return (0);
 }
 
 //	### Member Function [PRIVATE]
-
-bool	Client::_checkPath(void)
-{
-	return (false);
-}
 
 int	Client::_checkFile(void)
 {
