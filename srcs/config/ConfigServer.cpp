@@ -198,6 +198,31 @@ std::string	ConfigServer::getErrorPage505() const {
 	return this->_error_page_505;
 }
 
+std::string ConfigServer::getErrorPageByCode(const int &code) const {
+	switch (code) {
+		case 400:
+			return this->_error_page_400;
+		case 403:
+			return this->_error_page_403;
+		case 404:
+			return this->_error_page_404;
+		case 405:
+			return this->_error_page_405;
+		case 411:
+			return this->_error_page_411;
+		case 413:
+			return this->_error_page_413;
+		case 500:
+			return this->_error_page_500;
+		case 501:
+			return this->_error_page_501;
+		case 505:
+			return this->_error_page_505;
+		default:
+			return this->_error_page_500;
+	}
+}
+
 std::vector<ConfigRoute*>	ConfigServer::getRoutes() const {
 	return this->_routes;
 }
@@ -220,8 +245,11 @@ std::ostream    &operator<<(std::ostream &o, ConfigServer const &rhs) {
 	o << "error_page_403: " << rhs.getErrorPage403() << std::endl;
 	o << "error_page_404: " << rhs.getErrorPage404() << std::endl;
 	o << "error_page_405: " << rhs.getErrorPage405() << std::endl;
+	o << "error_page_411: " << rhs.getErrorPage411() << std::endl;
 	o << "error_page_413: " << rhs.getErrorPage413() << std::endl;
 	o << "error_page_500: " << rhs.getErrorPage500() << std::endl;
+	o << "error_page_501: " << rhs.getErrorPage501() << std::endl;
+	o << "error_page_505: " << rhs.getErrorPage505() << std::endl;
 
 	std::vector<ConfigRoute*> routes = rhs.getRoutes();
 	for (std::vector<ConfigRoute*>::iterator it = routes.begin(); it != routes.end(); ++it) {
