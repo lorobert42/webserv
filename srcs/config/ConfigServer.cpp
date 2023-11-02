@@ -224,7 +224,7 @@ ConfigHostname	*ConfigServer::getHostnameWithName(const std::string &name) const
 			return (*it);
 		}
 	}
-	std::cout << "Hostname not found: " << name << std::endl;
+	std::cout << "Hostname not found: " << name << ", using first hostname: " << this->_hostnames[0]->getName() << std::endl;
 	// Return the first hostname if no hostname with name is found
 	return this->_hostnames[0];
 }
