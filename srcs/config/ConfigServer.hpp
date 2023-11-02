@@ -21,6 +21,7 @@ class ConfigServer {
 		int							getPort() const;
 		double						getClientMaxBodySize() const;
 		std::string					getPortAsString() const;
+		std::string					getErrorPageByCode(const int &code) const;
 		std::string					getErrorPage400() const;
 		std::string					getErrorPage403() const;
 		std::string					getErrorPage404() const;
