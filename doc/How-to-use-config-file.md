@@ -80,10 +80,16 @@ option=value
   - Default: `srcs/config/www/404.html`
 - `error_page_405`: Set the path to the 405 error page.
   - Default: `srcs/config/www/405.html`
+- `error_page_411`: Set the path to the 411 error page.
+  - Default: `srcs/config/www/411.html`
 - `error_page_413`: Set the path to the 413 error page.
   - Default: `srcs/config/www/413.html`
 - `error_page_500`: Set the path to the 500 error page.
   - Default: `srcs/config/www/500.html`
+- `error_page_501`: Set the path to the 501 error page.
+  - Default: `srcs/config/www/501.html`
+- `error_page_505`: Set the path to the 505 error page.
+  - Default: `srcs/config/www/505.html`
 
 ### Route
 

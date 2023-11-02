@@ -13,7 +13,7 @@
             // Move the uploaded file to the target directory
             if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
                 $upload_message = "File uploaded successfully.";
-                header("Location: /");
+                header("Location: /form");
                 exit;  // Exit after sending the header to ensure no further processing
             } else {
                 $upload_message = "There was an error uploading the file, please try again!";
@@ -122,7 +122,7 @@
 
             const formData = new FormData(form);
 
-            fetch('/', {
+            fetch('/form', {
                 method: 'POST',
                 body: formData
             })
@@ -136,7 +136,7 @@
 
 		function deleteFile(filename) {
 			if (window.confirm("Are you sure you want to delete " + filename + "?")) {
-				fetch('/', {
+				fetch('/form', {
                     method: 'DELETE',
                     headers: {
                         'Content-Type': 'application/json',

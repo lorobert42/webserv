@@ -2,10 +2,10 @@ server:
 	name=custom
 	host=127.0.0.1
 	port=8080
-	client_max_body_size=1M
+	client_max_body_size=5M
 
 	route:
-		uri=/
+		uri=/form
 		get=true
 		post=true
 		delete=true
