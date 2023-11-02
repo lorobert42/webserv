@@ -68,7 +68,6 @@ Request& Request::operator=(Request const& other)
 bool	Request::parseHeader()
 {
 	// Get all the Request 
-	// TODO: if method is not implemented, send 501 Not Implemented, if not allowed, send 405
 	// TODO: if uri is in absolute form, replace Host with the host of the uri
 	std::string	read = _getline(_rawRequest);
 	if (_parseFirstLine(read) == false)
@@ -101,12 +100,23 @@ bool	Request::_parseFirstLine(std::string& line)
 	}
 	_uri = line.substr(0, space);
 	_version = line.substr(space + 1, line.size());
-	if (_method == "" || _uri == "" || _version.compare("HTTP/1.1") != 0 ||
+	if (_method == "" || _uri == "" || _version == "" ||
 			_method.find(" ") != std::string::npos ||
 			_uri.find(" ") != std::string::npos ||
 			_version.find(" ") != std::string::npos)
 	{
 		_error = 400;
+		return (false);
+	}
+	if (_method == "CONNECT" || _method == "HEAD" || _method == "OPTIONS" ||
+		_method == "PATCH" || _method == "PUT" || _method == "TRACE")
+	{
+		_error = 501;
+		return (false);
+	}
+	if (_version.compare("HTTP/1.1") != 0)
+	{
+		_error = 505;
 		return (false);
 	}
 	return (true);
@@ -266,6 +276,17 @@ std::string	Request::_getline(std::string& data)
 	std::string line = data.substr(0, ret);
 	data = data.substr(ret + 2);
 	return (line);
+}
+
+void	Request::clear()
+{
+	_rawRequest = "";
+	_header.clear();
+	_method = "";
+	_uri = "";
+	_version = "";
+	_body = "";
+	_error = 0;
 }
 
 void	Request::_printRequest() const

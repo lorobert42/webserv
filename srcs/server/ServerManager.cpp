@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
+/*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/25 10:31:06 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/02 10:44:24 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -172,10 +172,15 @@ bool	ServerManager::_handleWrite(int fd)
 	if (!client)
 		return (true);
 	std::cout << "[Sending data on fd:] " << client->getSocket() << std::endl;
-	client->writeHandler();
+	int res = client->writeHandler();
+	if (res == 0)
+	{
+		if (!_epollCtlMod(_epfd, fd, EPOLLIN))
+			return (false);
+		return (true);
+	}
 	if (!_epollCtlDel(_epfd, fd))
 		return (false);
-	// TODO: Close client only if necessary
 	_closeClient(fd);
 	return (true);
 }

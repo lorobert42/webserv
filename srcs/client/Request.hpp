@@ -28,7 +28,7 @@ class Request
 
 		bool	parseHeader();
 		int	checkBody();
-
+		void	clear();
 		void	appendRawRequest(char* to_add, int size);
 		void	appendBody(char* to_add, int size);
 		void	setBody(std::string const& new_body);

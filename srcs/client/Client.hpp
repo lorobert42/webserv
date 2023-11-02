@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/10/30 10:17:15 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/02 12:42:43 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,17 @@ enum	code_error {
 
 #define D_BUFF_SIZE 4096
 #define D_200_MESSAGE "HTTP/1.1 200 OK"
-#define D_404_MESSAGE "HTTP/1.1 404"
-#define D_403_MESSAGE "HTTP/1.1 403"
-#define D_405_MESSAGE "HTTP/1.1 405"
+#define D_201_MESSAGE "HTTP/1.1 201 Created"
+#define D_301_MESSAGE "HTTP/1.1 301 Moved Permanently"
+#define D_302_MESSAGE "HTTP/1.1 302 Found"
+#define D_400_MESSAGE "HTTP/1.1 400 Bad Request"
+#define D_403_MESSAGE "HTTP/1.1 403 Forbidden"
+#define D_404_MESSAGE "HTTP/1.1 404 Not Found"
+#define D_405_MESSAGE "HTTP/1.1 405 Method Not Allowed"
+#define D_411_MESSAGE "HTTP/1.1 411 Length Required"
+#define D_413_MESSAGE "HTTP/1.1 413 Content Too Large"
+#define D_501_MESSAGE "HTTP/1.1 501 Not Implemented"
+#define D_505_MESSAGE "HTTP/1.1 505 HTTP Version Not Supported"
 
 class Client
 {
@@ -73,12 +81,11 @@ class Client
 		bool			_checkPath(void);
 		int				_checkFile(void);
 		std::string		_fileFound(void);
-		void			_fileNotFound(void);
-		void			_fileNotAccess(void);
-		void			_methodNotAllowed(void);
+		void			_createErrorResponse(int status);
 		void			_sendRespond(bool CGI);
 		void			_parseRoute(const std::string &uri);
 		std::string		_calculatePathFromUri(const std::string &uri);
+		void			_clear();
 
 		Client(void);
 };
