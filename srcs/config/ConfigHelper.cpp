@@ -48,3 +48,12 @@ double ConfigHelper::convertStringToClientMaxBodySize(std::string const &str) {
 
 	return size;
 }
+
+std::string ConfigHelper::getValidErrorPage(std::string const &default_path, std::string const &new_path) {
+	std::ifstream file(new_path.c_str());
+	if (!file.is_open()) {
+		file.close();
+		return default_path;
+	}
+	return new_path;
+}

@@ -8,8 +8,11 @@ const std::string   DEFAULT_ERROR_PAGE_400          = "srcs/config/www/400.html"
 const std::string   DEFAULT_ERROR_PAGE_403          = "srcs/config/www/403.html";
 const std::string   DEFAULT_ERROR_PAGE_404          = "srcs/config/www/404.html";
 const std::string   DEFAULT_ERROR_PAGE_405          = "srcs/config/www/405.html";
+const std::string   DEFAULT_ERROR_PAGE_411          = "srcs/config/www/411.html";
 const std::string   DEFAULT_ERROR_PAGE_413          = "srcs/config/www/413.html";
 const std::string   DEFAULT_ERROR_PAGE_500          = "srcs/config/www/500.html";
+const std::string   DEFAULT_ERROR_PAGE_501          = "srcs/config/www/501.html";
+const std::string   DEFAULT_ERROR_PAGE_505          = "srcs/config/www/505.html";
 
 ConfigServer::ConfigServer():
 	_name(DEFAULT_SERVER_NAME),
@@ -20,8 +23,11 @@ ConfigServer::ConfigServer():
 	_error_page_403(DEFAULT_ERROR_PAGE_403),
 	_error_page_404(DEFAULT_ERROR_PAGE_404),
 	_error_page_405(DEFAULT_ERROR_PAGE_405),
+	_error_page_411(DEFAULT_ERROR_PAGE_411),
 	_error_page_413(DEFAULT_ERROR_PAGE_413),
-	_error_page_500(DEFAULT_ERROR_PAGE_500)
+	_error_page_500(DEFAULT_ERROR_PAGE_500),
+	_error_page_501(DEFAULT_ERROR_PAGE_501),
+	_error_page_505(DEFAULT_ERROR_PAGE_505)
 {
 	this->_routes.push_back(new ConfigRoute());
 }
@@ -36,8 +42,11 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 	this->_error_page_403 = DEFAULT_ERROR_PAGE_403;
 	this->_error_page_404 = DEFAULT_ERROR_PAGE_404;
 	this->_error_page_405 = DEFAULT_ERROR_PAGE_405;
+	this->_error_page_411 = DEFAULT_ERROR_PAGE_411;
 	this->_error_page_413 = DEFAULT_ERROR_PAGE_413;
 	this->_error_page_500 = DEFAULT_ERROR_PAGE_500;
+	this->_error_page_501 = DEFAULT_ERROR_PAGE_501;
+	this->_error_page_505 = DEFAULT_ERROR_PAGE_505;
 
 	// Parse server config
 	std::string line;
@@ -75,17 +84,23 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 		else if (option == "client_max_body_size")
 			this->_client_max_body_size = ConfigHelper::convertStringToClientMaxBodySize(value);
 		else if (option == "error_page_400")
-			this->_error_page_400 = value;
+			this->_error_page_400 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_400, value);
 		else if (option == "error_page_403")
-			this->_error_page_403 = value;
+			this->_error_page_403 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_403, value);
 		else if (option == "error_page_404")
-			this->_error_page_404 = value;
+			this->_error_page_404 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_404, value);
 		else if (option == "error_page_405")
-			this->_error_page_405 = value;
+			this->_error_page_405 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_405, value);
+		else if (option == "error_page_411")
+			this->_error_page_411 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_411, value);
 		else if (option == "error_page_413")
-			this->_error_page_413 = value;
+			this->_error_page_413 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_413, value);
 		else if (option == "error_page_500")
-			this->_error_page_500 = value;
+			this->_error_page_500 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_500, value);
+		else if (option == "error_page_501")
+			this->_error_page_501 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_501, value);
+		else if (option == "error_page_505")
+			this->_error_page_505 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_505, value);
 		else if (option == ";")
 			continue;
 		else
@@ -115,8 +130,11 @@ ConfigServer	&ConfigServer::operator=(ConfigServer const &rhs) {
 		this->_error_page_403 = rhs._error_page_403;
 		this->_error_page_404 = rhs._error_page_404;
 		this->_error_page_405 = rhs._error_page_405;
+		this->_error_page_411 = rhs._error_page_411;
 		this->_error_page_413 = rhs._error_page_413;
 		this->_error_page_500 = rhs._error_page_500;
+		this->_error_page_501 = rhs._error_page_501;
+		this->_error_page_505 = rhs._error_page_505;
 		this->_routes = rhs._routes;
 	}
 	return (*this);
@@ -160,12 +178,24 @@ std::string	ConfigServer::getErrorPage405() const {
 	return this->_error_page_405;
 }
 
+std::string	ConfigServer::getErrorPage411() const {
+	return this->_error_page_411;
+}
+
 std::string	ConfigServer::getErrorPage413() const {
 	return this->_error_page_413;
 }
 
 std::string	ConfigServer::getErrorPage500() const {
 	return this->_error_page_500;
+}
+
+std::string	ConfigServer::getErrorPage501() const {
+	return this->_error_page_501;
+}
+
+std::string	ConfigServer::getErrorPage505() const {
+	return this->_error_page_505;
 }
 
 std::vector<ConfigRoute*>	ConfigServer::getRoutes() const {

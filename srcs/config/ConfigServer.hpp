@@ -6,6 +6,7 @@
 #include <vector>
 #include "ConfigRoute.hpp"
 #include "ConfigExceptions.hpp"
+#include "ConfigHelper.hpp"
 
 class ConfigServer {
     public:
@@ -24,8 +25,11 @@ class ConfigServer {
 		std::string					getErrorPage403() const;
 		std::string					getErrorPage404() const;
 		std::string					getErrorPage405() const;
+		std::string					getErrorPage411() const;
 		std::string					getErrorPage413() const;
 		std::string					getErrorPage500() const;
+		std::string					getErrorPage501() const;
+		std::string					getErrorPage505() const;
         std::vector<ConfigRoute*>	getRoutes() const;
 		ConfigRoute					*getRouteWithUri(const std::string &uri) const;
 
@@ -38,8 +42,11 @@ class ConfigServer {
 		std::string					_error_page_403;
 		std::string					_error_page_404;
 		std::string					_error_page_405;
+		std::string					_error_page_411;
 		std::string					_error_page_413;
 		std::string					_error_page_500;
+		std::string					_error_page_501;
+		std::string					_error_page_505;
         std::vector<ConfigRoute*>	_routes;
 };
 
