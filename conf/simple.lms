@@ -3,6 +3,7 @@ server:
 	host=127.0.0.1
 	port=8080
 	client_max_body_size=5M
+	error_page_404=www/custom_errors_pages/404.html
 
 	route:
 		uri=/form

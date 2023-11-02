@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdlib.h>
+#include <fstream>
 #include "ConfigExceptions.hpp"
 
 class ConfigHelper {
@@ -9,4 +10,5 @@ class ConfigHelper {
 		static int convertStringToPort(std::string const &str);
 		static std::string checkValidPathFolder(std::string const &str);
 		static double convertStringToClientMaxBodySize(std::string const &str);
+		static std::string getValidErrorPage(std::string const &default_path, std::string const &new_path);
 };
