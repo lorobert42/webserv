@@ -66,6 +66,8 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 			}
 			this->_hostnames.push_back(new ConfigHostname(hostnameConfig));
 			continue;
+		} else {
+			this->_hostnames.push_back(new ConfigHostname());
 		}
 
 		std::string option = line.substr(0, line.find_first_of("="));
