@@ -31,6 +31,8 @@ ConfigHostname::ConfigHostname(const std::string &serverConfig) {
 			}
 			this->_routes.push_back(new ConfigRoute(routeConfig));
 			continue;
+		} else {
+			this->_routes.push_back(new ConfigRoute());
 		}
 
 		std::string option = line.substr(0, line.find_first_of("="));
