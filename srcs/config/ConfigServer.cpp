@@ -3,6 +3,7 @@
 const std::string   DEFAULT_SERVER_NAME             = "webserv";
 const int           DEFAULT_PORT                    = 8080;
 const double		DEFAULT_CLIENT_MAX_BODY_SIZE	= 1 * 1024 * 1024;
+const int			DEFAULT_TIMEOUT					= 60;
 const std::string   DEFAULT_ERROR_PAGE_400          = "srcs/config/www/400.html";
 const std::string   DEFAULT_ERROR_PAGE_403          = "srcs/config/www/403.html";
 const std::string   DEFAULT_ERROR_PAGE_404          = "srcs/config/www/404.html";
@@ -17,6 +18,7 @@ ConfigServer::ConfigServer():
 	_name(DEFAULT_SERVER_NAME),
 	_port(DEFAULT_PORT),
 	_client_max_body_size(DEFAULT_CLIENT_MAX_BODY_SIZE),
+	_timeout(DEFAULT_TIMEOUT),
 	_error_page_400(DEFAULT_ERROR_PAGE_400),
 	_error_page_403(DEFAULT_ERROR_PAGE_403),
 	_error_page_404(DEFAULT_ERROR_PAGE_404),
@@ -35,6 +37,7 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 	this->_name = DEFAULT_SERVER_NAME;
 	this->_port = DEFAULT_PORT;
 	this->_client_max_body_size = DEFAULT_CLIENT_MAX_BODY_SIZE;
+	this->_timeout = DEFAULT_TIMEOUT;
 	this->_error_page_400 = DEFAULT_ERROR_PAGE_400;
 	this->_error_page_403 = DEFAULT_ERROR_PAGE_403;
 	this->_error_page_404 = DEFAULT_ERROR_PAGE_404;
@@ -64,8 +67,11 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 			if (line != ";") {
 				throw InvalidCloseDirectiveException(line);
 			}
-			this->_hostnames.push_back(new ConfigHostname(hostnameConfig));
-			continue;
+			if (hostnameConfig.empty()) {
+				this->_hostnames.push_back(new ConfigHostname());
+			} else {
+				this->_hostnames.push_back(new ConfigHostname(hostnameConfig));
+			}
 		}
 
 		std::string option = line.substr(0, line.find_first_of("="));
@@ -78,6 +84,8 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 			this->_port = ConfigHelper::convertStringToPort(value);
 		else if (option == "client_max_body_size")
 			this->_client_max_body_size = ConfigHelper::convertStringToClientMaxBodySize(value);
+		else if (option == "timeout")
+			this->_timeout = ConfigHelper::convertStringToInt(value);
 		else if (option == "error_page_400")
 			this->_error_page_400 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_400, value);
 		else if (option == "error_page_403")
@@ -120,6 +128,7 @@ ConfigServer	&ConfigServer::operator=(ConfigServer const &rhs) {
 		this->_name = rhs._name;
 		this->_port = rhs._port;
 		this->_client_max_body_size = rhs._client_max_body_size;
+		this->_timeout = rhs._timeout;
 		this->_error_page_400 = rhs._error_page_400;
 		this->_error_page_403 = rhs._error_page_403;
 		this->_error_page_404 = rhs._error_page_404;
@@ -150,6 +159,10 @@ std::string	ConfigServer::getPortAsString() const {
 
 double	ConfigServer::getClientMaxBodySize() const {
 	return this->_client_max_body_size;
+}
+
+int	ConfigServer::getTimeout() const {
+	return this->_timeout;
 }
 
 std::string	ConfigServer::getErrorPage400() const {
@@ -234,6 +247,7 @@ std::ostream    &operator<<(std::ostream &o, ConfigServer const &rhs) {
 	o << "name: " << rhs.getName() << std::endl;
 	o << "port: " << rhs.getPort() << std::endl;
 	o << "client_max_body_size: " << rhs.getClientMaxBodySize() << std::endl;
+	o << "timeout: " << rhs.getTimeout() << std::endl;
 	o << "error_page_400: " << rhs.getErrorPage400() << std::endl;
 	o << "error_page_403: " << rhs.getErrorPage403() << std::endl;
 	o << "error_page_404: " << rhs.getErrorPage404() << std::endl;

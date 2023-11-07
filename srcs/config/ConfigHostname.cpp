@@ -29,8 +29,11 @@ ConfigHostname::ConfigHostname(const std::string &serverConfig) {
 			if (line != ";") {
 				throw InvalidCloseDirectiveException(line);
 			}
-			this->_routes.push_back(new ConfigRoute(routeConfig));
-			continue;
+			if (routeConfig.empty()) {
+				this->_routes.push_back(new ConfigRoute());
+			} else {
+				this->_routes.push_back(new ConfigRoute(routeConfig));
+			}
 		}
 
 		std::string option = line.substr(0, line.find_first_of("="));

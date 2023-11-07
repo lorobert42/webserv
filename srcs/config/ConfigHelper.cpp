@@ -57,3 +57,11 @@ std::string ConfigHelper::getValidErrorPage(std::string const &default_path, std
 	}
 	return new_path;
 }
+
+int	ConfigHelper::convertStringToInt(std::string const &str) {
+for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
+		if (!std::isdigit(*it))
+			throw InvalidOptionValueException(str);
+	}
+	return std::atoi(str.c_str());
+}

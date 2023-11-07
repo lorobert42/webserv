@@ -34,7 +34,11 @@ Config::Config(const char *configPath) {
 			if (line != ";") {
 				throw InvalidCloseDirectiveException(line);
 			}
-			this->_servers.push_back(new ConfigServer(serverConfig));
+			if (serverConfig.empty()) {
+				this->_servers.push_back(new ConfigServer());
+			} else {
+				this->_servers.push_back(new ConfigServer(serverConfig));
+			}
 		}
 	}
 
