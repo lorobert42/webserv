@@ -177,6 +177,7 @@ bool	ServerManager::_handleWrite(int fd)
 	{
 		if (!_epollCtlMod(_epfd, fd, EPOLLIN))
 			return (false);
+		client->_clear();
 		return (true);
 	}
 	else if (res == -1)

@@ -90,52 +90,32 @@ int	Client::readHandler(void)
 
 	int read = recv(_socket, buffer, D_BUFF_SIZE, MSG_DONTWAIT);
 	if (read < 0)
-		throw std::runtime_error("[READ] : Error");
+		return (ERROR);
 	else if (read == 0)
 	{
 		std::cout << "Nothing to read, client quit" << std::endl;
-		return (-1);
+		return (ERROR);
 	}
 	if (read != 0)
 	{
 		_request->appendRawRequest(buffer, read);
 		_nb_read++;
 	}
-	if (!_headerOk && _request->getRawRequest().rfind("\r\n\r\n") != std::string::npos)
+	if (!_headerOk)
 	{
-		if (_request->parseHeader() == false)
-		{
-			std::cerr << "Error parsing header" << std::endl;
-			return (0);
-		}
+		int res = _request->parseHeader();
+		if (res != OK)
+			return (res);
 		_headerOk = true;
 		if (_request->getMethod() != "POST")
-			return (0);
+			return (OK);
 	}
 	if (_headerOk && _request->getMethod() == "POST")
 	{
 		std::cout << "Should check body" << std::endl;
-		if (_nb_read > 1)
-		{
-			std::cout << "Second time coming, should add buffer to body" << std::endl;
-			// std::cout << "buffer to add:\n" << buffer << std::endl;
-			_request->appendBody(buffer, read);
-		}
-		int check = _request->checkBody();
-		std::cout << "Check result: " << check << std::endl;
-		switch (check)
-		{
-			case ERROR:
-				return (0);
-				break;
-			case TOO_SHORT:
-				return (1);
-				break;
-		}
-		std::cout << "End of request" << std::endl;
-		return (0);
+		return (_request->checkBody());
 	}
-	return (1);
+	return (TOO_SHORT);
 }
 
 static std::string	readFile(std::string path_with_index)
@@ -147,7 +127,7 @@ static std::string	readFile(std::string path_with_index)
 	if (!ifs)
 	{
 		std::cout << "file cannot be read: " << path_with_index << std::endl;
-		//TODO better error handling
+		//TODO: better error handling
 		return ("");
 	}
 	while (std::getline(ifs, line))
@@ -187,11 +167,7 @@ int	Client::writeHandler(void)
 		return (1);
 	if (_should_close == true)
 		return (-1);
-	else
-	{
-		_clear();
-		return (0);
-	}
+	return (0);
 }
 
 //	### Member Function [PRIVATE]
