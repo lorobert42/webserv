@@ -68,7 +68,6 @@ Request& Request::operator=(Request const& other)
 int	Request::parseHeader()
 {
 	// Get all the Request 
-	// TODO: if uri is in absolute form, replace Host with the host of the uri
 	if (_rawRequest.rfind("\r\n\r\n") == std::string::npos)
 		return (TOO_SHORT);
 	std::string	read = _getline(_rawRequest);
