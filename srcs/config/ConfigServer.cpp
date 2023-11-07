@@ -64,10 +64,11 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 			if (line != ";") {
 				throw InvalidCloseDirectiveException(line);
 			}
-			this->_hostnames.push_back(new ConfigHostname(hostnameConfig));
-			continue;
-		} else {
-			this->_hostnames.push_back(new ConfigHostname());
+			if (hostnameConfig.empty()) {
+				this->_hostnames.push_back(new ConfigHostname());
+			} else {
+				this->_hostnames.push_back(new ConfigHostname(hostnameConfig));
+			}
 		}
 
 		std::string option = line.substr(0, line.find_first_of("="));
