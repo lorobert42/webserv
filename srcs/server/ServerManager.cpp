@@ -119,7 +119,7 @@ void ServerManager::_run()
 				t_timeout	timeout;
 				if (_isTimeoutOK(&timeout, it->first) == -1)
 					continue ;
-				std::cout << difftime(timeout.now,it->second) << std::endl;
+//				std::cout << difftime(timeout.now,it->second) << std::endl;
 				if (difftime(timeout.now, it->second) > timeout.server->getTimeout())
 				{
 					std::cout << "closing client [" << it->first << "] due to a timeout." << std::endl;
