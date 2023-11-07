@@ -1,5 +1,4 @@
-/*
- * ************************************************************************** */
+/* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
@@ -104,8 +103,10 @@ int	Client::readHandler(void)
 	if (!_headerOk)
 	{
 		int res = _request->parseHeader();
-		if (res != OK)
-			return (res);
+		if (res == TOO_SHORT)
+			return (TOO_SHORT);
+		else if (res == ERROR)
+			return (OK);
 		_headerOk = true;
 		if (_request->getMethod() != "POST")
 			return (OK);
