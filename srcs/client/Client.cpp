@@ -222,13 +222,9 @@ void	Client::_createRespond(void)
 	if (code_error == E_SUCCESS)
 		_header = _fileFound();
 	else if (code_error == E_ACCESS)
-	{
 		_createErrorResponse(403);
-	}
 	else
-	{
 		_createErrorResponse(404);
-	}
 	if (_body.size() == 0)
 		_body = readFile(_path);
 }
@@ -280,34 +276,34 @@ void	Client::_createErrorResponse(int status)
 	switch (status)
 	{
 		case 400:
-			_header.append("400 Bad Request\n");
+			_header.append("400 Bad Request\r\n");
 			break;
 		case 403:
-			_header.append("403 Forbidden\n");
+			_header.append("403 Forbidden\r\n");
 			break;
 		case 404:
-			_header.append("404 Not Found\n");
+			_header.append("404 Not Found\r\n");
 			break;
 		case 405:
-			_header.append("405 Method Not Allowed\n");
+			_header.append("405 Method Not Allowed\r\n");
 			break;
 		case 411:
-			_header.append("411 Length Required\n");
+			_header.append("411 Length Required\r\n");
 			break;
 		case 413:
-			_header.append("413 Content Too Large\n");
+			_header.append("413 Content Too Large\r\n");
 			break;
 		case 501:
-			_header.append("501 Not Implemented\n");
+			_header.append("501 Not Implemented\r\n");
 			break;
 		case 505:
-			_header.append("505 HTTP Version Not Supported\n");
+			_header.append("505 HTTP Version Not Supported\r\n");
 			break;
 		default:
-			_header.append("500 Internal Server Error\n");
+			_header.append("500 Internal Server Error\r\n");
 			break;
 	}
-	_header.append("Content-Type: text/html\nContent-Length: ");
+	_header.append("Content-Type: text/html\r\nContent-Length: ");
 	_body = readFile(_config_server->getErrorPageByCode(status));
 	_error = true;
 	_should_close = true;

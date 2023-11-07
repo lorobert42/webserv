@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/02 15:57:51 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/07 13:05:59 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -111,13 +111,40 @@ void ServerManager::_run()
 			std::cerr << "Epoll wait error: " << strerror(errno) << std::endl;
 			break;
 		}
-
+		if (nfds == 0)
+		{
+			for (std::map<int, time_t>::iterator it = _timeout.begin();
+					it != _timeout.end(); it++)
+			{
+				t_timeout	timeout;
+				if (_isTimeoutOK(&timeout, it->first) == -1)
+					continue ;
+				std::cout << difftime(timeout.now,it->second) << std::endl;
+				if (difftime(timeout.now, it->second) > timeout.server->getTimeout())
+				{
+					std::cout << "closing client [" << it->first << "] due to a timeout." << std::endl;
+					_closeClient(it->first);
+				}
+			}
+		}
 		for (int n = 0; n < nfds; ++n)
 		{
+			std::map<int, time_t>::iterator it = _timeout.find(events[n].data.fd);
+			if (it != _timeout.end())
+			{
+				time_t	now;
+				time(&now);
+				it->second = now;
+			}
+
 			if (_isServerSocket(events[n].data.fd))
 			{
+				int socket;
 				std::cout << "[Received new connection]" << std::endl;
-				_newClient(events[n].data.fd); // create client
+				socket = _newClient(events[n].data.fd); // create client
+				time_t	start;
+				time(&start);
+				_timeout.insert(std::pair<int, time_t>(socket, start));
 			}
 			else if (events[n].events & EPOLLIN)
 			{
@@ -190,8 +217,10 @@ bool	ServerManager::_handleWrite(int fd)
 }
 
 // ### Client management ###
-void ServerManager::_newClient(int server_socket)
+int	ServerManager::_newClient(int server_socket)
 {
+	//TODO Chekc it error send the right value
+
 	int client_socket;
 	struct sockaddr_in client_addr;
 	socklen_t client_len = sizeof(client_addr);
@@ -201,21 +230,22 @@ void ServerManager::_newClient(int server_socket)
 	if (client_socket == -1)
 	{
 		std::cerr << "Cannot accept client connection: " << strerror(errno) << std::endl;
-		return;
+		return -1;
 	}
 	Server	*server = _getServerBySocket(server_socket);
 	if (!server)
 	{
 		close(client_socket);
-		return;
+		return -1;
 	}
 	if (!_epollCtlAdd(_epfd, client_socket, EPOLLIN))
 	{
 		close(client_socket);
-		return;
+		return -1;
 	}
 	new_client = new Client(server->getConfig(), client_socket);
 	_clients[client_socket] = new_client;
+	return (client_socket);
 }
 
 Client* ServerManager::_getClientBySocket(int socket)
@@ -238,6 +268,7 @@ void	ServerManager::_closeClient(int socket)
 	delete client;
 	close(socket);
 	_clients.erase(socket);
+	_timeout.erase(socket);
 }
 
 void	ServerManager::_closeAllClients()
@@ -266,6 +297,19 @@ Server* ServerManager::_getServerBySocket(int socket)
 		return NULL;
 	}
 	return (search->second);
+}
+
+int	ServerManager::_isTimeoutOK(t_timeout *timeout, int socket)
+{
+	Client	*client = _getClientBySocket(socket);
+	if (client == NULL)
+		return (-1);
+	ConfigServer *server= client->getConfigServer();
+	if (server == NULL)
+		return (-1);
+	timeout->server = server;
+	time(&timeout->now);
+	return (0);
 }
 
 // ### Epoll management ###
