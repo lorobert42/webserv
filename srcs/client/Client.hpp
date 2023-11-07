@@ -64,6 +64,7 @@ class Client
 
 		int				readHandler(void);
 		int 			writeHandler(void);
+		void			_clear();
 
 	private:
 		ConfigServer	*_config_server;
@@ -93,7 +94,6 @@ class Client
 		void			_createErrorResponse(int status);
 		void			_parseRoute(const std::string &uri);
 		std::string		_calculatePathFromUri(const std::string &uri);
-		void			_clear();
 
 		Client(void);
 };

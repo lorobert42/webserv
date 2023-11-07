@@ -65,21 +65,24 @@ Request& Request::operator=(Request const& other)
 
 //	### Member Function [PUBLIC] ###
 // ### Header parser
-bool	Request::parseHeader()
+int	Request::parseHeader()
 {
 	// Get all the Request 
 	// TODO: if uri is in absolute form, replace Host with the host of the uri
+	if (_rawRequest.rfind("\r\n\r\n") == std::string::npos)
+		return (TOO_SHORT);
 	std::string	read = _getline(_rawRequest);
 	if (_parseFirstLine(read) == false)
-		return (false);
+		return (ERROR);
 
 	if (_parseFields() == false)
-		return (false);
+		return (ERROR);
 
 	_body = _rawRequest;
+	_rawRequest = "";
 
 	_printRequest();
-	return (true);
+	return (OK);
 }
 
 bool	Request::_parseFirstLine(std::string& line)
@@ -164,6 +167,11 @@ bool	Request::_parseFields()
 
 int	Request::checkBody()
 {
+	if (_rawRequest.length() != 0)
+	{
+		_body += _rawRequest;
+		_rawRequest = "";
+	}
 	std::string	content_length = getValue("Content-Length");
 	std::string transfer_encoding = getValue("Transfer-Encoding");
 	if (content_length != "" && transfer_encoding != "")

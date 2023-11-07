@@ -13,9 +13,11 @@
 #include <stdexcept>
 #include "../utils/strtolower.hpp"
 
-#define OK 1
-#define TOO_SHORT 2
-#define ERROR 3
+enum {
+	ERROR = -1,
+	OK = 0,
+	TOO_SHORT = 1,
+};
 
 class Request
 {
@@ -26,7 +28,7 @@ class Request
 		Request &operator=(Request const &other);
 		~Request(void);
 
-		bool	parseHeader();
+		int	parseHeader();
 		int	checkBody();
 		void	clear();
 		void	appendRawRequest(char* to_add, int size);
