@@ -72,6 +72,8 @@ option=value
   - Default: `8080`
 - `client_max_body_size`: The maximum size of the body of a request. You can use the suffixes `K`, `M` and `G` to specify the size in kilobytes, megabytes and gigabytes.
   - Default: `1M`
+- `timeout`: The timeout of the server in seconds.
+  - Default: `60`
 - `error_page_400`: Set the path to the 400 error page.
   - Default: `srcs/config/www/400.html`
 - `error_page_403`: Set the path to the 403 error page.
