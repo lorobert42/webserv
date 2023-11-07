@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/07 11:23:58 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/07 13:05:59 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,12 +113,14 @@ void ServerManager::_run()
 		}
 		if (nfds == 0)
 		{
-			for (std::map<int, clock_t>::iterator it = _timeout.begin();
+			for (std::map<int, time_t>::iterator it = _timeout.begin();
 					it != _timeout.end(); it++)
 			{
-				clock_t	now = clock();
-				std::cout << "[" << (double) now / D_PER_SEC << "]" << std::endl;
-				if ((now - it->second) / D_PER_SEC > D_TIMEOUT_CLIENT)
+				t_timeout	timeout;
+				if (_isTimeoutOK(&timeout, it->first) == -1)
+					continue ;
+				std::cout << difftime(timeout.now,it->second) << std::endl;
+				if (difftime(timeout.now, it->second) > timeout.server->getTimeout())
 				{
 					std::cout << "closing client [" << it->first << "] due to a timeout." << std::endl;
 					_closeClient(it->first);
@@ -127,16 +129,22 @@ void ServerManager::_run()
 		}
 		for (int n = 0; n < nfds; ++n)
 		{
-			std::map<int, clock_t>::iterator it = _timeout.find(events[n].data.fd);
+			std::map<int, time_t>::iterator it = _timeout.find(events[n].data.fd);
 			if (it != _timeout.end())
-				it->second = clock();
+			{
+				time_t	now;
+				time(&now);
+				it->second = now;
+			}
 
 			if (_isServerSocket(events[n].data.fd))
 			{
 				int socket;
 				std::cout << "[Received new connection]" << std::endl;
 				socket = _newClient(events[n].data.fd); // create client
-				_timeout.insert(std::pair<int, clock_t>(socket, clock()));
+				time_t	start;
+				time(&start);
+				_timeout.insert(std::pair<int, time_t>(socket, start));
 			}
 			else if (events[n].events & EPOLLIN)
 			{
@@ -289,6 +297,19 @@ Server* ServerManager::_getServerBySocket(int socket)
 		return NULL;
 	}
 	return (search->second);
+}
+
+int	ServerManager::_isTimeoutOK(t_timeout *timeout, int socket)
+{
+	Client	*client = _getClientBySocket(socket);
+	if (client == NULL)
+		return (-1);
+	ConfigServer *server= client->getConfigServer();
+	if (server == NULL)
+		return (-1);
+	timeout->server = server;
+	time(&timeout->now);
+	return (0);
 }
 
 // ### Epoll management ###

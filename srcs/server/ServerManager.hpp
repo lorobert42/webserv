@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:19:14 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/07 11:21:08 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/07 13:05:23 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,8 +27,12 @@
 
 #define D_MAX_EVENTS 10050
 #define D_TIMEOUT 200
-#define D_PER_SEC 600
-#define D_TIMEOUT_CLIENT 10 // ~ 650 for one seconde so 3000 is aprox 5 sec
+#define D_TIMEOUT_REQUEST 60
+
+typedef	struct s_timeout {
+	ConfigServer	*server;
+	time_t			now;
+}	t_timeout;
 
 class ServerManager {
 
@@ -45,7 +49,7 @@ class ServerManager {
 		int						_epfd;
 		std::map<int, Server*> 	_servers;
 		std::map<int, Client*>	_clients;
-		std::map<int, clock_t>	_timeout;
+		std::map<int, time_t>	_timeout;
 
 		// Initialization
 		void	_setupServers();
@@ -63,6 +67,7 @@ class ServerManager {
 		// Servers management
 		bool	_isServerSocket(int socket) const;
 		Server*	_getServerBySocket(int socket);
+		int		_isTimeoutOK(t_timeout *timeout, int socket);
 		// Epoll management
 		bool	_epollCtlAdd(int epfd, int fd, uint32_t events);
 		bool	_epollCtlMod(int epfd, int fd, uint32_t events);
