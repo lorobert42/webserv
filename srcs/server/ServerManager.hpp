@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:19:14 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/03 13:50:17 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/07 11:21:08 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,8 @@
 
 #define D_MAX_EVENTS 10050
 #define D_TIMEOUT 200
-#define D_TIMEOUT_CLIENT 3000 // ~ 650 for one seconde so 3000 is aprox 5 sec
+#define D_PER_SEC 600
+#define D_TIMEOUT_CLIENT 10 // ~ 650 for one seconde so 3000 is aprox 5 sec
 
 class ServerManager {
 

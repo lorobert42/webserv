@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/03 13:49:07 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/07 11:23:58 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -113,13 +113,14 @@ void ServerManager::_run()
 		}
 		if (nfds == 0)
 		{
-			for (std::map<int, clock_t>::const_iterator it = _timeout.begin();
+			for (std::map<int, clock_t>::iterator it = _timeout.begin();
 					it != _timeout.end(); it++)
 			{
 				clock_t	now = clock();
-				if (now - it->second > D_TIMEOUT_CLIENT)
+				std::cout << "[" << (double) now / D_PER_SEC << "]" << std::endl;
+				if ((now - it->second) / D_PER_SEC > D_TIMEOUT_CLIENT)
 				{
-					std::cout << "closing client [" << it->first << "] due to a timeout" << std::endl;
+					std::cout << "closing client [" << it->first << "] due to a timeout." << std::endl;
 					_closeClient(it->first);
 				}
 			}
