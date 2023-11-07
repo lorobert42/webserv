@@ -70,7 +70,7 @@ option=value
   - Default: `webserv`
 - `port`: The port of the server.
   - Default: `8080`
-- `client_max_body_size`: The maximum size of the body of a request. You can use the suffixes `K`, `M` and `G` to specify the size in kilobytes, megabytes and gigabytes.
+- `client_max_body_size`: The maximum size of the body of a request. You can use the suffixes `B`, `K`, `M` and `G` to specify the size in bytes, kilobytes, megabytes and gigabytes.
   - Default: `1M`
 - `timeout`: The timeout of the server in seconds.
   - Default: `60`

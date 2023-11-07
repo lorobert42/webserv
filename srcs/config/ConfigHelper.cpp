@@ -37,16 +37,15 @@ double ConfigHelper::convertStringToClientMaxBodySize(std::string const &str) {
 
 	double size = std::atof(value.c_str());
 
-	if (unit == "K")
-		size *= 1024;
+	if (unit == "B")
+		return size;
+	else if (unit == "K")
+		return size * 1024;
 	else if (unit == "M")
-		size *= 1024 * 1024;
+		return size * 1024 * 1024;
 	else if (unit == "G")
-		size *= 1024 * 1024 * 1024;
-	else
-		throw InvalidOptionValueException(str);
-
-	return size;
+		return size * 1024 * 1024 * 1024;
+	throw InvalidOptionValueException(str);
 }
 
 std::string ConfigHelper::getValidErrorPage(std::string const &default_path, std::string const &new_path) {
