@@ -8,6 +8,7 @@ SRCS		= srcs/main.cpp \
 			srcs/client/Client.cpp \
 			srcs/client/ClientHelper.cpp \
 			srcs/client/Request.cpp \
+			srcs/client/Response.cpp \
 			srcs/config/Config.cpp \
 			srcs/config/ConfigServer.cpp \
 			srcs/config/ConfigHostname.cpp \
@@ -16,6 +17,7 @@ SRCS		= srcs/main.cpp \
 			srcs/cgi/CgiHandler.cpp \
 			srcs/autoindex/AutoIndex.cpp \
 			srcs/utils/strtolower.cpp \
+			srcs/utils/readFile.cpp \
 
 SRCS_TEST	= srcs/epoll_serv.cpp
 
