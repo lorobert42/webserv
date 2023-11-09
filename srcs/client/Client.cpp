@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/11/09 13:53:40 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/09 15:40:39 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -127,6 +127,7 @@ int	Client::writeHandler(void)
 	{
 		_response->createResponse();
 		_server_message = _response->getHeader() + _response->getBody();
+		std::cout << "Response to send:\n" << _server_message << std::endl;
 	}
 	_responseOK = true;
 
@@ -135,19 +136,22 @@ int	Client::writeHandler(void)
 	buffer.assign(_server_message, _total_bytes_send, _total_bytes_send + D_BUFF_SIZE);
 	bytes_send = send(_socket, buffer.c_str(), buffer.size(), 0); 
 	if (bytes_send < 0)
-		return (-1);
+		return (ERROR);
 	_total_bytes_send += bytes_send;
 	if (_total_bytes_send < static_cast<int>(_server_message.size()))
-		return (1);
+		return (TOO_SHORT);
 	if (_response->shouldClose())
-		return (-1);
-	return (0);
+		return (ERROR);
+	return (OK);
 }
 
 //	### Member Function [PRIVATE]
 void	Client::_clear()
 {
-	_request->clear();
+	delete _request;
+	_request = new Request(_config_server->getClientMaxBodySize());
+	delete _response;
+	_response = new Response(_config_server, _request);
 	_read = "";
 	_nb_read = 0;
 	_total_bytes_send = 0;
