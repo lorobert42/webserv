@@ -6,15 +6,15 @@
 #include <cstring>
 #include <sys/wait.h>
 #include <sys/types.h>
-#include "../client/Client.hpp"
+#include "../client/Response.hpp"
 #include "../client/Request.hpp"
 
-class Client;
+class Response;
 
 class CgiHandler
 {
 	public:
-		CgiHandler(Client  *client);
+		CgiHandler(Response  *response);
 		CgiHandler(CgiHandler const &src);
 		~CgiHandler();
 
@@ -26,6 +26,6 @@ class CgiHandler
 		CgiHandler();
 		char**								_getEnv();
 		std::map<std::string, std::string>	_env;
-		Client								*_client;
+		Response*								_response;
 		std::string							_bodyContent;
 };

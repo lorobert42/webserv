@@ -2,41 +2,41 @@
 
 CgiHandler::CgiHandler() {}
 
-CgiHandler::CgiHandler(Client *client) : _client(client), _bodyContent(client->getRequest()->getBody()) {
+CgiHandler::CgiHandler(Response *response) : _response(response), _bodyContent(_response->getRequest()->getBody()) {
 
 	// Set environment variables dedicated for the server
 	this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
-	this->_env["SERVER_NAME"] = client->getConfigServer()->getName();
+	this->_env["SERVER_NAME"] = response->getConfigServer()->getName();
 	this->_env["GATEWAY_INTERFACE"] = "CGI/1.1";
 
 	// TODO: Set environment variables dedicated for the request
-	this->_env["SERVER_PROTOCOL"] = client->getRequest()->getVersion();
-	this->_env["SERVER_PORT"] = client->getConfigServer()->getPortAsString();
-	this->_env["REQUEST_METHOD"] = client->getRequest()->getMethod();
+	this->_env["SERVER_PROTOCOL"] = response->getRequest()->getVersion();
+	this->_env["SERVER_PORT"] = response->getConfigServer()->getPortAsString();
+	this->_env["REQUEST_METHOD"] = response->getRequest()->getMethod();
 	this->_env["REMOTE_HOST"] = ""; // TODO: Get the hostname of the client
 	this->_env["REMOTE_ADDR"] = ""; // TODO: Get the IP address of the client
-	this->_env["AUTH_TYPE"] = client->getRequest()->getValue("Authorization");
-	this->_env["REMOTE_USER"] = client->getRequest()->getValue("Authorization");
-	this->_env["REMOTE_IDENT"] = client->getRequest()->getValue("Authorization");
-	this->_env["CONTENT_TYPE"] = client->getRequest()->getValue("Content-Type");
-	this->_env["CONTENT_LENGTH"] = client->getRequest()->getValue("Content-Length");
-	this->_env["HTTP_X_FILENAME"] = client->getRequest()->getValue("X-Filename");
+	this->_env["AUTH_TYPE"] = response->getRequest()->getValue("Authorization");
+	this->_env["REMOTE_USER"] = response->getRequest()->getValue("Authorization");
+	this->_env["REMOTE_IDENT"] = response->getRequest()->getValue("Authorization");
+	this->_env["CONTENT_TYPE"] = response->getRequest()->getValue("Content-Type");
+	this->_env["CONTENT_LENGTH"] = response->getRequest()->getValue("Content-Length");
+	this->_env["HTTP_X_FILENAME"] = response->getRequest()->getValue("X-Filename");
 
-	// Set environment variables from the client
-	this->_env["HTTP_ACCEPT"] = client->getRequest()->getValue("Accept");
-	this->_env["HTTP_ACCEPT_CHARSET"] = client->getRequest()->getValue("Accept-Charset");
-	this->_env["HTTP_ACCEPT_ENCODING"] = client->getRequest()->getValue("Accept-Encoding");
-	this->_env["HTTP_ACCEPT_LANGUAGE"] = client->getRequest()->getValue("Accept-Language");
-	this->_env["HTTP_CONNECTION"] = client->getRequest()->getValue("Connection");
-	this->_env["HTTP_HOST"] = client->getRequest()->getValue("Host");
-	this->_env["HTTP_REFERER"] = client->getRequest()->getValue("Referer");
-	this->_env["HTTP_USER_AGENT"] = client->getRequest()->getValue("User-Agent");
-	this->_env["HTTP_COOKIE"] = client->getRequest()->getValue("Cookie");
+	// Set environment variables from the response
+	this->_env["HTTP_ACCEPT"] = response->getRequest()->getValue("Accept");
+	this->_env["HTTP_ACCEPT_CHARSET"] = response->getRequest()->getValue("Accept-Charset");
+	this->_env["HTTP_ACCEPT_ENCODING"] = response->getRequest()->getValue("Accept-Encoding");
+	this->_env["HTTP_ACCEPT_LANGUAGE"] = response->getRequest()->getValue("Accept-Language");
+	this->_env["HTTP_CONNECTION"] = response->getRequest()->getValue("Connection");
+	this->_env["HTTP_HOST"] = response->getRequest()->getValue("Host");
+	this->_env["HTTP_REFERER"] = response->getRequest()->getValue("Referer");
+	this->_env["HTTP_USER_AGENT"] = response->getRequest()->getValue("User-Agent");
+	this->_env["HTTP_COOKIE"] = response->getRequest()->getValue("Cookie");
 
 	// Set environment variables dedicated for PHP
 	this->_env["REDIRECT_STATUS"] = "200";
-	this->_env["SCRIPT_FILENAME"] = client->getConfigRoute()->getCgiScript();
-	this->_env["SCRIPT_CGI"] = client->getConfigRoute()->getCgiBin();
+	this->_env["SCRIPT_FILENAME"] = response->getConfigRoute()->getCgiScript();
+	this->_env["SCRIPT_CGI"] = response->getConfigRoute()->getCgiBin();
 }
 
 CgiHandler::CgiHandler(CgiHandler const &src) {
@@ -50,7 +50,7 @@ CgiHandler   	&CgiHandler::operator=(CgiHandler const &rhs)
 	if (this != &rhs)
 	{
 		this->_env = rhs._env;
-		this->_client = rhs._client;
+		this->_response = rhs._response;
 		this->_bodyContent = rhs._bodyContent;
 	}
 	return (*this);
