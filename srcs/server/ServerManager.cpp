@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/10 16:32:13 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/10 16:42:07 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,8 +45,8 @@ ServerManager& ServerManager::operator=(ServerManager const& other)
 	_config = other._config;
 	_epfd = other._epfd;
 	_servers = other._servers;
-	_clients = other.clients;
-	_timeout = other.timeout;
+	_clients = other._clients;
+	_timeout = other._timeout;
 	return (*this);
 }
 
