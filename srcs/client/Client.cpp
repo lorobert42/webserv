@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/11/09 15:40:39 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/10 13:37:47 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ Client::Client(ConfigServer *config, int &client_socket) :
 	_total_bytes_send(0),
 	_headerOk(false),
 	_responseOK(false),
+	_CGI_on(false),
 	_error(false)
 {
 	_request = new Request(config->getClientMaxBodySize());
@@ -32,15 +33,10 @@ Client::Client(ConfigServer *config, int &client_socket) :
 }
 
 // ### Copy Constructor ###
-Client::Client(Client const& other) :
-	_config_server(other._config_server),
-	_socket(other._socket), 
-	_nb_read(other._nb_read),
-	_total_bytes_send(other._total_bytes_send),
-	_headerOk(other._headerOk),
-	_responseOK(other._responseOK),
-	_error(other._error)
-{}
+Client::Client(Client const& other) 
+{
+	*this = other;
+}
 
 // ### Destructor ###
 Client::~Client()
@@ -54,10 +50,18 @@ Client& Client::operator=(Client const& other)
 {
 	if (this == &other)
 		return (*this);
-	this->_config_server = other._config_server;
-	this->_socket = other._socket;
-	_headerOk = other._headerOk;
+	_config_server = other._config_server;
+	_request = other._request;
+	_response = other._response;
+
+	_socket = other._socket;
+	_read = other._read;
+	_server_message = _server_message;
 	_nb_read = other._nb_read;
+	_total_bytes_send = other._total_bytes_send;
+	_headerOk = other._headerOk;
+	_responseOK = other._responseOK;
+	_CGI_on = other._CGI_on;
 	_error = other._error;
 	return (*this);
 }
@@ -138,7 +142,7 @@ int	Client::writeHandler(void)
 	if (bytes_send < 0)
 		return (ERROR);
 	_total_bytes_send += bytes_send;
-	if (_total_bytes_send < static_cast<int>(_server_message.size()))
+	if (_total_bytes_send <static_cast<int>(_server_message.size()))
 		return (TOO_SHORT);
 	if (_response->shouldClose())
 		return (ERROR);
@@ -153,11 +157,11 @@ void	Client::_clear()
 	delete _response;
 	_response = new Response(_config_server, _request);
 	_read = "";
+	_server_message = "";
 	_nb_read = 0;
 	_total_bytes_send = 0;
 	_headerOk = false;
 	_responseOK = false;
 	_CGI_on = false;
 	_error = false;
-	_server_message = "";
 }

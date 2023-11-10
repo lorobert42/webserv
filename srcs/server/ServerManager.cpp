@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/07 13:05:59 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/10 16:32:13 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,9 +23,10 @@ ServerManager::ServerManager(Config* config) :
 {}
 
 // ### Copy Constructor ###
-ServerManager::ServerManager(ServerManager const& other) :
-	_config(other._config)
-{}
+ServerManager::ServerManager(ServerManager const& other)
+{
+	*this = other;
+}
 
 // ### Destructor ###
 ServerManager::~ServerManager()
@@ -42,6 +43,10 @@ ServerManager& ServerManager::operator=(ServerManager const& other)
 	if (this == &other)
 		return (*this);
 	_config = other._config;
+	_epfd = other._epfd;
+	_servers = other._servers;
+	_clients = other.clients;
+	_timeout = other.timeout;
 	return (*this);
 }
 
@@ -119,7 +124,7 @@ void ServerManager::_run()
 				t_timeout	timeout;
 				if (_isTimeoutOK(&timeout, it->first) == -1)
 					continue ;
-//				std::cout << difftime(timeout.now,it->second) << std::endl;
+				// std::cout << difftime(timeout.now,it->second) << std::endl;
 				if (difftime(timeout.now, it->second) > timeout.server->getTimeout())
 				{
 					std::cout << "closing client [" << it->first << "] due to a timeout." << std::endl;
@@ -219,8 +224,6 @@ bool	ServerManager::_handleWrite(int fd)
 // ### Client management ###
 int	ServerManager::_newClient(int server_socket)
 {
-	//TODO Chekc it error send the right value
-
 	int client_socket;
 	struct sockaddr_in client_addr;
 	socklen_t client_len = sizeof(client_addr);
