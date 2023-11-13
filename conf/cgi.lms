@@ -30,7 +30,7 @@ server:
 		;
 		route:
 			uri=/upload
-			get=true
+			get=false
 			post=true
 			cgi_script=www/cgi/upload.cgi.php
 			cgi_bin=/usr/bin/php-cgi

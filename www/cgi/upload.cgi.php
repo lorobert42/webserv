@@ -2,8 +2,24 @@
 	ini_set('display_errors', 1);
     ini_set('display_startup_errors', 1);
     error_reporting(E_ALL);
+    $UPLOAD_DIR = "upload/";
 
-	ob_start();
+    ob_start();
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+        // File upload handling
+        if (isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
+            $targetFile = $UPLOAD_DIR . basename($_FILES['file']['name']);
+
+            // Move the uploaded file to the target directory
+            if (move_uploaded_file($_FILES['file']['tmp_name'], $targetFile)) {
+                $upload_message = "File successfully uploaded!";
+            } else {
+                $upload_message = "There was an error uploading the file, please try again!";
+            }
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,7 +29,8 @@
     <title>HTML Forms</title>
 </head>
 <body>
-	<h1>File successfully uploaded</h1>
+	<h1><?php echo $upload_message; ?></h1>
+	<button onclick="window.location.href = '/';">Home</button>
 </body>
 </html>
 <?php
