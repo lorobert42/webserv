@@ -179,21 +179,29 @@ bool	Response::_checkCgi()
 		return (false);
 	CgiHandler cgi(this);
 
-	_body = cgi.executeCgi();
-	_header = "HTTP/1.1 ";
-	switch (cgi.getStatusCode()) {
-		case 200:
-			_header.append("200 OK\r\n");
-			break;
-		case 201:
-			_header.append("201 Created\r\n");
-			break;
-		case 508:
-			_createErrorResponse(508);
-			break;
-		default:
-			_header.append("500 Internal Server Error\r\n");
-			break;
+	// Get extension of cgi script
+	std::string extension = _route->getCgiScript().substr(_route->getCgiScript().find_last_of(".") + 1);
+
+	if (extension == "py") {
+		_body = cgi.executeCgi();
+	}
+	else if (extension == "php") {
+		_body = cgi.executeCgi();
+		_header = "HTTP/1.1 ";
+		switch (cgi.getStatusCode()) {
+			case 200:
+				_header.append("200 OK\r\n");
+				break;
+			case 201:
+				_header.append("201 Created\r\n");
+				break;
+			case 508:
+				_createErrorResponse(508);
+				break;
+			default:
+				_header.append("500 Internal Server Error\r\n");
+				break;
+		}
 	}
 	return (true);
 }
