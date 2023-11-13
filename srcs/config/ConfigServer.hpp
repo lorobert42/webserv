@@ -31,6 +31,7 @@ class ConfigServer {
 		std::string						getErrorPage500() const;
 		std::string						getErrorPage501() const;
 		std::string						getErrorPage505() const;
+		std::string						getErrorPage508() const;
         std::vector<ConfigHostname*>	getHostnames() const;
 		ConfigHostname					*getHostnameWithName(const std::string &name) const;
 
@@ -48,6 +49,7 @@ class ConfigServer {
 		std::string						_error_page_500;
 		std::string						_error_page_501;
 		std::string						_error_page_505;
+		std::string 					_error_page_508;
         std::vector<ConfigHostname*>	_hostnames;
 };
 

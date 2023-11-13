@@ -92,6 +92,8 @@ option=value
   - Default: `srcs/config/www/501.html`
 - `error_page_505`: Set the path to the 505 error page.
   - Default: `srcs/config/www/505.html`
+- `error_page_508`: Set the path to the 508 error page.
+  - Default: `srcs/config/www/508.html`
 
 ### Hostname
 

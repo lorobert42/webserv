@@ -13,6 +13,7 @@ const std::string   DEFAULT_ERROR_PAGE_413          = "srcs/config/www/413.html"
 const std::string   DEFAULT_ERROR_PAGE_500          = "srcs/config/www/500.html";
 const std::string   DEFAULT_ERROR_PAGE_501          = "srcs/config/www/501.html";
 const std::string   DEFAULT_ERROR_PAGE_505          = "srcs/config/www/505.html";
+const std::string   DEFAULT_ERROR_PAGE_508			= "srcs/config/www/508.html";
 
 ConfigServer::ConfigServer():
 	_name(DEFAULT_SERVER_NAME),
@@ -27,7 +28,8 @@ ConfigServer::ConfigServer():
 	_error_page_413(DEFAULT_ERROR_PAGE_413),
 	_error_page_500(DEFAULT_ERROR_PAGE_500),
 	_error_page_501(DEFAULT_ERROR_PAGE_501),
-	_error_page_505(DEFAULT_ERROR_PAGE_505)
+	_error_page_505(DEFAULT_ERROR_PAGE_505),
+	_error_page_508(DEFAULT_ERROR_PAGE_508)
 {
 	this->_hostnames.push_back(new ConfigHostname());
 }
@@ -47,6 +49,7 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 	this->_error_page_500 = DEFAULT_ERROR_PAGE_500;
 	this->_error_page_501 = DEFAULT_ERROR_PAGE_501;
 	this->_error_page_505 = DEFAULT_ERROR_PAGE_505;
+	this->_error_page_508 = DEFAULT_ERROR_PAGE_508;
 
 	// Parse server config
 	std::string line;
@@ -104,6 +107,8 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 			this->_error_page_501 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_501, value);
 		else if (option == "error_page_505")
 			this->_error_page_505 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_505, value);
+		else if (option == "error_page_508")
+			this->_error_page_508 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_508, value);
 		else if (option == ";")
 			continue;
 		else
@@ -138,6 +143,7 @@ ConfigServer	&ConfigServer::operator=(ConfigServer const &rhs) {
 		this->_error_page_500 = rhs._error_page_500;
 		this->_error_page_501 = rhs._error_page_501;
 		this->_error_page_505 = rhs._error_page_505;
+		this->_error_page_508 = rhs._error_page_508;
 		this->_hostnames = rhs._hostnames;
 	}
 	return (*this);
@@ -201,6 +207,10 @@ std::string	ConfigServer::getErrorPage505() const {
 	return this->_error_page_505;
 }
 
+std::string	ConfigServer::getErrorPage508() const {
+	return this->_error_page_508;
+}
+
 std::string ConfigServer::getErrorPageByCode(const int &code) const {
 	switch (code) {
 		case 400:
@@ -221,6 +231,8 @@ std::string ConfigServer::getErrorPageByCode(const int &code) const {
 			return this->_error_page_501;
 		case 505:
 			return this->_error_page_505;
+		case 508:
+			return this->_error_page_508;
 		default:
 			return this->_error_page_500;
 	}
@@ -257,6 +269,7 @@ std::ostream    &operator<<(std::ostream &o, ConfigServer const &rhs) {
 	o << "error_page_500: " << rhs.getErrorPage500() << std::endl;
 	o << "error_page_501: " << rhs.getErrorPage501() << std::endl;
 	o << "error_page_505: " << rhs.getErrorPage505() << std::endl;
+	o << "error_page_508: " << rhs.getErrorPage508() << std::endl;
 
 	std::vector<ConfigHostname*> hostnames = rhs.getHostnames();
 	for (std::vector<ConfigHostname*>::iterator it = hostnames.begin(); it != hostnames.end(); ++it) {
