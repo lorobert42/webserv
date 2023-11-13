@@ -25,6 +25,7 @@ server:
 		route:
 			uri=/list
 			get=true
+			delete=true
 			cgi_script=www/cgi/list.cgi.php
 			cgi_bin=/usr/bin/php-cgi
 		;
@@ -33,13 +34,6 @@ server:
 			get=false
 			post=true
 			cgi_script=www/cgi/upload.cgi.php
-			cgi_bin=/usr/bin/php-cgi
-		;
-		route:
-			uri=/delete
-			get=true
-			post=true
-			cgi_script=www/cgi/create.cgi.php
 			cgi_bin=/usr/bin/php-cgi
 		;
 		route:

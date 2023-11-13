@@ -10,7 +10,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>HTML Forms</title>
+    <title>Form to upload a file</title>
 </head>
 <body>
 	<button onclick="window.location.href = '/';">Home</button>

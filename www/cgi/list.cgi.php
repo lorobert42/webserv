@@ -4,6 +4,18 @@
     error_reporting(E_ALL);
     $UPLOAD_DIR = "upload/";
 	ob_start();
+
+    if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
+        $filename = urldecode($_SERVER['HTTP_X_FILENAME']);
+        $targetFile = $UPLOAD_DIR . $filename;
+
+        if (file_exists($targetFile)) {
+            unlink($targetFile);
+            echo "File deleted successfully.";
+        } else {
+            echo "File does not exist.";
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,7 +33,7 @@
         $files = scandir($UPLOAD_DIR);
         foreach ($files as $file) {
             if ($file != "." && $file != "..") {
-            	echo '<li>' . $file . '</li>';
+            	echo '<li>' . $file . '<button type="button" style="margin-left: 10px;" onclick="deleteFile(\'' . $file . '\')">Delete</button></li>';
             }
         }
         if (count($files) == 2) {
@@ -31,6 +43,24 @@
 	</ul>
 </body>
 </html>
+<script>
+	function deleteFile(filename) {
+		if (window.confirm("Are you sure you want to delete " + filename + "?")) {
+			fetch('/list', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Filename': encodeURIComponent(filename),
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    window.location.reload();
+                }
+            })
+		}
+	}
+</script>
 <?php
 	header("Content-Length: " . ob_get_length());
 	$buffer = ob_get_contents();
