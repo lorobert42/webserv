@@ -7,45 +7,51 @@ ConfigHostname::ConfigHostname(): _name(DEFAULT_NAME) {
 }
 
 ConfigHostname::ConfigHostname(const std::string &serverConfig) {
-	// Set default values
-	this->_name = DEFAULT_NAME;
 
-	// Parse server config
-	std::string line;
-	std::istringstream serverConfigStream(serverConfig);
+	try {
+		// Set default values
+		this->_name = DEFAULT_NAME;
 
-	while (std::getline(serverConfigStream, line)) {
-		if (line.empty())
-			continue;
+		// Parse server config
+		std::string line;
+		std::istringstream serverConfigStream(serverConfig);
 
-		// Check if line contains strictly "route:"
-		if (line == "route:") {
-			std::string routeConfig;
-			while (std::getline(serverConfigStream, line) && (line[0] == '\t' || line.empty())) {
-				// Remove tabulation
-				line.erase(0, 1);
-				routeConfig += line + "\n";
+		while (std::getline(serverConfigStream, line)) {
+			if (line.empty())
+				continue;
+
+			// Check if line contains strictly "route:"
+			if (line == "route:") {
+				std::string routeConfig;
+				while (std::getline(serverConfigStream, line) && (line[0] == '\t' || line.empty())) {
+					// Remove tabulation
+					line.erase(0, 1);
+					routeConfig += line + "\n";
+				}
+				if (line != ";") {
+					throw InvalidCloseDirectiveException(line);
+				}
+				if (routeConfig.empty()) {
+					this->_routes.push_back(new ConfigRoute());
+				} else {
+					this->_routes.push_back(new ConfigRoute(routeConfig));
+				}
 			}
-			if (line != ";") {
-				throw InvalidCloseDirectiveException(line);
-			}
-			if (routeConfig.empty()) {
-				this->_routes.push_back(new ConfigRoute());
-			} else {
-				this->_routes.push_back(new ConfigRoute(routeConfig));
-			}
+
+			std::string option = line.substr(0, line.find_first_of("="));
+			std::string value = line.substr(line.find_first_of("=") + 1);
+
+			// Set server options
+			if (option == "name")
+				this->_name = value;
+			else if (option == ";")
+				continue;
+			else
+				throw InvalidOptionKeyException(option);
 		}
-
-		std::string option = line.substr(0, line.find_first_of("="));
-		std::string value = line.substr(line.find_first_of("=") + 1);
-
-		// Set server options
-		if (option == "name")
-			this->_name = value;
-		else if (option == ";")
-			continue;
-		else
-			throw InvalidOptionKeyException(option);
+	} catch (std::exception &e) {
+		std::cerr << e.what() << std::endl;
+		exit(EXIT_FAILURE);
 	}
 }
 

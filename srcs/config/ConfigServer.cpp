@@ -35,84 +35,90 @@ ConfigServer::ConfigServer():
 }
 
 ConfigServer::ConfigServer(const std::string &serverConfig) {
-	// Set default values
-	this->_name = DEFAULT_SERVER_NAME;
-	this->_port = DEFAULT_PORT;
-	this->_client_max_body_size = DEFAULT_CLIENT_MAX_BODY_SIZE;
-	this->_timeout = DEFAULT_TIMEOUT;
-	this->_error_page_400 = DEFAULT_ERROR_PAGE_400;
-	this->_error_page_403 = DEFAULT_ERROR_PAGE_403;
-	this->_error_page_404 = DEFAULT_ERROR_PAGE_404;
-	this->_error_page_405 = DEFAULT_ERROR_PAGE_405;
-	this->_error_page_411 = DEFAULT_ERROR_PAGE_411;
-	this->_error_page_413 = DEFAULT_ERROR_PAGE_413;
-	this->_error_page_500 = DEFAULT_ERROR_PAGE_500;
-	this->_error_page_501 = DEFAULT_ERROR_PAGE_501;
-	this->_error_page_505 = DEFAULT_ERROR_PAGE_505;
-	this->_error_page_508 = DEFAULT_ERROR_PAGE_508;
 
-	// Parse server config
-	std::string line;
-	std::istringstream serverConfigStream(serverConfig);
+	try {
+		// Set default values
+		this->_name = DEFAULT_SERVER_NAME;
+		this->_port = DEFAULT_PORT;
+		this->_client_max_body_size = DEFAULT_CLIENT_MAX_BODY_SIZE;
+		this->_timeout = DEFAULT_TIMEOUT;
+		this->_error_page_400 = DEFAULT_ERROR_PAGE_400;
+		this->_error_page_403 = DEFAULT_ERROR_PAGE_403;
+		this->_error_page_404 = DEFAULT_ERROR_PAGE_404;
+		this->_error_page_405 = DEFAULT_ERROR_PAGE_405;
+		this->_error_page_411 = DEFAULT_ERROR_PAGE_411;
+		this->_error_page_413 = DEFAULT_ERROR_PAGE_413;
+		this->_error_page_500 = DEFAULT_ERROR_PAGE_500;
+		this->_error_page_501 = DEFAULT_ERROR_PAGE_501;
+		this->_error_page_505 = DEFAULT_ERROR_PAGE_505;
+		this->_error_page_508 = DEFAULT_ERROR_PAGE_508;
 
-	while (std::getline(serverConfigStream, line)) {
-		if (line.empty())
-			continue;
+		// Parse server config
+		std::string line;
+		std::istringstream serverConfigStream(serverConfig);
 
-		// Check if line contains strictly "hostname:"
-		if (line == "hostname:") {
-			std::string hostnameConfig;
-			while (std::getline(serverConfigStream, line) && (line[0] == '\t' || line.empty())) {
-				// Remove tabulation
-				line.erase(0, 1);
-				hostnameConfig += line + "\n";
+		while (std::getline(serverConfigStream, line)) {
+			if (line.empty())
+				continue;
+
+			// Check if line contains strictly "hostname:"
+			if (line == "hostname:") {
+				std::string hostnameConfig;
+				while (std::getline(serverConfigStream, line) && (line[0] == '\t' || line.empty())) {
+					// Remove tabulation
+					line.erase(0, 1);
+					hostnameConfig += line + "\n";
+				}
+				if (line != ";") {
+					throw InvalidCloseDirectiveException(line);
+				}
+				if (hostnameConfig.empty()) {
+					this->_hostnames.push_back(new ConfigHostname());
+				} else {
+					this->_hostnames.push_back(new ConfigHostname(hostnameConfig));
+				}
 			}
-			if (line != ";") {
-				throw InvalidCloseDirectiveException(line);
-			}
-			if (hostnameConfig.empty()) {
-				this->_hostnames.push_back(new ConfigHostname());
-			} else {
-				this->_hostnames.push_back(new ConfigHostname(hostnameConfig));
-			}
+
+			std::string option = line.substr(0, line.find_first_of("="));
+			std::string value = line.substr(line.find_first_of("=") + 1);
+
+			// Set server options
+			if (option == "name")
+				this->_name = value;
+			else if (option == "port")
+				this->_port = ConfigHelper::convertStringToPort(value);
+			else if (option == "client_max_body_size")
+				this->_client_max_body_size = ConfigHelper::convertStringToClientMaxBodySize(value);
+			else if (option == "timeout")
+				this->_timeout = ConfigHelper::convertStringToInt(value);
+			else if (option == "error_page_400")
+				this->_error_page_400 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_400, value);
+			else if (option == "error_page_403")
+				this->_error_page_403 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_403, value);
+			else if (option == "error_page_404")
+				this->_error_page_404 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_404, value);
+			else if (option == "error_page_405")
+				this->_error_page_405 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_405, value);
+			else if (option == "error_page_411")
+				this->_error_page_411 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_411, value);
+			else if (option == "error_page_413")
+				this->_error_page_413 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_413, value);
+			else if (option == "error_page_500")
+				this->_error_page_500 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_500, value);
+			else if (option == "error_page_501")
+				this->_error_page_501 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_501, value);
+			else if (option == "error_page_505")
+				this->_error_page_505 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_505, value);
+			else if (option == "error_page_508")
+				this->_error_page_508 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_508, value);
+			else if (option == ";")
+				continue;
+			else
+				throw InvalidOptionKeyException(option);
 		}
-
-		std::string option = line.substr(0, line.find_first_of("="));
-		std::string value = line.substr(line.find_first_of("=") + 1);
-
-		// Set server options
-		if (option == "name")
-			this->_name = value;
-		else if (option == "port")
-			this->_port = ConfigHelper::convertStringToPort(value);
-		else if (option == "client_max_body_size")
-			this->_client_max_body_size = ConfigHelper::convertStringToClientMaxBodySize(value);
-		else if (option == "timeout")
-			this->_timeout = ConfigHelper::convertStringToInt(value);
-		else if (option == "error_page_400")
-			this->_error_page_400 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_400, value);
-		else if (option == "error_page_403")
-			this->_error_page_403 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_403, value);
-		else if (option == "error_page_404")
-			this->_error_page_404 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_404, value);
-		else if (option == "error_page_405")
-			this->_error_page_405 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_405, value);
-		else if (option == "error_page_411")
-			this->_error_page_411 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_411, value);
-		else if (option == "error_page_413")
-			this->_error_page_413 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_413, value);
-		else if (option == "error_page_500")
-			this->_error_page_500 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_500, value);
-		else if (option == "error_page_501")
-			this->_error_page_501 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_501, value);
-		else if (option == "error_page_505")
-			this->_error_page_505 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_505, value);
-		else if (option == "error_page_508")
-			this->_error_page_508 = ConfigHelper::getValidErrorPage(DEFAULT_ERROR_PAGE_508, value);
-		else if (option == ";")
-			continue;
-		else
-			throw InvalidOptionKeyException(option);
+	} catch (std::exception &e) {
+		std::cerr << e.what() << std::endl;
+		exit(EXIT_FAILURE);
 	}
 }
 

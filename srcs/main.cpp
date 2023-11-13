@@ -33,7 +33,7 @@ int	main(int argc, char **argv)
 		delete config;
 	} catch (std::exception &e) {
 		std::cerr << "Error: " << e.what() << std::endl;
-		return (1);
+		exit(EXIT_FAILURE);
 	}
 	return (0);
 }
