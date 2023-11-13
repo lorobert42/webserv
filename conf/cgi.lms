@@ -17,6 +17,12 @@ server:
 			cgi_bin=/usr/bin/php-cgi
 		;
 		route:
+			uri=/list
+			get=true
+			cgi_script=www/cgi/list.cgi.php
+			cgi_bin=/usr/bin/php-cgi
+		;
+		route:
 			uri=/upload
 			get=true
 			post=true
