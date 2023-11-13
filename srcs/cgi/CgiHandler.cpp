@@ -56,12 +56,11 @@ CgiHandler   	&CgiHandler::operator=(CgiHandler const &rhs)
 	return (*this);
 }
 
-void	CgiHandler::displayEnv() {
-	char**	env = this->_getEnv();
-
+void	freeEnv(char** env) {
 	for (int i = 0; env[i]; i++) {
-		std::cout << env[i] << std::endl;
+		delete[] env[i];
 	}
+	delete[] env;
 }
 
 char	**CgiHandler::_getEnv() {
@@ -130,12 +129,7 @@ std::string CgiHandler::executeCgi() {
 		close(outpipefd[0]);
 		waitpid(pid, NULL, 0);
 	}
-
-	// Free env
-	for (int i = 0; env[i]; i++) {
-		delete[] env[i];
-	}
-	delete[] env;
+	freeEnv(env);
 
 	return response;
 }

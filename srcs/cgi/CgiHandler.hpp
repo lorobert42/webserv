@@ -20,7 +20,6 @@ class CgiHandler
 
 		CgiHandler   	&operator=(CgiHandler const &rhs);
 		std::string		executeCgi();
-		void			displayEnv();
 
 	private:
 		CgiHandler();
