@@ -1,0 +1,41 @@
+server:
+	name=webserv
+	port=8080
+	timeout=10
+
+	hostname:
+		route:
+			uri=/loop
+			get=true
+			cgi_script=www/cgi/loop.cgi.php
+			cgi_bin=/usr/bin/php-cgi
+		;
+		route:
+			uri=/form
+			get=true
+			cgi_script=www/cgi/form.cgi.php
+			cgi_bin=/usr/bin/php-cgi
+		;
+		route:
+			uri=/upload
+			get=true
+			post=true
+			cgi_script=www/cgi/upload.cgi.php
+			cgi_bin=/usr/bin/php-cgi
+		;
+		route:
+			uri=/delete
+			get=true
+			post=true
+			cgi_script=www/cgi/create.cgi.php
+			cgi_bin=/usr/bin/php-cgi
+		;
+		route:
+			uri=/counter
+			get=true
+			post=true
+			cgi_script=www/cgi/counter.cgi.php
+			cgi_bin=/usr/bin/php-cgi
+		;
+	;
+;
