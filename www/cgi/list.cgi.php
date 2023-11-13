@@ -5,6 +5,22 @@
     $UPLOAD_DIR = "upload/";
 	ob_start();
 
+	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+		$filename = urldecode($_POST['filename']);
+		$targetFile = $UPLOAD_DIR . $filename;
+
+		if (file_exists($targetFile)) {
+			header('Content-Description: File Transfer');
+			header('Content-Type: application/octet-stream');
+			header('Content-Disposition: attachment; filename="' . $filename . '"');
+			header('Content-Length: ' . filesize($targetFile));
+			readfile($targetFile);
+			exit;
+		} else {
+			echo "File does not exist.";
+		}
+	} else
+
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         $filename = urldecode($_SERVER['HTTP_X_FILENAME']);
         $targetFile = $UPLOAD_DIR . $filename;
@@ -33,7 +49,18 @@
         $files = scandir($UPLOAD_DIR);
         foreach ($files as $file) {
             if ($file != "." && $file != "..") {
-            	echo '<li>' . $file . '<button type="button" style="margin-left: 10px;" onclick="deleteFile(\'' . $file . '\')">Delete</button></li>';
+            	echo '
+            	<li>' . $file . '
+            	    <form method="post" action="/list">
+				        <input type="hidden" name="filename" value="' . $file . '">
+				        <button type="submit">
+				            Download
+				        </button>
+			        </form>
+                    <button type="button" onclick="deleteFile(\'' . $file . '\')">
+                        Delete
+                    </button>
+                </li>';
             }
         }
         if (count($files) == 2) {

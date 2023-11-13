@@ -25,6 +25,7 @@ server:
 		route:
 			uri=/list
 			get=true
+			post=true
 			delete=true
 			cgi_script=www/cgi/list.cgi.php
 			cgi_bin=/usr/bin/php-cgi
