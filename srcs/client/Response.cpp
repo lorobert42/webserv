@@ -178,8 +178,23 @@ bool	Response::_checkCgi()
 	if (_route->getCgiScript() == "" || _route->getCgiBin() == "")
 		return (false);
 	CgiHandler cgi(this);
-	_header = "HTTP/1.1 200 OK\r\n";
+
 	_body = cgi.executeCgi();
+	_header = "HTTP/1.1 ";
+	switch (cgi.getStatusCode()) {
+		case 200:
+			_header.append("200 OK\r\n");
+			break;
+		case 201:
+			_header.append("201 Created\r\n");
+			break;
+		case 508:
+			_createErrorResponse(508);
+			break;
+		default:
+			_header.append("500 Internal Server Error\r\n");
+			break;
+	}
 	return (true);
 }
 
@@ -288,6 +303,9 @@ void	Response::_createHeader(int status)
 			break;
 		case 505:
 			_header.append("505 HTTP Version Not Supported\r\n");
+			break;
+		case 508:
+			_header.append("508 Loop Detected\r\n");
 			break;
 		default:
 			_header.append("500 Internal Server Error\r\n");

@@ -2,7 +2,11 @@
 
 CgiHandler::CgiHandler() {}
 
-CgiHandler::CgiHandler(Response *response) : _response(response), _bodyContent(_response->getRequest()->getBody()) {
+CgiHandler::CgiHandler(Response *response) :
+	_response(response),
+	_bodyContent(_response->getRequest()->getBody()),
+	_statusCode(200)
+{
 
 	// Set environment variables dedicated for the server
 	this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
@@ -56,12 +60,11 @@ CgiHandler   	&CgiHandler::operator=(CgiHandler const &rhs)
 	return (*this);
 }
 
-void	CgiHandler::displayEnv() {
-	char**	env = this->_getEnv();
-
+void	freeEnv(char** env) {
 	for (int i = 0; env[i]; i++) {
-		std::cout << env[i] << std::endl;
+		delete[] env[i];
 	}
+	delete[] env;
 }
 
 char	**CgiHandler::_getEnv() {
@@ -123,19 +126,34 @@ std::string CgiHandler::executeCgi() {
 		}
 		close(inpipefd[1]); // Close the write end once data is written
 
+		int status;
+		time_t start = time(NULL);
+		while (waitpid(pid, &status, WNOHANG) == 0) {
+			time_t	now = time(NULL);
+			if (difftime(now, start) > _response->getConfigServer()->getTimeout()) {
+				kill(pid, SIGKILL);
+				_statusCode = 508;
+				break;
+			}
+		}
+
 		while ((bytesRead = read(outpipefd[0], buffer, sizeof(buffer))) > 0) {
 			response.append(buffer, bytesRead);
 		}
 
 		close(outpipefd[0]);
-		waitpid(pid, NULL, 0);
 	}
+	freeEnv(env);
 
-	// Free env
-	for (int i = 0; env[i]; i++) {
-		delete[] env[i];
+	// Get the status code from the response
+	if (response.find("Status: ") != std::string::npos) {
+		std::string statusCode = response.substr(response.find("Status: ") + 8, 3);
+		_statusCode = std::atoi(statusCode.c_str());
 	}
-	delete[] env;
 
 	return response;
+}
+
+int	CgiHandler::getStatusCode() const {
+	return _statusCode;
 }

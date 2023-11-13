@@ -4,6 +4,7 @@
 #include <map>
 #include <unistd.h>
 #include <cstring>
+#include <csignal>
 #include <sys/wait.h>
 #include <sys/types.h>
 #include "../client/Response.hpp"
@@ -20,12 +21,13 @@ class CgiHandler
 
 		CgiHandler   	&operator=(CgiHandler const &rhs);
 		std::string		executeCgi();
-		void			displayEnv();
+		int				getStatusCode() const;
 
 	private:
 		CgiHandler();
 		char**								_getEnv();
 		std::map<std::string, std::string>	_env;
-		Response*								_response;
+		Response*							_response;
 		std::string							_bodyContent;
+		int									_statusCode;
 };
