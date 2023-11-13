@@ -64,3 +64,28 @@ for (std::string::const_iterator it = str.begin(); it != str.end(); ++it) {
 	}
 	return std::atoi(str.c_str());
 }
+
+std::string ConfigHelper::checkValidCGIScript(std::string const &str) {
+	// Check extension must be .php or .py
+	std::string extension = str.substr(str.find_last_of(".") + 1);
+	if (extension != "php" && extension != "py")
+		throw InvalidOptionValueException(str);
+
+	std::ifstream file(str.c_str());
+	if (!file.is_open()) {
+		file.close();
+		throw InvalidOptionValueException(str);
+	}
+	file.close();
+	return str;
+}
+
+std::string ConfigHelper::checkValidCGIBin(std::string const &str) {
+	std::ifstream file(str.c_str());
+	if (!file.is_open()) {
+		file.close();
+		throw InvalidOptionValueException(str);
+	}
+	file.close();
+	return str;
+}

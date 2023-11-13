@@ -69,9 +69,9 @@ ConfigRoute::ConfigRoute(const std::string &routeConfig) {
 		else if (option == "autoindex")
 			this->_autoindex = ConfigHelper::convertStringToBool(value);
 		else if (option == "cgi_script")
-			this->_cgi_script = value;
+			this->_cgi_script = ConfigHelper::checkValidCGIScript(value);
 		else if (option == "cgi_bin")
-			this->_cgi_bin = value;
+			this->_cgi_bin = ConfigHelper::checkValidCGIBin(value);
 		else if (option == "upload_dir")
 			this->_upload_dir = ConfigHelper::checkValidPathFolder(value);
 		else
