@@ -13,19 +13,11 @@
     <title>HTML Forms</title>
 </head>
 <body>
-	<button onclick="window.location.href = '/';">Home</button>
-
-	<h1>Form to upload a file</h1>
-	<form method="POST" enctype="multipart/form-data" action="/upload">
-        <label for="file">File</label>
-        <input type="file" id="file" name="file" required>
-        <button id="submit" type="submit">
-            Upload
-        </button>
-    </form>
+	<h1>File successfully uploaded</h1>
 </body>
 </html>
 <?php
+	http_response_code(201);
 	header("Content-Length: " . ob_get_length());
 	$buffer = ob_get_contents();
 	ob_end_clean();
