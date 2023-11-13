@@ -5,6 +5,12 @@ server:
 
 	hostname:
 		route:
+			uri=/
+			get=true
+			cgi_script=www/cgi/index.cgi.php
+			cgi_bin=/usr/bin/php-cgi
+		;
+		route:
 			uri=/loop
 			get=true
 			cgi_script=www/cgi/loop.cgi.php

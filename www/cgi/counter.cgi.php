@@ -33,7 +33,7 @@
     <title>HTML Forms</title>
 </head>
 <body>
-    <h1>Counter</h1>
+	<button onclick="window.location.href = '/';">Home</button>
 
     <form method="POST">
 		<p><?php echo $count; ?></p>
