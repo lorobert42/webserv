@@ -4,6 +4,7 @@
 #include <map>
 #include <unistd.h>
 #include <cstring>
+#include <csignal>
 #include <sys/wait.h>
 #include <sys/types.h>
 #include "../client/Response.hpp"

@@ -126,12 +126,22 @@ std::string CgiHandler::executeCgi() {
 		}
 		close(inpipefd[1]); // Close the write end once data is written
 
+		int status;
+		time_t start = time(NULL);
+		while (waitpid(pid, &status, WNOHANG) == 0) {
+			time_t	now = time(NULL);
+			if (difftime(now, start) > _response->getConfigServer()->getTimeout()) {
+				kill(pid, SIGKILL);
+				_statusCode = 508;
+				break;
+			}
+		}
+
 		while ((bytesRead = read(outpipefd[0], buffer, sizeof(buffer))) > 0) {
 			response.append(buffer, bytesRead);
 		}
 
 		close(outpipefd[0]);
-		waitpid(pid, NULL, 0);
 	}
 	freeEnv(env);
 

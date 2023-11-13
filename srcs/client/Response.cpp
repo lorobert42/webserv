@@ -188,6 +188,9 @@ bool	Response::_checkCgi()
 		case 201:
 			_header.append("201 Created\r\n");
 			break;
+		case 508:
+			_createErrorResponse(508);
+			break;
 		default:
 			_header.append("500 Internal Server Error\r\n");
 			break;
@@ -300,6 +303,9 @@ void	Response::_createHeader(int status)
 			break;
 		case 505:
 			_header.append("505 HTTP Version Not Supported\r\n");
+			break;
+		case 508:
+			_header.append("508 Loop Detected\r\n");
 			break;
 		default:
 			_header.append("500 Internal Server Error\r\n");
