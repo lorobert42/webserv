@@ -178,8 +178,20 @@ bool	Response::_checkCgi()
 	if (_route->getCgiScript() == "" || _route->getCgiBin() == "")
 		return (false);
 	CgiHandler cgi(this);
-	_header = "HTTP/1.1 200 OK\r\n";
+
 	_body = cgi.executeCgi();
+	_header = "HTTP/1.1 ";
+	switch (cgi.getStatusCode()) {
+		case 200:
+			_header.append("200 OK\r\n");
+			break;
+		case 201:
+			_header.append("201 Created\r\n");
+			break;
+		default:
+			_header.append("500 Internal Server Error\r\n");
+			break;
+	}
 	return (true);
 }
 

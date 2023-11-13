@@ -2,7 +2,11 @@
 
 CgiHandler::CgiHandler() {}
 
-CgiHandler::CgiHandler(Response *response) : _response(response), _bodyContent(_response->getRequest()->getBody()) {
+CgiHandler::CgiHandler(Response *response) :
+	_response(response),
+	_bodyContent(_response->getRequest()->getBody()),
+	_statusCode(200)
+{
 
 	// Set environment variables dedicated for the server
 	this->_env["SERVER_SOFTWARE"] = "Webserv/1.0";
@@ -131,5 +135,15 @@ std::string CgiHandler::executeCgi() {
 	}
 	freeEnv(env);
 
+	// Get the status code from the response
+	if (response.find("Status: ") != std::string::npos) {
+		std::string statusCode = response.substr(response.find("Status: ") + 8, 3);
+		_statusCode = std::atoi(statusCode.c_str());
+	}
+
 	return response;
+}
+
+int	CgiHandler::getStatusCode() const {
+	return _statusCode;
 }
