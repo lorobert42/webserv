@@ -5,7 +5,7 @@
     $UPLOAD_DIR = "upload/";
 	ob_start();
 
-	if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+	if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['filename'])) {
 		$filename = urldecode($_POST['filename']);
 		$targetFile = $UPLOAD_DIR . $filename;
 
@@ -19,7 +19,7 @@
 		} else {
 			echo "File does not exist.";
 		}
-	} else
+	}
 
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
         $filename = urldecode($_SERVER['HTTP_X_FILENAME']);
