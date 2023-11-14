@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 12:57:53 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/09 13:37:33 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/10 10:32:19 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,39 +42,41 @@ class Response
 		Response(Response const& other);
 		Response& operator=(Response const& other);
 		~Response();
-		void	createResponse();
-		ConfigServer*	getConfigServer();
-		ConfigRoute*	getConfigRoute();
-		Request*	getRequest();
+
+		void				createResponse();
+		ConfigServer*		getConfigServer();
+		ConfigRoute*		getConfigRoute();
+		Request*			getRequest();
 		std::string const&	getHeader() const;
 		std::string const&	getBody() const;
-		bool	shouldClose() const;
+		bool				shouldClose() const;
 
 	private:
-		void	_createRoute();
-		void	_parseRoute(std::string const& uri);
-		bool	_checkRequestOK();
-		bool	_checkRouteExists();
-		bool	_checkMethodAllowed();
-		bool	_checkCgi();
+		void		_createRoute();
+		void		_parseRoute(std::string const& uri);
+		bool		_checkRequestOK();
+		bool		_checkRouteExists();
+		bool		_checkMethodAllowed();
+		bool		_checkCgi();
 		std::string	_createPathFromUri(std::string const& uri);
-		bool	_checkPath();
-		int	_checkDir();
-		int	_checkFile();
-		bool	_createBody();
-		void	_createHeader(int status);
-		void	_createErrorResponse(int status);
+		bool		_checkPath();
+		int			_checkDir();
+		int			_checkFile();
+		bool		_createBody();
+		void		_createHeader(int status);
+		void		_createErrorResponse(int status);
 		std::string	_get500Body();
+
 		Response();
 
-		ConfigServer*	_config_server;
-		ConfigHostname*	_config_hostname;
-		ConfigRoute* _route;
-		Request*	_request;
+		ConfigServer	*_config_server;
+		ConfigHostname	*_config_hostname;
+		ConfigRoute		*_route;
+		Request			*_request;
 
-		std::string	_header;
-		std::string	_body;
-		std::string	_path;
+		std::string					_header;
+		std::string					_body;
+		std::string					_path;
 		std::vector<std::string>	_uri_segments;
-		bool	_should_close;
+		bool						_should_close;
 };

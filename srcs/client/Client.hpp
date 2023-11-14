@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/10 16:44:56 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/09 13:24:11 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/10 13:37:59 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,17 +50,17 @@ class Client
 	private:
 		ConfigServer	*_config_server;
 		Request			*_request;
-		int				_socket;
-
-		std::string					_read;
-		int							_nb_read;
-		int							_total_bytes_send;
-		bool						_headerOk;
-		bool						_responseOK;
-		bool						_CGI_on;
-		bool						_error;
 		Response*		_response;
-		std::string					_server_message;
+
+		int				_socket;
+		std::string		_read;
+		std::string		_server_message;
+		int				_nb_read;
+		int				_total_bytes_send;
+		bool			_headerOk;
+		bool			_responseOK;
+		bool			_CGI_on;
+		bool			_error;
 
 		Client(void);
 };
