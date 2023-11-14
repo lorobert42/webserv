@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/11/14 11:25:09 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/14 13:15:44 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -92,6 +92,12 @@ int	Client::readHandler(void)
 	int read = recv(_socket, buffer, D_BUFF_SIZE, MSG_DONTWAIT);
 	if (read < 0)
 		return (ERROR);
+	if (_request->getError() == 413)
+	{
+		if (read < D_BUFF_SIZE)
+			return (OK);
+		return (TOO_SHORT);
+	}
 	else if (read == 0)
 	{
 		std::cout << "Nothing to read, client quit" << std::endl;
