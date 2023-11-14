@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
+/*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/14 11:40:54 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/14 13:54:59 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -173,6 +173,7 @@ void ServerManager::_run()
 	}
 	std::cout << "Closing remaining clients" << std::endl;
 	_closeAllClients();
+	std::cout << "Clients closed\n";
 }
 
 // ### I/O management ###
@@ -279,7 +280,8 @@ void	ServerManager::_closeAllClients()
 {
 	for (std::map<int, Client*>::iterator it = _clients.begin(); it != _clients.end(); it++)
 	{
-		_closeClient(it->first);
+		delete it->second;
+		close(it->first);
 	}
 }
 
