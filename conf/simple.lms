@@ -32,7 +32,7 @@ server:
 
 		route:
 			uri=/python
-			cgi_script=www/cgi/env.cgi.py
+			cgi_script=www/cgi/hello.cgi.py
 			cgi_bin=/usr/bin/python
 		;
 
