@@ -185,6 +185,7 @@ int	Request::checkBody()
 		std::cout << "Body length: " << getBody().length() << std::endl;
 		if (content_length.find_first_not_of("0123456789") != std::string::npos)
 		{
+			setBody("");
 			_error = 400;
 			return (ERROR);
 		}
@@ -192,6 +193,7 @@ int	Request::checkBody()
 		if (expectedContentLength > _client_max_body_size)
 		{
 			std::cout << "Client max body size reached" << std::endl;
+			setBody("");
 			_error = 413;
 			return (ERROR);
 		}
@@ -211,6 +213,7 @@ int	Request::checkBody()
 	}
 	else if (content_length == "" && _body.length() != 0)
 	{
+		setBody("");
 		_error = 411;
 		return (ERROR);
 	}
@@ -300,14 +303,14 @@ void	Request::_printRequest() const
 {
 	//	### Printing ###
 	std::cout << "Method : [" << _method << "]" << std::endl \
-			  << "Uri : [" << _uri  << "]" << std::endl \
-			  << "Version : [" << _version << "]" << std::endl \
-			  << "HEADER : " << std::endl;
+		<< "Uri : [" << _uri  << "]" << std::endl \
+		<< "Version : [" << _version << "]" << std::endl \
+		<< "HEADER : " << std::endl;
 	for (std::map<std::string, std::string>::const_iterator it = _header.begin(); \
 			it != _header.end(); it++)
 	{
 		std::cout << "[KEY] : " << it->first << std::endl \
-			      << "[VALUE] : " << it->second << std::endl;
+			<< "[VALUE] : " << it->second << std::endl;
 	}
 	if (_body.size() != 0)
 		std::cout << "BODY :\n" << _body << std::endl;
