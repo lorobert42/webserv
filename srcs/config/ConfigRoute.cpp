@@ -27,55 +27,61 @@ ConfigRoute::ConfigRoute() :
 	{}
 
 ConfigRoute::ConfigRoute(const std::string &routeConfig) {
-	// Set default values
-	this->_uri = DEFAULT_URI;
-	this->_path = DEFAULT_PATH;
-	this->_index = DEFAULT_INDEX;
-	this->_redirect = DEFAULT_REDIRECT;
-	this->_get = DEFAULT_GET;
-	this->_post = DEFAULT_POST;
-	this->_delete = DEFAULT_DELETE;
-	this->_autoindex = DEFAULT_AUTOINDEX;
-	this->_cgi_script = DEFAULT_CGI_SCRIPT;
-	this->_cgi_bin = DEFAULT_CGI_BIN;
-	this->_upload_dir = DEFAULT_UPLOAD_DIR;
 
-	// Parse route config
-	std::string line;
-	std::istringstream routeConfigStream(routeConfig);
+	try {
+		// Set default values
+		this->_uri = DEFAULT_URI;
+		this->_path = DEFAULT_PATH;
+		this->_index = DEFAULT_INDEX;
+		this->_redirect = DEFAULT_REDIRECT;
+		this->_get = DEFAULT_GET;
+		this->_post = DEFAULT_POST;
+		this->_delete = DEFAULT_DELETE;
+		this->_autoindex = DEFAULT_AUTOINDEX;
+		this->_cgi_script = DEFAULT_CGI_SCRIPT;
+		this->_cgi_bin = DEFAULT_CGI_BIN;
+		this->_upload_dir = DEFAULT_UPLOAD_DIR;
 
-	while (std::getline(routeConfigStream, line)) {
-		if (line.empty())
-			continue;
+		// Parse route config
+		std::string line;
+		std::istringstream routeConfigStream(routeConfig);
 
-		std::string option = line.substr(0, line.find_first_of("="));
-		std::string value = line.substr(line.find_first_of("=") + 1);
+		while (std::getline(routeConfigStream, line)) {
+			if (line.empty())
+				continue;
 
-		// Set route options
-		if (option == "uri")
-			this->_uri = value;
-		else if (option == "path")
-			this->_path = ConfigHelper::checkValidPathFolder(value);
-		else if (option == "index")
-			this->_index = value;
-		else if (option == "redirect")
-			this->_redirect = value;
-		else if (option == "get")
-			this->_get = ConfigHelper::convertStringToBool(value);
-		else if (option == "post")
-			this->_post = ConfigHelper::convertStringToBool(value);
-		else if (option == "delete")
-			this->_delete = ConfigHelper::convertStringToBool(value);
-		else if (option == "autoindex")
-			this->_autoindex = ConfigHelper::convertStringToBool(value);
-		else if (option == "cgi_script")
-			this->_cgi_script = ConfigHelper::checkValidCGIScript(value);
-		else if (option == "cgi_bin")
-			this->_cgi_bin = ConfigHelper::checkValidCGIBin(value);
-		else if (option == "upload_dir")
-			this->_upload_dir = ConfigHelper::checkValidPathFolder(value);
-		else
-			throw InvalidOptionKeyException(option);
+			std::string option = line.substr(0, line.find_first_of("="));
+			std::string value = line.substr(line.find_first_of("=") + 1);
+
+			// Set route options
+			if (option == "uri")
+				this->_uri = value;
+			else if (option == "path")
+				this->_path = ConfigHelper::checkValidPathFolder(value);
+			else if (option == "index")
+				this->_index = value;
+			else if (option == "redirect")
+				this->_redirect = value;
+			else if (option == "get")
+				this->_get = ConfigHelper::convertStringToBool(value);
+			else if (option == "post")
+				this->_post = ConfigHelper::convertStringToBool(value);
+			else if (option == "delete")
+				this->_delete = ConfigHelper::convertStringToBool(value);
+			else if (option == "autoindex")
+				this->_autoindex = ConfigHelper::convertStringToBool(value);
+			else if (option == "cgi_script")
+				this->_cgi_script = ConfigHelper::checkValidCGIScript(value);
+			else if (option == "cgi_bin")
+				this->_cgi_bin = ConfigHelper::checkValidCGIBin(value);
+			else if (option == "upload_dir")
+				this->_upload_dir = ConfigHelper::checkValidPathFolder(value);
+			else
+				throw InvalidOptionKeyException(option);
+		}
+	} catch (std::exception &e) {
+		std::cerr << e.what() << std::endl;
+		exit(EXIT_FAILURE);
 	}
 }
 
