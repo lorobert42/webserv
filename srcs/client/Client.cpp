@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/11/10 13:37:47 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/14 11:25:09 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -142,7 +142,7 @@ int	Client::writeHandler(void)
 	if (bytes_send < 0)
 		return (ERROR);
 	_total_bytes_send += bytes_send;
-	if (_total_bytes_send <static_cast<int>(_server_message.size()))
+	if (_total_bytes_send < static_cast<int>(_server_message.size()))
 		return (TOO_SHORT);
 	if (_response->shouldClose())
 		return (ERROR);
