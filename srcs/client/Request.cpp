@@ -189,7 +189,9 @@ int	Request::checkBody()
 			std::cout << "Client max body size reached" << std::endl;
 			setBody("");
 			_error = 413;
-			return (ERROR);
+			if (_body.length() >= expectedContentLength)
+				return (ERROR);
+			return (TOO_SHORT);
 		}
 		return (_checkBodyContentLength(expectedContentLength));
 	}
