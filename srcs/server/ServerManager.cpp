@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/10 16:42:07 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/14 11:40:54 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -214,6 +214,7 @@ bool	ServerManager::_handleWrite(int fd)
 	}
 	else if (res == -1)
 	{
+		std::cout << "Server close connection on [" << fd << "]" << std::endl;
 		if (!_epollCtlDel(_epfd, fd))
 			return (false);
 		_closeClient(fd);

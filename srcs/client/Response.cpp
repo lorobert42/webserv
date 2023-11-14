@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 12:57:48 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/10 13:39:55 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/14 12:40:12 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,8 @@ void	Response::createResponse()
 	if (!_checkRouteExists())
 		return ;
 	if (!_checkMethodAllowed())
+		return ;
+	if (_checkRedirection())
 		return ;
 	if (_checkCgi())
 		return ;
@@ -117,9 +119,6 @@ void	Response::_createRoute()
 				break ;
 		}
 	}
-	// Check redirection
-	if (_route != NULL && _route->getRedirect() != "")
-		_route = _config_hostname->getRouteWithUri(_route->getRedirect());
 }
 
 void	Response::_parseRoute(std::string const& uri)
@@ -166,6 +165,16 @@ bool	Response::_checkMethodAllowed()
 	return (false);
 }
 
+bool	Response::_checkRedirection()
+{
+	if (_route->getRedirect() != "")
+	{
+		_createHeader(302);
+		return (true);
+	}
+	return (false);
+}
+
 bool	Response::_checkCgi()
 {
 	if (_route->getCgiScript() == "" || _route->getCgiBin() == "")
@@ -177,6 +186,8 @@ bool	Response::_checkCgi()
 
 	if (extension == "py") {
 		_body = cgi.executeCgi();
+		if (cgi.getStatusCode() != 200 || cgi.getStatusCode() != 201)
+			_should_close = true;
 	}
 	else if (extension == "php") {
 		_body = cgi.executeCgi();
@@ -189,9 +200,11 @@ bool	Response::_checkCgi()
 				_header.append("201 Created\r\n");
 				break;
 			case 508:
+				_should_close = true;
 				_createErrorResponse(508);
 				break;
 			default:
+				_should_close = true;
 				_header.append("500 Internal Server Error\r\n");
 				break;
 		}
@@ -280,6 +293,12 @@ void	Response::_createHeader(int status)
 	{
 		case 200:
 			_header.append("200 OK\r\n");
+			break;
+		case 302:
+			_header.append("302 Found\r\n");
+			_header.append("Location: ");
+			_header.append(_route->getRedirect());
+			_header.append("\r\n");
 			break;
 		case 400:
 			_header.append("400 Bad Request\r\n");

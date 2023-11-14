@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 12:57:53 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/10 10:32:19 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/14 12:29:00 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ class Response
 		bool		_checkRequestOK();
 		bool		_checkRouteExists();
 		bool		_checkMethodAllowed();
+		bool		_checkRedirection();
 		bool		_checkCgi();
 		std::string	_createPathFromUri(std::string const& uri);
 		bool		_checkPath();

@@ -1,0 +1,19 @@
+server:
+	name=webserv
+	port=8080
+	client_max_body_size=5M
+
+	hostname:
+		name=127.0.0.1
+		route:
+			uri=/
+			path=www/path/
+			index=index.html
+		;
+
+		route:
+			uri=/foo
+			redirect=/
+		;
+	;
+;
