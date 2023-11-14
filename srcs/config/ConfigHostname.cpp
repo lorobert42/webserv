@@ -50,8 +50,12 @@ ConfigHostname::ConfigHostname(const std::string &serverConfig) {
 				throw InvalidOptionKeyException(option);
 		}
 	} catch (std::exception &e) {
-		std::cerr << e.what() << std::endl;
-		exit(EXIT_FAILURE);
+		if (this->_routes.size() > 0) {
+			for (std::vector<ConfigRoute*>::iterator it = this->_routes.begin(); it != this->_routes.end(); ++it) {
+				delete (*it);
+			}
+		}
+		throw;
 	}
 }
 

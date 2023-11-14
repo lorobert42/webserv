@@ -117,8 +117,12 @@ ConfigServer::ConfigServer(const std::string &serverConfig) {
 				throw InvalidOptionKeyException(option);
 		}
 	} catch (std::exception &e) {
-		std::cerr << e.what() << std::endl;
-		exit(EXIT_FAILURE);
+		if (this->_hostnames.size() > 0) {
+			for (std::vector<ConfigHostname*>::iterator it = this->_hostnames.begin(); it != this->_hostnames.end(); ++it) {
+				delete (*it);
+			}
+		}
+		throw;
 	}
 }
 

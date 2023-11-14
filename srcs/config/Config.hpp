@@ -16,9 +16,9 @@ class Config {
         Config(Config const &src);
         Config	&operator=(Config const &rhs);
 
-        std::vector<ConfigServer*>   getServers() const;
+        std::vector<ConfigServer*>  getServers() const;
     private:
-        std::vector<ConfigServer*>   _servers;
+        std::vector<ConfigServer*>  _servers;
 };
 
 std::ostream    &operator<<(std::ostream &o, Config const &rhs);

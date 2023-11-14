@@ -49,8 +49,12 @@ Config::Config(const char *configPath) {
 			throw NoServerDefinedException();
 		}
 	} catch (std::exception &e) {
-		std::cerr << e.what() << std::endl;
-		exit(EXIT_FAILURE);
+		if (this->_servers.size() > 0) {
+			for (std::vector<ConfigServer*>::iterator it = this->_servers.begin(); it != this->_servers.end(); ++it) {
+				delete (*it);
+			}
+		}
+		throw;
 	}
 }
 
