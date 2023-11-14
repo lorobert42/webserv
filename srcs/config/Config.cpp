@@ -5,46 +5,56 @@ Config::Config() {
 }
 
 Config::Config(const char *configPath) {
-	// Check extension must be .lms
-	std::string path(configPath);
-	if (path.substr(path.find_last_of(".") + 1) != "lms") {
-		throw InvalidExtensionException();
-	}
 
-	// Open config file
-	std::ifstream config(configPath);
-	if (!config.is_open()) {
-		throw CouldNotOpenFileException();
-	}
+	try {
+		// Check extension must be .lms
+		std::string path(configPath);
+		if (path.substr(path.find_last_of(".") + 1) != "lms") {
+			throw InvalidExtensionException();
+		}
 
-	// Read config file
-	std::string line;
-	while (std::getline(config, line)) {
-		if (line.empty())
-			continue;
+		// Open config file
+		std::ifstream config(configPath);
+		if (!config.is_open()) {
+			throw CouldNotOpenFileException();
+		}
 
-		// Check if line contains strictly "server:"
-		if (line == "server:") {
-			std::string serverConfig;
-			while (std::getline(config, line) && (line[0] == '\t' || line.empty())) {
-				// Remove tabulation
-				line.erase(0, 1);
-				serverConfig += line + "\n";
-			}
-			if (line != ";") {
-				throw InvalidCloseDirectiveException(line);
-			}
-			if (serverConfig.empty()) {
-				this->_servers.push_back(new ConfigServer());
-			} else {
-				this->_servers.push_back(new ConfigServer(serverConfig));
+		// Read config file
+		std::string line;
+		while (std::getline(config, line)) {
+			if (line.empty())
+				continue;
+
+			// Check if line contains strictly "server:"
+			if (line == "server:") {
+				std::string serverConfig;
+				while (std::getline(config, line) && (line[0] == '\t' || line.empty())) {
+					// Remove tabulation
+					line.erase(0, 1);
+					serverConfig += line + "\n";
+				}
+				if (line != ";") {
+					throw InvalidCloseDirectiveException(line);
+				}
+				if (serverConfig.empty()) {
+					this->_servers.push_back(new ConfigServer());
+				} else {
+					this->_servers.push_back(new ConfigServer(serverConfig));
+				}
 			}
 		}
-	}
 
-	// Check if at least one server is defined
-	if (this->_servers.size() == 0) {
-		throw NoServerDefinedException();
+		// Check if at least one server is defined
+		if (this->_servers.size() == 0) {
+			throw NoServerDefinedException();
+		}
+	} catch (std::exception &e) {
+		if (this->_servers.size() > 0) {
+			for (std::vector<ConfigServer*>::iterator it = this->_servers.begin(); it != this->_servers.end(); ++it) {
+				delete (*it);
+			}
+		}
+		throw;
 	}
 }
 

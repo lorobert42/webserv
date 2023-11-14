@@ -32,16 +32,10 @@ Request::Request(double client_max_body_size) :
 {}
 
 // ### Copy Constructor ###
-Request::Request(Request const& other) :
-	_rawRequest(other._rawRequest),
-	_header(other._header),
-	_method(other._method),
-	_uri(other._uri),
-	_version(other._version),
-	_body(other._body),
-	_error(other._error),
-	_client_max_body_size(other._client_max_body_size)
-{}
+Request::Request(Request const& other)
+{
+	*this = other;
+}
 
 // ### Destructor ###
 Request::~Request()

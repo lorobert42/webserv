@@ -23,17 +23,10 @@ Response::Response(ConfigServer* config, Request* request) :
 	_should_close(false)
 {}
 
-Response::Response(Response const& other) :
-	_config_server(other._config_server),
-	_config_hostname(other._config_hostname),
-	_route(other._route),
-	_request(other._request),
-	_header(other._header),
-	_body(other._body),
-	_path(other._path),
-	_uri_segments(other._uri_segments),
-	_should_close(other._should_close)
-{}
+Response::Response(Response const& other)
+{
+	*this = other;
+}
 
 Response& Response::operator=(Response const& other)
 {
