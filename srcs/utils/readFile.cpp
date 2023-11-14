@@ -6,9 +6,10 @@ std::string	readFile(std::string const& path)
 	std::string all;
 	std::ifstream ifs(path.c_str());
 
-	if (!ifs)
+	if (!ifs.is_open())
 		throw std::runtime_error("Cannot read file: " + path);
 	while (std::getline(ifs, line))
-		all.append(line);
+		all.append(line + "\n");
+	ifs.close();
 	return (all);
 }

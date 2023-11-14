@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 12:57:48 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/10 13:39:55 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/14 09:57:27 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -297,7 +297,7 @@ void	Response::_createHeader(int status)
 			_header.append("411 Length Required\r\n");
 			break;
 		case 413:
-			_header.append("413 Payload Too Large\r\n");
+			_header.append("413 Content Too Large\r\n");
 			break;
 		case 501:
 			_header.append("501 Not Implemented\r\n");
