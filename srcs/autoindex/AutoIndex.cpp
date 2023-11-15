@@ -107,6 +107,8 @@ std::string AutoIndex::getBody() {
 	for (std::vector<std::string>::iterator it = this->_folders.begin(); it != this->_folders.end(); ++it)
 	{
 		this->_body.append("<a href=\"");
+		this->_body.append(this->_uri);
+		this->_body.append("/");
 		this->_body.append(*it);
 		this->_body.append("/\">");
 		this->_body.append(*it);
