@@ -89,6 +89,20 @@ AutoIndex	&AutoIndex::operator=(const AutoIndex &rhs) {
 
 AutoIndex::~AutoIndex() {}
 
+bool AutoIndex::isExistingFile() {
+	struct stat s;
+
+	if (stat(_pwd.c_str(), &s) == -1)
+		return (false);
+	if (s.st_mode & S_IFREG) // check the path for a existing file
+	{
+		if (access(_pwd.c_str(), R_OK) == 0) // check if we can read the file
+			return (true);
+		return (false);
+	}
+	return (false);
+}
+
 std::string AutoIndex::getBody() {
 
 	this->_body.append("<html>\n");

@@ -233,9 +233,8 @@ bool	Response::_checkPath()
 	AutoIndex autoindex(_request->getUri(), _path);
 
 	// If autoindex is true and file exists -> 200
-	if (_route->getAutoindex() && autoindex.fileExists()) {
-		_should_close = true;
-		return (false);
+	if (_route->getAutoindex() && autoindex.isExistingFile()) {
+		return (true);
 	}
 
 	int err_dir = _checkDir();
