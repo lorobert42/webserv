@@ -118,6 +118,8 @@ void	Response::_createRoute()
 			if (_route != NULL)
 				break ;
 		}
+		if (_route == NULL)
+			_route = _config_hostname->getRouteWithUri("/");
 	}
 }
 
@@ -216,8 +218,10 @@ std::string Response::_createPathFromUri(std::string const& uri)
 {
 	std::string calculatedPath = _route->getPath();
 	if (uri != _route->getUri()) {
-		std::string uriWithoutRoute = uri.substr(_route->getUri().length() + 1);
-		calculatedPath.append(uriWithoutRoute);
+		if (_route->getUri() == "/")
+			calculatedPath.append(uri.substr(_route->getUri().length()));
+		else
+			calculatedPath.append(uri.substr(_route->getUri().length() + 1));
 		calculatedPath.append("/");
 	}
 	// Remove last slash
@@ -228,14 +232,11 @@ std::string Response::_createPathFromUri(std::string const& uri)
 
 bool	Response::_checkPath()
 {
-	std::cout << "🚧Route: " << *_route << std::endl;
-	std::cout << "🚗Path: " << _path << std::endl;
 	AutoIndex autoindex(_request->getUri(), _path);
 
 	// If autoindex is true and file exists -> 200
-	if (_route->getAutoindex() && autoindex.isExistingFile()) {
+	if (_route->getAutoindex() && autoindex.isExistingFile())
 		return (true);
-	}
 
 	int err_dir = _checkDir();
 	int err_file = err_dir == E_SUCCESS ? _checkFile() : E_FAIL;
