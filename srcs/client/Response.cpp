@@ -228,6 +228,16 @@ std::string Response::_createPathFromUri(std::string const& uri)
 
 bool	Response::_checkPath()
 {
+	std::cout << "🚧Route: " << *_route << std::endl;
+	std::cout << "🚗Path: " << _path << std::endl;
+	AutoIndex autoindex(_request->getUri(), _path);
+
+	// If autoindex is true and file exists -> 200
+	if (_route->getAutoindex() && autoindex.fileExists()) {
+		_should_close = true;
+		return (false);
+	}
+
 	int err_dir = _checkDir();
 	int err_file = err_dir == E_SUCCESS ? _checkFile() : E_FAIL;
 
@@ -236,8 +246,15 @@ bool	Response::_checkPath()
 		return (true);
 	// If folder exists, but file doesn't or not readable -> 403
 	else if (err_dir == E_SUCCESS && (err_file == E_FAIL || err_file == E_ACCESS)) {
-		if (!_checkAutoindex())
-			_createErrorResponse(403);
+
+		// If autoindex is true, display folder content
+		if (_route->getAutoindex()) {
+			_body = autoindex.getBody();
+			_createHeader(200);
+			_should_close = true;
+			return (false);
+		}
+		_createErrorResponse(403);
 	}
 	// If folder exists, but it's not readable -> 403
 	else if (err_dir == E_ACCESS)
@@ -279,19 +296,6 @@ int	Response::_checkFile()
 		return (E_ACCESS);
 	}
 	return (E_FAIL);
-}
-
-int	Response::_checkAutoindex()
-{
-	if (_route->getAutoindex()) {
-		std::cout << "Autoindex" << std::endl;
-		AutoIndex autoindex(_request->getUri(), _route->getPath());
-		_body = autoindex.getBody();
-		_createHeader(200);
-		_should_close = true;
-		return (true);
-	}
-	return (false);
 }
 
 bool	Response::_createBody()

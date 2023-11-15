@@ -6,7 +6,7 @@ server:
 		route:
 			uri=/autoindex
 			path=www/autoindex/
-			index=ff.html
+			index=index.html
 			autoindex=true
 		;
 	;

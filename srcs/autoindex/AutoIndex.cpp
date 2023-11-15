@@ -83,7 +83,6 @@ AutoIndex	&AutoIndex::operator=(const AutoIndex &rhs) {
 		this->_pwd = rhs._pwd;
 		this->_body = rhs._body;
 		this->_folders = rhs._folders;
-		this->_files = rhs._files;
 	}
 	return *this;
 }
@@ -108,6 +107,8 @@ std::string AutoIndex::getBody() {
 	{
 		this->_body.append("<a href=\"");
 		this->_body.append(this->_uri);
+		if (this->_uri[this->_uri.length() - 1] != '/')
+			this->_body.append("/");
 		this->_body.append(*it);
 		this->_body.append("/\">");
 		this->_body.append(*it);
@@ -127,6 +128,8 @@ std::string AutoIndex::getBody() {
 	{
 		this->_body.append("<a href=\"");
 		this->_body.append(this->_uri);
+		if (this->_uri[this->_uri.length() - 1] != '/')
+			this->_body.append("/");
 		this->_body.append(*it);
 		this->_body.append("\">");
 		this->_body.append(*it);
