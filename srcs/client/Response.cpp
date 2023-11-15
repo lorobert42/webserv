@@ -220,6 +220,9 @@ std::string Response::_createPathFromUri(std::string const& uri)
 		calculatedPath.append(uriWithoutRoute);
 		calculatedPath.append("/");
 	}
+	// Remove last slash
+	if (calculatedPath[calculatedPath.length() - 1] == '/')
+		calculatedPath.erase(calculatedPath.length() - 1);
 	return calculatedPath;
 }
 
