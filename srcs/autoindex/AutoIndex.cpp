@@ -39,6 +39,8 @@ AutoIndex::AutoIndex(const std::string &uri, const std::string &pwd) :
 	_uri(uri),
 	_pwd(pwd)
 {
+	std::cout << "uri: " << uri << std::endl;
+	std::cout << "pwd: " << pwd << std::endl;
 	// Get all files and folders in path_folder
 	DIR *dir;
 	struct dirent *ent;

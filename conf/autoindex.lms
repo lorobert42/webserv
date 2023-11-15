@@ -4,10 +4,10 @@ server:
 
 	hostname:
 		route:
-			uri=/
+			uri=/autoindex
 			path=www/autoindex/
 			index=ff.html
-			autoindex=on
+			autoindex=true
 		;
 	;
 ;
