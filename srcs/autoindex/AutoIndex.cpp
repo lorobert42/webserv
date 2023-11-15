@@ -39,6 +39,8 @@ AutoIndex::AutoIndex(const std::string &uri, const std::string &pwd) :
 	_uri(uri),
 	_pwd(pwd)
 {
+	std::cout << "uri: " << uri << std::endl;
+	std::cout << "pwd: " << pwd << std::endl;
 	// Get all files and folders in path_folder
 	DIR *dir;
 	struct dirent *ent;
@@ -81,12 +83,25 @@ AutoIndex	&AutoIndex::operator=(const AutoIndex &rhs) {
 		this->_pwd = rhs._pwd;
 		this->_body = rhs._body;
 		this->_folders = rhs._folders;
-		this->_files = rhs._files;
 	}
 	return *this;
 }
 
 AutoIndex::~AutoIndex() {}
+
+bool AutoIndex::isExistingFile() {
+	struct stat s;
+
+	if (stat(_pwd.c_str(), &s) == -1)
+		return (false);
+	if (s.st_mode & S_IFREG) // check the path for a existing file
+	{
+		if (access(_pwd.c_str(), R_OK) == 0) // check if we can read the file
+			return (true);
+		return (false);
+	}
+	return (false);
+}
 
 std::string AutoIndex::getBody() {
 
@@ -105,6 +120,9 @@ std::string AutoIndex::getBody() {
 	for (std::vector<std::string>::iterator it = this->_folders.begin(); it != this->_folders.end(); ++it)
 	{
 		this->_body.append("<a href=\"");
+		this->_body.append(this->_uri);
+		if (this->_uri[this->_uri.length() - 1] != '/')
+			this->_body.append("/");
 		this->_body.append(*it);
 		this->_body.append("/\">");
 		this->_body.append(*it);
@@ -123,6 +141,9 @@ std::string AutoIndex::getBody() {
 	for (std::vector<std::string>::iterator it = this->_files.begin(); it != this->_files.end(); ++it)
 	{
 		this->_body.append("<a href=\"");
+		this->_body.append(this->_uri);
+		if (this->_uri[this->_uri.length() - 1] != '/')
+			this->_body.append("/");
 		this->_body.append(*it);
 		this->_body.append("\">");
 		this->_body.append(*it);

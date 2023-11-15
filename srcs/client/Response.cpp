@@ -118,6 +118,8 @@ void	Response::_createRoute()
 			if (_route != NULL)
 				break ;
 		}
+		if (_route == NULL)
+			_route = _config_hostname->getRouteWithUri("/");
 	}
 }
 
@@ -216,24 +218,50 @@ std::string Response::_createPathFromUri(std::string const& uri)
 {
 	std::string calculatedPath = _route->getPath();
 	if (uri != _route->getUri()) {
-		std::string uriWithoutRoute = uri.substr(_route->getUri().length() + 1);
-		calculatedPath.append(uriWithoutRoute);
+		if (_route->getUri() == "/")
+			calculatedPath.append(uri.substr(_route->getUri().length()));
+		else
+			calculatedPath.append(uri.substr(_route->getUri().length() + 1));
 		calculatedPath.append("/");
 	}
+	// Remove last slash
+	if (calculatedPath[calculatedPath.length() - 1] == '/')
+		calculatedPath.erase(calculatedPath.length() - 1);
 	return calculatedPath;
 }
 
 bool	Response::_checkPath()
 {
-	int error = _checkDir();
-	if (error == E_SUCCESS)
-		error = _checkFile();
-	if (error == E_SUCCESS)
+	AutoIndex autoindex(_request->getUri(), _path);
+
+	// If autoindex is true and file exists -> 200
+	if (_route->getAutoindex() && autoindex.isExistingFile())
 		return (true);
-	else if (error == E_FAIL)
-		_createErrorResponse(404);
-	else
+
+	int err_dir = _checkDir();
+	int err_file = err_dir == E_SUCCESS ? _checkFile() : E_FAIL;
+
+	// If folder and file exist -> 200
+	if (err_dir == E_SUCCESS && err_file == E_SUCCESS)
+		return (true);
+	// If folder exists, but file doesn't or not readable -> 403
+	else if (err_dir == E_SUCCESS && (err_file == E_FAIL || err_file == E_ACCESS)) {
+
+		// If autoindex is true, display folder content
+		if (_route->getAutoindex()) {
+			_body = autoindex.getBody();
+			_createHeader(200);
+			_should_close = true;
+			return (false);
+		}
 		_createErrorResponse(403);
+	}
+	// If folder exists, but it's not readable -> 403
+	else if (err_dir == E_ACCESS)
+		_createErrorResponse(403);
+	// If folder doesn't exist -> 404
+	else
+		_createErrorResponse(404);
 	return (false);
 }
 

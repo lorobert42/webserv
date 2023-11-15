@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
 #include <vector>
@@ -15,6 +16,7 @@ class AutoIndex {
 		~AutoIndex();
 
 		std::string getBody();
+		bool		isExistingFile();
 
 	private:
 		AutoIndex();

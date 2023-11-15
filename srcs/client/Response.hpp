@@ -27,6 +27,7 @@
 #include "../cgi/CgiHandler.hpp"
 #include "../utils/readFile.hpp"
 #include "ClientHelper.hpp"
+#include "../autoindex/Autoindex.hpp"
 
 enum	error_code
 {
@@ -63,6 +64,7 @@ class Response
 		bool		_checkPath();
 		int			_checkDir();
 		int			_checkFile();
+		int			_checkAutoindex();
 		bool		_createBody();
 		void		_createHeader(int status);
 		void		_createErrorResponse(int status);
