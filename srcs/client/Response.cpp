@@ -225,15 +225,21 @@ std::string Response::_createPathFromUri(std::string const& uri)
 
 bool	Response::_checkPath()
 {
-	int error = _checkDir();
-	if (error == E_SUCCESS)
-		error = _checkFile();
-	if (error == E_SUCCESS)
+	int err_dir = _checkDir();
+	int err_file = err_dir == E_SUCCESS ? _checkFile() : E_FAIL;
+
+	// If folder and file exist -> 200
+	if (err_dir == E_SUCCESS && err_file == E_SUCCESS)
 		return (true);
-	else if (error == E_FAIL)
-		_createErrorResponse(404);
-	else
+	// If folder exists, but file doesn't or not readable -> 403
+	else if (err_dir == E_SUCCESS && (err_file == E_FAIL || err_file == E_ACCESS))
 		_createErrorResponse(403);
+	// If folder exists, but it's not readable -> 403
+	else if (err_dir == E_ACCESS)
+		_createErrorResponse(403);
+	// If folder doesn't exist -> 404
+	else
+		_createErrorResponse(404);
 	return (false);
 }
 

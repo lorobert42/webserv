@@ -1,0 +1,13 @@
+server:
+	name=webserv
+	port=8080
+
+	hostname:
+		route:
+			uri=/
+			path=www/autoindex/
+			index=ff.html
+			autoindex=on
+		;
+	;
+;
