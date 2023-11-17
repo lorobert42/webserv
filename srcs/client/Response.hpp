@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 12:57:53 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/14 12:29:00 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/17 13:31:17 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,7 +27,7 @@
 #include "../cgi/CgiHandler.hpp"
 #include "../utils/readFile.hpp"
 #include "ClientHelper.hpp"
-#include "../autoindex/Autoindex.hpp"
+#include "../autoindex/AutoIndex.hpp"
 
 enum	error_code
 {
