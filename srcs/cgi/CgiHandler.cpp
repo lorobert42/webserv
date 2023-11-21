@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/21 11:08:37 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/21 11:22:34 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/21 16:19:19 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -147,7 +147,7 @@ std::string CgiHandler::executeCgi() {
 		time_t start = time(NULL);
 		while (waitpid(pid, &status, WNOHANG) == 0) {
 			time_t	now = time(NULL);
-			if (difftime(now, start) > 2) {
+			if (difftime(now, start) > 20) {
 				kill(pid, SIGKILL);
 				_statusCode = 508;
 				break;

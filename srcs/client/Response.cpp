@@ -6,7 +6,7 @@
 /*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/09 12:57:48 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/14 09:57:27 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/21 17:45:34 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,8 @@ void	Response::createResponse()
 	if (!_checkRequestOK())
 		return ;
 	_config_hostname = _config_server->getHostnameWithName(_request->getHostname());
+
+
 	_createRoute();
 	if (!_checkRouteExists())
 		return ;
@@ -119,7 +121,9 @@ void	Response::_createRoute()
 				break ;
 		}
 		if (_route == NULL)
-			_route = _config_hostname->getRouteWithUri("/");
+            _route = _config_hostname->getRouteWithUri("/");
+		if (_route->getAutoindex() == false)
+			_route = NULL;
 	}
 }
 

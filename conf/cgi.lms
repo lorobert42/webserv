@@ -1,7 +1,9 @@
 server:
 	name=webserv
 	port=8080
-	timeout=2
+	timeout=60
+	client_max_body_size=5M
+
 
 	hostname:
 		route:
