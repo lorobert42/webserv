@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   ServerManager.cpp                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
+/*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/14 16:03:43 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/21 11:29:56 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,11 +15,14 @@
 extern bool g_should_stop;
 
 // ### Constructor ###
-ServerManager::ServerManager()
+ServerManager::ServerManager() :
+	_config(NULL),
+	_epfd(-1)
 {}
 
 ServerManager::ServerManager(Config* config) :
-	_config(config)
+	_config(config),
+	_epfd(-1)
 {}
 
 // ### Copy Constructor ###
