@@ -1,13 +1,11 @@
 server:
 	name=webserv
 	port=8080
-	timeout=10
 
 	hostname:
-		name=test.com
 		route:
 			uri=/
-			path=www/srcs/
+			path=www/hello_world/
 			index=home.html
 		;
 	;
