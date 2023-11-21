@@ -1,0 +1,31 @@
+server:
+	name=webserv
+	port=80
+
+	hostname:
+		name=test.com
+		route:
+			uri=/
+			path=www/hostname/
+			index=index.html
+		;
+	;
+
+	hostname:
+		name=test1.com
+		route:
+			uri=/
+			path=www/hostname/
+			index=host1.html
+		;
+	;
+
+	hostname:
+		name=test2.com
+		route:
+			uri=/
+			path=www/hostname/
+			index=host2.html
+		;
+	;
+;
