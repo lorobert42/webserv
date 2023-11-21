@@ -130,7 +130,7 @@ std::string CgiHandler::executeCgi() {
 		time_t start = time(NULL);
 		while (waitpid(pid, &status, WNOHANG) == 0) {
 			time_t	now = time(NULL);
-			if (difftime(now, start) > _response->getConfigServer()->getTimeout()) {
+			if (difftime(now, start) > 2) {
 				kill(pid, SIGKILL);
 				_statusCode = 508;
 				break;
