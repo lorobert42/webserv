@@ -1,10 +1,23 @@
 server:
 	name=webserv
 	port=8080
+	timeout=60
 
 	hostname:
 		route:
 			uri=/
+			path=www/hello_world/
+			index=asodiaf.html
+			autoindex=true
+		;
+		route:
+			uri=/foo
+			path=www/autoindex/
+			index=hello.html
+			autoindex=true
+		;
+		route:
+			uri=/bar
 			path=www/autoindex/
 			index=index.html
 			autoindex=true

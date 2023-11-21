@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/21 11:09:06 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/21 11:09:09 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/21 16:21:27 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ Request& Request::operator=(Request const& other)
 	return (*this);
 }
 
-//	### Member Function [PUBLIC] ###
+// ### Member Function [PUBLIC] ###
 // ### Header parser
 int	Request::parseHeader()
 {

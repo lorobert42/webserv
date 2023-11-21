@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/21 11:08:30 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/21 11:08:32 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/21 16:55:11 by mjulliat         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,8 @@
 #include <vector>
 #include <algorithm>
 #include <sstream>
+
+//TODO Fix not allowed to go back further than the initial path
 
 class AutoIndex {
 	public:
