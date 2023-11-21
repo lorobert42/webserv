@@ -1,13 +1,12 @@
 server:
 	name=webserv
 	port=8080
-	client_max_body_size=5M
 
 	hostname:
 		name=test.com
 		route:
 			uri=/
-			path=www/path/
+			path=www/hostname/
 			index=index.html
 		;
 	;
@@ -16,8 +15,8 @@ server:
 		name=test1.com
 		route:
 			uri=/
-			path=www/path/1/
-			index=index.html
+			path=www/hostname/
+			index=host1.html
 		;
 	;
 
@@ -25,8 +24,8 @@ server:
 		name=test2.com
 		route:
 			uri=/
-			path=www/path/2/
-			index=index.html
+			path=www/hostname/
+			index=host2.html
 		;
 	;
 ;

@@ -1,0 +1,16 @@
+server:
+	name=webserv
+	port=8080
+
+	hostname:
+		route:
+			uri=/
+			path=www/hello_world/
+		;
+		route:
+			uri=/salut
+			path=www/hello_world/
+			index=salut.html
+		;
+	;
+;

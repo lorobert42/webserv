@@ -1,0 +1,13 @@
+server:
+	name=webserv
+	port=8080
+
+	hostname:
+		route:
+			uri=/
+			get=true
+			cgi_script=www/cgi/fake.cgi.php
+			cgi_bin=/usr/bin/php-cgi
+		;
+	;
+;
