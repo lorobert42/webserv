@@ -3,19 +3,25 @@
 /*                                                        :::      ::::::::   */
 /*   Client.cpp                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: lorobert <lorobert@student.42lausanne.ch>  +#+  +:+       +#+        */
+/*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/11 13:29:33 by mjulliat          #+#    #+#             */
-/*   Updated: 2023/11/14 13:15:44 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/21 11:24:00 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "Client.hpp"
-#include "Request.hpp"
-#include "Response.hpp"
 
 // ### Constructor ###
-Client::Client()
+Client::Client() :
+	_config_server(NULL),
+	_socket(-1),
+	_nb_read(0),
+	_total_bytes_send(0),
+	_headerOk(false),
+	_responseOK(false),
+	_CGI_on(false),
+	_error(false)
 {}
 
 Client::Client(ConfigServer *config, int &client_socket) :

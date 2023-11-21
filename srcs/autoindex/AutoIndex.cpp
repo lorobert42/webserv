@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/21 11:08:19 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/21 11:08:26 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/21 11:20:18 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,11 +45,16 @@ static void appendCorrectSpace(size_t contentLength, std::string &body, size_t n
 	body.append(std::string(spacesToAppend, ' '));
 }
 
-AutoIndex::AutoIndex() {}
+AutoIndex::AutoIndex() :
+	_uri(""),
+	_pwd(""),
+	_body("")
+{}
 
 AutoIndex::AutoIndex(const std::string &uri, const std::string &pwd) :
 	_uri(uri),
-	_pwd(pwd)
+	_pwd(pwd),
+	_body("")
 {
 	std::cout << "uri: " << uri << std::endl;
 	std::cout << "pwd: " << pwd << std::endl;

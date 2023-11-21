@@ -6,13 +6,17 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/21 11:08:37 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/21 11:08:38 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/21 11:22:34 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "CgiHandler.hpp"
 
-CgiHandler::CgiHandler() {}
+CgiHandler::CgiHandler() :
+	_response(NULL),
+	_bodyContent(""),
+	_statusCode(0)
+{}
 
 CgiHandler::CgiHandler(Response *response) :
 	_response(response),
@@ -68,6 +72,7 @@ CgiHandler   	&CgiHandler::operator=(CgiHandler const &rhs)
 		this->_env = rhs._env;
 		this->_response = rhs._response;
 		this->_bodyContent = rhs._bodyContent;
+		this->_statusCode = rhs._statusCode;
 	}
 	return (*this);
 }
