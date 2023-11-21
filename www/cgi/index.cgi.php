@@ -17,6 +17,7 @@
 		<li><a href="/form">Form</a></li>
 		<li><a href="/list">Uploaded files</a></li>
 		<li><a href="/counter">Counter</a></li>
+		<li><a href="/session">Session</a></li>
 		<li><a href="/python">Python</a></li>
 		<li><a href="/loop">Loop</a></li>
 	</ul>
