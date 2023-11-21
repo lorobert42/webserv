@@ -49,5 +49,12 @@ server:
 			cgi_script=www/cgi/hello.cgi.py
 			cgi_bin=/usr/bin/python3
 		;
+		route:
+			uri=/session
+			get=true
+			post=true
+			cgi_script=www/cgi/session.cgi.php
+			cgi_bin=/usr/bin/php-cgi
+		;
 	;
 ;
