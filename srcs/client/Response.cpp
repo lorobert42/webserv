@@ -217,16 +217,19 @@ bool	Response::_checkCgi()
 std::string Response::_createPathFromUri(std::string const& uri)
 {
 	std::string calculatedPath = _route->getPath();
-	if (uri != _route->getUri()) {
-		if (_route->getUri() == "/")
-			calculatedPath.append(uri.substr(_route->getUri().length()));
-		else
-			calculatedPath.append(uri.substr(_route->getUri().length() + 1));
-		calculatedPath.append("/");
+
+	if (_route->getAutoindex() == true) {
+		if (uri != _route->getUri()) {
+			if (_route->getUri() == "/")
+				calculatedPath.append(uri.substr(_route->getUri().length()));
+			else
+				calculatedPath.append(uri.substr(_route->getUri().length() + 1));
+			calculatedPath.append("/");
+		}
+		// Remove last slash
+		if (calculatedPath[calculatedPath.length() - 1] == '/')
+			calculatedPath.erase(calculatedPath.length() - 1);
 	}
-	// Remove last slash
-	if (calculatedPath[calculatedPath.length() - 1] == '/')
-		calculatedPath.erase(calculatedPath.length() - 1);
 	return calculatedPath;
 }
 
@@ -273,6 +276,7 @@ int	Response::_checkDir()
 	struct stat s;
 	DIR *fd;
 
+	std::cout << "checkdir:" << _path.c_str() << std::endl;
 	if (stat(_path.c_str(), &s) == -1)
 		return (E_FAIL);
 	if (s.st_mode & S_IFDIR) // check the path for a existing dir

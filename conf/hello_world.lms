@@ -7,5 +7,10 @@ server:
 			uri=/
 			path=www/hello_world/
 		;
+		route:
+			uri=/salut
+			path=www/hello_world/
+			index=salut.html
+		;
 	;
 ;
