@@ -8,7 +8,6 @@ server:
 		route:
 			uri=/
 			path=www/redirect/
-			index=hello.html
 		;
 
 		route:

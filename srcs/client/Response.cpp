@@ -241,6 +241,9 @@ bool	Response::_checkPath()
 	int err_dir = _checkDir();
 	int err_file = err_dir == E_SUCCESS ? _checkFile() : E_FAIL;
 
+	std::cout << "err_dir: " << err_dir << std::endl;
+	std::cout << "err_file: " << err_file << std::endl;
+
 	// If folder and file exist -> 200
 	if (err_dir == E_SUCCESS && err_file == E_SUCCESS)
 		return (true);
@@ -277,6 +280,8 @@ int	Response::_checkDir()
 		if ((fd = opendir(_path.c_str())) == NULL) // check if we can open the dir
 			return (E_ACCESS);
 		closedir(fd);
+		if (_path[_path.length() - 1] != '/')
+			_path.append("/");
 		_path.append(_route->getIndex()); // if both is ok will append the the index to the path
 		return (E_SUCCESS);
 	}
@@ -287,6 +292,7 @@ int	Response::_checkFile()
 {
 	struct stat s;
 
+	std::cout << "checkfile:" << _path.c_str() << std::endl;
 	if (stat(_path.c_str(), &s) == -1)
 		return (E_FAIL);
 	if (s.st_mode & S_IFREG) // check the path for a existing file

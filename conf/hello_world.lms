@@ -6,7 +6,6 @@ server:
 		route:
 			uri=/
 			path=www/hello_world/
-			index=home.html
 		;
 	;
 ;
