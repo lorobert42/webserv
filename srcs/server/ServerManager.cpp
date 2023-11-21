@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/09/20 13:29:33 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/21 11:29:56 by lorobert         ###   ########.fr       */
+/*   Updated: 2023/11/21 11:59:24 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,11 @@ ServerManager& ServerManager::operator=(ServerManager const& other)
 void	ServerManager::start()
 {
 	_setupServers();
+	if (_servers.size() == 0)
+	{
+		std::cerr << "No server could be started\n";
+		return ;
+	}
 	if (_setupEpoll() == false)
 	{
 		return;
