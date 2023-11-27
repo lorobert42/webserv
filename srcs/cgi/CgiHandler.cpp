@@ -143,14 +143,17 @@ std::string CgiHandler::executeCgi() {
 		}
 		close(inpipefd[1]); // Close the write end once data is written
 
-		int status;
-		time_t start = time(NULL);
-		while (waitpid(pid, &status, WNOHANG) == 0) {
-			time_t	now = time(NULL);
-			if (difftime(now, start) > 5) {
-				kill(pid, SIGKILL);
-				_statusCode = 508;
-				break;
+		if (this->_response->getRequest()->getUri() != "/list" || this->_response->getRequest()->getMethod() != "POST")
+		{
+			int status;
+			time_t start = time(NULL);
+			while (waitpid(pid, &status, WNOHANG) == 0) {
+				time_t	now = time(NULL);
+				if (difftime(now, start) > 5) {
+					kill(pid, SIGKILL);
+					_statusCode = 508;
+					break;
+				}
 			}
 		}
 
