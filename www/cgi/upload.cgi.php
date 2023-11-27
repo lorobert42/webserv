@@ -7,6 +7,7 @@
     ob_start();
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    	$upload_message = "No file uploaded...";
 
         // File upload handling
         if (isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
