@@ -102,14 +102,32 @@ std::string CgiHandler::executeCgi() {
 	pid_t pid;
 	int inpipefd[2]; // For writing input to CGI script
 	int outpipefd[2]; // For reading output from CGI script
-	char buffer[4096];
-	int bytesRead;
+	const int BUFFER_SIZE = 4096;
+	char buffer[BUFFER_SIZE];
 	std::string response;
 	char** env = this->_getEnv();
 
 	if (pipe(inpipefd) == -1 || pipe(outpipefd) == -1) {
 		throw std::runtime_error("[CGI] pipe() failed");
 	}
+
+	// Configure outpipefd[0] for non-blocking I/O
+	fcntl(outpipefd[0], F_SETFL, O_NONBLOCK);
+
+	// Create epoll instance
+	int epoll_fd = epoll_create1(0);
+	if (epoll_fd == -1) {
+		throw std::runtime_error("[CGI] epoll_create1() failed");
+	}
+
+	struct epoll_event ev;
+	ev.events = EPOLLIN; // Interested in input events
+	ev.data.fd = outpipefd[0];
+
+	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, outpipefd[0], &ev) == -1) {
+		throw std::runtime_error("[CGI] epoll_ctl() failed");
+	}
+
 	if ((pid = fork()) == -1) {
 		throw std::runtime_error("[CGI] fork() failed");
 	}
@@ -143,26 +161,51 @@ std::string CgiHandler::executeCgi() {
 		}
 		close(inpipefd[1]); // Close the write end once data is written
 
-		if (this->_response->getRequest()->getUri() != "/list" || this->_response->getRequest()->getMethod() != "POST")
-		{
-			int status;
-			time_t start = time(NULL);
-			while (waitpid(pid, &status, WNOHANG) == 0) {
-				time_t	now = time(NULL);
-				if (difftime(now, start) > 5) {
-					kill(pid, SIGKILL);
-					_statusCode = 508;
+		struct epoll_event events[1];
+		int nr_events;
+		int status;
+		bool childExited = false;
+		time_t startTime = time(NULL);
+
+		while (!childExited || nr_events > 0) {
+
+			// Check for timeout
+			time_t currentTime = time(NULL);
+			if (difftime(currentTime, startTime) > 5) {
+				kill(pid, SIGKILL);
+				_statusCode = 508;
+				break;
+			}
+
+			// Check if child has exited
+			if (waitpid(pid, &status, WNOHANG) > 0) {
+				childExited = true;
+			}
+
+			// Wait for events on the epoll file descriptor
+			nr_events = epoll_wait(epoll_fd, events, 1, 1000); // 1000 ms timeout
+
+			if (nr_events == -1) {
+				if (errno != EINTR) {
+					perror("epoll_wait");
 					break;
+				}
+			} else if (nr_events > 0) {
+				if (events[0].data.fd == outpipefd[0]) {
+					int bytesRead = read(outpipefd[0], buffer, BUFFER_SIZE);
+					if (bytesRead > 0) {
+						response.append(buffer, bytesRead);
+					} else if (bytesRead == 0 ||
+							   (bytesRead == -1 && errno != EAGAIN)) {
+						break; // Pipe closed or error
+					}
 				}
 			}
 		}
 
-		while ((bytesRead = read(outpipefd[0], buffer, sizeof(buffer))) > 0) {
-			response.append(buffer, bytesRead);
-		}
-
 		close(outpipefd[0]);
 	}
+
 	freeEnv(env);
 
 	// Get the status code from the response
