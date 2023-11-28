@@ -99,30 +99,38 @@ char	**CgiHandler::_getEnv() {
 }
 
 std::string CgiHandler::executeCgi() {
-	pid_t pid;
-	int inpipefd[2]; // For writing input to CGI script
-	int outpipefd[2]; // For reading output from CGI script
-	char buffer[4096];
-	int bytesRead;
-	std::string response;
-	char** env = this->_getEnv();
+	pid_t		pid;
+	int			fd[2]; // For writing input to CGI script
+	char 		buffer[4096];
+	int 		bytesRead;
+	std::string	response;
+	char** 		env = this->_getEnv();
 
-	if (pipe(inpipefd) == -1 || pipe(outpipefd) == -1) {
+	// Create a temporary file to store the output of the CGI script
+	char tempFileName[] = "/tmp/cgi_output.XXXXXX";
+	int tempFileDescriptor = mkstemp(tempFileName);
+	if (tempFileDescriptor == -1) {
+		throw std::runtime_error("[CGI] mkstemp() failed");
+	}
+
+	if (pipe(fd) == -1) {
 		throw std::runtime_error("[CGI] pipe() failed");
 	}
+
 	if ((pid = fork()) == -1) {
 		throw std::runtime_error("[CGI] fork() failed");
 	}
-	if (pid == 0) {
-		close(outpipefd[0]); // Close the read end of the out pipe
-		close(inpipefd[1]);  // Close the write end of the in pipe
 
-		if (dup2(inpipefd[0], STDIN_FILENO) == -1 || dup2(outpipefd[1], STDOUT_FILENO) == -1) {
+	if (pid == 0) { // Child process
+		close(fd[1]);  // Close the write end of the in pipe
+
+		// Redirection de la sortie standard vers le fichier temporaire
+		if (dup2(fd[0], STDIN_FILENO) == -1 || dup2(tempFileDescriptor, STDOUT_FILENO) == -1) {
 			perror("dup2");
 			exit(EXIT_FAILURE);
 		}
-		close(inpipefd[0]);
-		close(outpipefd[1]);
+		close(fd[0]);
+		close(tempFileDescriptor);
 
 		char* argv[3];
 		argv[0] = const_cast<char*>(this->_env["SCRIPT_CGI"].c_str());
@@ -133,36 +141,45 @@ std::string CgiHandler::executeCgi() {
 			perror("execve");
 			exit(EXIT_FAILURE);
 		}
-	} else {
-		close(outpipefd[1]); // Close the write end of the out pipe
-		close(inpipefd[0]);  // Close the read end of the in pipe
+	} else { // Parent process
+		close(fd[0]);  // Close the read end of the in pipe
 
-		// If there's body content, write it to the input of the child process.
+		// Write body content to the input of the child process, if any
 		if (!_bodyContent.empty()) {
-			write(inpipefd[1], _bodyContent.c_str(), _bodyContent.length());
+			write(fd[1], _bodyContent.c_str(), _bodyContent.length());
 		}
-		close(inpipefd[1]); // Close the write end once data is written
+		close(fd[1]); // Close the write end once data is written
 
-		if (this->_response->getRequest()->getUri() != "/list" || this->_response->getRequest()->getMethod() != "POST")
-		{
-			int status;
-			time_t start = time(NULL);
-			while (waitpid(pid, &status, WNOHANG) == 0) {
-				time_t	now = time(NULL);
-				if (difftime(now, start) > 5) {
-					kill(pid, SIGKILL);
-					_statusCode = 508;
-					break;
-				}
+		// Wait for the child process to terminate or kill it after 5 seconds
+		int status;
+		time_t start = time(NULL);
+		while (waitpid(pid, &status, WNOHANG) == 0) {
+			time_t	now = time(NULL);
+			if (difftime(now, start) > 5) {
+				kill(pid, SIGKILL);
+				_statusCode = 508;
+				break;
 			}
 		}
 
-		while ((bytesRead = read(outpipefd[0], buffer, sizeof(buffer))) > 0) {
+		close(tempFileDescriptor);
+
+		// Open the temporary file
+		FILE* tempFile = fopen(tempFileName, "r");
+		if (tempFile == NULL) {
+			throw std::runtime_error("[CGI] fopen() failed");
+		}
+
+		// Read the content of the temporary file
+		while ((bytesRead = fread(buffer, 1, sizeof(buffer), tempFile)) > 0) {
 			response.append(buffer, bytesRead);
 		}
 
-		close(outpipefd[0]);
+		// Close and delete the temporary file
+		fclose(tempFile);
+		remove(tempFileName);
 	}
+
 	freeEnv(env);
 
 	// Get the status code from the response
