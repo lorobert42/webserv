@@ -24,6 +24,8 @@
 #include "../client/Response.hpp"
 #include "../client/Request.hpp"
 
+#define D_CGI_TIMEOUT 2
+
 class Response;
 
 class CgiHandler

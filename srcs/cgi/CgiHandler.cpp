@@ -99,22 +99,12 @@ char	**CgiHandler::_getEnv() {
 }
 
 std::string CgiHandler::executeCgi() {
-<<<<<<< HEAD
-	pid_t pid;
-	int inpipefd[2]; // For writing input to CGI script
-	int outpipefd[2]; // For reading output from CGI script
-	const int BUFFER_SIZE = 4096;
-	char buffer[BUFFER_SIZE];
-	std::string response;
-	char** env = this->_getEnv();
-=======
 	pid_t		pid;
 	int			fd[2]; // For writing input to CGI script
 	char 		buffer[4096];
 	int 		bytesRead;
 	std::string	response;
 	char** 		env = this->_getEnv();
->>>>>>> 7a57d3ff1f52dfaf5906d225cd85487f3a853105
 
 	// Create a temporary file to store the output of the CGI script
 	char tempFileName[] = "/tmp/cgi_output.XXXXXX";
@@ -127,26 +117,6 @@ std::string CgiHandler::executeCgi() {
 		throw std::runtime_error("[CGI] pipe() failed");
 	}
 
-<<<<<<< HEAD
-	// Configure outpipefd[0] for non-blocking I/O
-	fcntl(outpipefd[0], F_SETFL, O_NONBLOCK);
-
-	// Create epoll instance
-	int epoll_fd = epoll_create1(0);
-	if (epoll_fd == -1) {
-		throw std::runtime_error("[CGI] epoll_create1() failed");
-	}
-
-	struct epoll_event ev;
-	ev.events = EPOLLIN; // Interested in input events
-	ev.data.fd = outpipefd[0];
-
-	if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, outpipefd[0], &ev) == -1) {
-		throw std::runtime_error("[CGI] epoll_ctl() failed");
-	}
-
-=======
->>>>>>> 7a57d3ff1f52dfaf5906d225cd85487f3a853105
 	if ((pid = fork()) == -1) {
 		throw std::runtime_error("[CGI] fork() failed");
 	}
@@ -180,57 +150,12 @@ std::string CgiHandler::executeCgi() {
 		}
 		close(fd[1]); // Close the write end once data is written
 
-<<<<<<< HEAD
-		struct epoll_event events[1];
-		int nr_events;
-		int status;
-		bool childExited = false;
-		time_t startTime = time(NULL);
-
-		while (!childExited || nr_events > 0) {
-
-			// Check for timeout
-			time_t currentTime = time(NULL);
-			if (difftime(currentTime, startTime) > 5) {
-				kill(pid, SIGKILL);
-				_statusCode = 508;
-				break;
-			}
-
-			// Check if child has exited
-			if (waitpid(pid, &status, WNOHANG) > 0) {
-				childExited = true;
-			}
-
-			// Wait for events on the epoll file descriptor
-			nr_events = epoll_wait(epoll_fd, events, 1, 1000); // 1000 ms timeout
-
-			if (nr_events == -1) {
-				if (errno != EINTR) {
-					perror("epoll_wait");
-					break;
-				}
-			} else if (nr_events > 0) {
-				if (events[0].data.fd == outpipefd[0]) {
-					int bytesRead = read(outpipefd[0], buffer, BUFFER_SIZE);
-					if (bytesRead > 0) {
-						response.append(buffer, bytesRead);
-					} else if (bytesRead == 0 ||
-							   (bytesRead == -1 && errno != EAGAIN)) {
-						break; // Pipe closed or error
-					}
-				}
-			}
-		}
-
-		close(outpipefd[0]);
-=======
 		// Wait for the child process to terminate or kill it after 5 seconds
 		int status;
 		time_t start = time(NULL);
 		while (waitpid(pid, &status, WNOHANG) == 0) {
 			time_t	now = time(NULL);
-			if (difftime(now, start) > 5) {
+			if (difftime(now, start) > D_CGI_TIMEOUT) {
 				kill(pid, SIGKILL);
 				_statusCode = 508;
 				break;
@@ -253,7 +178,6 @@ std::string CgiHandler::executeCgi() {
 		// Close and delete the temporary file
 		fclose(tempFile);
 		remove(tempFileName);
->>>>>>> 7a57d3ff1f52dfaf5906d225cd85487f3a853105
 	}
 
 	freeEnv(env);
