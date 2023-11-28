@@ -31,7 +31,7 @@
 </head>
 <body>
 	<h1><?php echo $upload_message; ?></h1>
-	<button onclick="window.location.href = '/';">Home</button>
+	<button onclick="window.location.href = '/cgi';">Home</button>
 </body>
 </html>
 <?php

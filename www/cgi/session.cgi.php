@@ -27,7 +27,7 @@
     <title>HTML Session</title>
 </head>
 <body>
-	<button onclick="window.location.href = '/';">Home</button>
+	<button onclick="window.location.href = '/cgi';">Home</button>
 
     <?php if (!isset($_COOKIE['session'])) : ?>
         <p>Welcome Guest</p>

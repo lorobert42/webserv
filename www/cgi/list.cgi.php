@@ -52,7 +52,7 @@
     <title>Uploaded files</title>
 </head>
 <body>
-	<button onclick="window.location.href = '/';">Home</button>
+	<button onclick="window.location.href = '/cgi';">Home</button>
 
     <h1>Uploaded files</h1>
 	<ul>
