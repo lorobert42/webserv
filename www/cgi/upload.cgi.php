@@ -7,6 +7,7 @@
     ob_start();
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    	$upload_message = "No file uploaded...";
 
         // File upload handling
         if (isset($_FILES['file']) && $_FILES['file']['error'] == 0) {
@@ -30,7 +31,7 @@
 </head>
 <body>
 	<h1><?php echo $upload_message; ?></h1>
-	<button onclick="window.location.href = '/';">Home</button>
+	<button onclick="window.location.href = '/cgi';">Home</button>
 </body>
 </html>
 <?php

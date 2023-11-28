@@ -13,7 +13,7 @@
     <title>Form to upload a file</title>
 </head>
 <body>
-	<button onclick="window.location.href = '/';">Home</button>
+	<button onclick="window.location.href = '/cgi';">Home</button>
 
 	<h1>Form to upload a file</h1>
 	<form method="POST" enctype="multipart/form-data" action="/upload">

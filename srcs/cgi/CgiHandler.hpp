@@ -19,8 +19,12 @@
 #include <csignal>
 #include <sys/wait.h>
 #include <sys/types.h>
+#include <sys/epoll.h>
+#include <fcntl.h>
 #include "../client/Response.hpp"
 #include "../client/Request.hpp"
+
+#define D_CGI_TIMEOUT 2
 
 class Response;
 

@@ -4,13 +4,7 @@ server:
 	timeout=60
 	client_max_body_size=5M
 
-
 	hostname:
-		route:
-			uri=/
-			path=www/cgi/
-			index=index.html
-		;
 		route:
 			uri=/cgi
 			get=true
@@ -62,6 +56,33 @@ server:
 			post=true
 			cgi_script=www/cgi/session.cgi.php
 			cgi_bin=/usr/bin/php-cgi
+		;
+		route:
+			uri=autoindex
+			path=www/hello_world/
+			index=none.html
+			autoindex=true
+		;
+		route:
+			uri=/autoindex/foo
+			path=www/autoindex/
+			index=hello.html
+			autoindex=true
+		;
+		route:
+			uri=autoindex/bar
+			path=www/autoindex/
+			index=index.html
+			autoindex=true
+		;
+		route:
+			uri=/
+			path=srcs/config/www/
+			index=index.html
+		;
+		route:
+			uri=/redirect
+			redirect=/
 		;
 	;
 ;

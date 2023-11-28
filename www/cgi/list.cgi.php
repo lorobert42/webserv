@@ -13,8 +13,19 @@
 			header('Content-Description: File Transfer');
 			header('Content-Type: application/octet-stream');
 			header('Content-Disposition: attachment; filename="' . $filename . '"');
+			header('Expires: 0');
+			header('Cache-Control: must-revalidate');
+			header('Pragma: public');
 			header('Content-Length: ' . filesize($targetFile));
-			readfile($targetFile);
+
+			$file = fopen($targetFile, "r");
+
+			while (!feof($file)) {
+				echo fread($file, 1);
+				flush();
+			}
+
+			fclose($file);
 			exit;
 		} else {
 			echo "File does not exist.";
@@ -41,7 +52,7 @@
     <title>Uploaded files</title>
 </head>
 <body>
-	<button onclick="window.location.href = '/';">Home</button>
+	<button onclick="window.location.href = '/cgi';">Home</button>
 
     <h1>Uploaded files</h1>
 	<ul>
