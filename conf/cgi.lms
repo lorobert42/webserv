@@ -7,11 +7,6 @@ server:
 
 	hostname:
 		route:
-			uri=/
-			path=www/cgi/
-			index=index.html
-		;
-		route:
 			uri=/cgi
 			get=true
 			cgi_script=www/cgi/index.cgi.php

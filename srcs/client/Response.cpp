@@ -122,7 +122,7 @@ void	Response::_createRoute()
 		}
 		if (_route == NULL)
             _route = _config_hostname->getRouteWithUri("/");
-		if (_route->getAutoindex() == false)
+		if (_route && _route->getAutoindex() == false)
 			_route = NULL;
 	}
 }
