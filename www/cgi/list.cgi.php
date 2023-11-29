@@ -33,7 +33,7 @@
 	}
 
     if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-        $filename = urldecode($_SERVER['HTTP_X_FILENAME']);
+        $filename = file_get_contents('php://input');
         $targetFile = $UPLOAD_DIR . $filename;
 
         if (file_exists($targetFile)) {
@@ -88,8 +88,8 @@
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Filename': encodeURIComponent(filename),
                 },
+				body: encodeURIComponent(filename),
             })
             .then(response => {
                 if (response.ok) {

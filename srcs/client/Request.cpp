@@ -6,7 +6,7 @@
 /*   By: lorobert <marvin@42lausanne.ch>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/11/21 11:09:06 by lorobert          #+#    #+#             */
-/*   Updated: 2023/11/21 16:21:27 by mjulliat         ###   ########.fr       */
+/*   Updated: 2023/11/29 15:24:09 by lorobert         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -198,10 +198,12 @@ int	Request::checkBody()
 		if (expectedContentLength > _client_max_body_size)
 		{
 			std::cout << "Client max body size reached" << std::endl;
-			setBody("");
 			_error = 413;
 			if (_body.length() >= expectedContentLength)
+			{
+				setBody("");
 				return (ERROR);
+			}
 			return (TOO_SHORT);
 		}
 		return (_checkBodyContentLength(expectedContentLength));
