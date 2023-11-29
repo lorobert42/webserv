@@ -25,9 +25,9 @@ OBJS		= $(SRCS:.cpp=.o)
 OBJS_TEST	= $(SRCS_TEST:.cpp=.o)
 
 ifeq ($(shell uname), Linux)
- CC			= g++ -g
+ CC			= g++ #-g
 else
- CC			= c++ -g
+ CC			= c++ #-g
 endif
 
 CPPFLAGS	= -Wall -Werror -Wextra -std=c++98 #-fsanitize=address

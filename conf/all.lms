@@ -58,7 +58,7 @@ server:
 			cgi_bin=/usr/bin/php-cgi
 		;
 		route:
-			uri=autoindex
+			uri=/autoindex
 			path=www/hello_world/
 			index=none.html
 			autoindex=true
@@ -70,7 +70,7 @@ server:
 			autoindex=true
 		;
 		route:
-			uri=autoindex/bar
+			uri=/autoindex/bar
 			path=www/autoindex/
 			index=index.html
 			autoindex=true
